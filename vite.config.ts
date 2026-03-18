@@ -1,5 +1,6 @@
 import path from 'node:path'
 import { defineConfig } from 'vite'
+import glsl from 'vite-plugin-glsl'
 
 export default defineConfig({
   server: {
@@ -14,14 +15,16 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'),
-      '@core': path.resolve(__dirname, 'src/core'),
-      '@scenes': path.resolve(__dirname, 'src/scenes'),
-      '@utils': path.resolve(__dirname, 'src/utils'),
-      '@services': path.resolve(__dirname, 'src/services'),
       '@assets': path.resolve(__dirname, 'public/assets'),
-      interfaces: path.resolve(__dirname, 'src/interfaces'),
-      types: path.resolve(__dirname, 'src/types')
+      '@core': path.resolve(__dirname, 'src/core'),
+      '@rendering': path.resolve(__dirname, 'src/core/rendering'),
+      '@ecs': path.resolve(__dirname, 'src/ecs'),
+      '@game': path.resolve(__dirname, 'src/game'),
+      '@utils': path.resolve(__dirname, 'src/utils'),
     }
-  }
+  },
+  build: {
+    target: 'esnext',
+  },
+  plugins: [glsl()]
 })

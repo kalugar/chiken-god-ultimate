@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["@webgpu/types"],
     "target": "ESNext",
     "useDefineForClassFields": true,
     "module": "ESNext",
@@ -26,13 +27,10 @@
       "@/*": ["src/*"],
       "@assets/*": ["public/assets/*"],
       "@core/*": ["src/core/*"],
-      "@services/*": ["src/services/*"],
-      "@behaviour/*": ["src/behaviour/*"],
-      "@scenes/*": ["src/scenes/*"],
-      "@utils/*": ["src/utils/*"],
-      "types/*": ["src/types/*"],
-      "interfaces/*": ["src/interfaces/*"]
+      "@game/*": ["src/game/*"],
+      "@ecs/*": ["src/ecs/*"],
+      "@rendering/*": ["src/core/rendering/*"],
     }
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "src/**/*.d.ts"]
 }

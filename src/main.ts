@@ -1,27 +1,19 @@
-import { Application, Assets, Sprite, Texture } from 'pixi.js'
+console.log('entry point')
 
-// Создаем приложение
-const app = new Application()
+import { Engine } from './core/engine'
+import { spawnAsteroidField } from '@game/level-builder'
 
-// Инициализируем приложение (Vite позволяет использовать await прямо здесь!)
-// eslint-disable-next-line unicorn/prefer-global-this
-await app.init({ background: '#1099bb', resizeTo: window })
+async function bootstrap() {
+  // Выделяем память под 100 000 объектов!
+  const engine = new Engine(200000)
 
-// Добавляем canvas в DOM
-document.querySelector('#pixi-container')!.append(app.canvas)
+  // Инициализируем WebGPU и загружаем текстуры
+  await engine.init()
 
-// 👇 МАГИЯ ТИПОВ ЗДЕСЬ: Явно указываем <Texture>, чтобы избежать any
-const texture = await Assets.load<Texture>('/assets/bunny.png')
+  // Спавним 50 000 астероидов за долю секунды
+  spawnAsteroidField(engine, 100000)
 
-// Теперь TS точно знает, что texture - это Texture, и Sprite не будет ругаться
-const bunny = new Sprite(texture)
+  console.log('🚀 Движок успешно запущен! WebGPU/WebGL2 инстансинг работает.')
+}
 
-// Центрируем
-bunny.anchor.set(0.5)
-bunny.position.set(app.screen.width / 2, app.screen.height / 2)
-app.stage.addChild(bunny)
-
-// Анимация
-app.ticker.add((time) => {
-  bunny.rotation += 0.1 * time.deltaTime
-})
+bootstrap()

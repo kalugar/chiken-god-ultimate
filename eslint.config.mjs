@@ -12,7 +12,7 @@ import { defineConfig, globalIgnores } from 'eslint/config'
  * @type {import('eslint').Linter.Config[]}
  */
 export default defineConfig([
-  globalIgnores(['dist', 'build', 'node_modules', 'eslint.config.mjs', 'builder/**/*.js']),
+  globalIgnores(['dist', 'build', 'node_modules', 'eslint.config.mjs', 'builder/**/*.js', 'src/**/*.wgsl']),
 
   js.configs.recommended,
   tseslint.configs.recommendedTypeChecked,
@@ -45,6 +45,7 @@ export default defineConfig([
       'no-console': 'off',
       'no-duplicate-imports': 'error',
       'no-new': 'warn',
+      'no-new-buffer': 'warn',
       'no-loop-func': 'error',
       'unicorn/no-process-exit': 'off',
       'unicorn/no-null': 'off',

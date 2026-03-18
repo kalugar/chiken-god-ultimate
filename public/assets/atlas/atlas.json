@@ -1,0 +1,28 @@
+{"frames": {
+
+"ornament_025":
+{
+	"frame": {"x":1,"y":1,"w":243,"h":180},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":243,"h":180},
+	"sourceSize": {"w":243,"h":180}
+},
+"ornament_0125":
+{
+	"frame": {"x":1,"y":181,"w":122,"h":90},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":122,"h":90},
+	"sourceSize": {"w":122,"h":90}
+}},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.1",
+	"image": "atlas.png",
+	"format": "RGBA8888",
+	"size": {"w":245,"h":272},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:9f228c822f55f8cb9ed4f850d7985d52:dca65dc08b9874f3245504411d88dce2:cbce6b53f0f49e0bf15173c25c41f876$"
+}
+}
