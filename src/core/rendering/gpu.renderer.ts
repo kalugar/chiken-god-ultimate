@@ -1,13 +1,23 @@
-import { Buffer, Mesh, Geometry, Shader, GpuProgram, TextureSource, GlProgram } from 'pixi.js'
+import {
+  Buffer,
+  Mesh,
+  Geometry,
+  Shader,
+  GpuProgram,
+  TextureSource,
+  GlProgram,
+  RenderGroup,
+  Container
+} from 'pixi.js'
 
-import type { ECSRegistry } from '@ecs/ecs-registry'
+import type { ECSRegistry } from '@ecs/ecs.registry'
 import type { System } from '@ecs/system'
 
 import unifiedWgsl from '@rendering/shaders/sprite.wgsl?raw'
 import glslFragment from '@rendering/shaders/sprite.frag.glsl?raw'
 import glslVertex from '@rendering/shaders/sprite.vert.glsl?raw'
 
-import { ComponentMask } from '@ecs/components/component-mask'
+import { ComponentMask } from '@ecs/components/component.mask'
 import {
   STRIDE_BYTES,
   OFFSET_X,
@@ -18,7 +28,7 @@ import {
   OFFSET_UV_U,
   OFFSET_ORIG_W,
   OFFSET_COLOR_32
-} from '@ecs/components/memory-layout'
+} from '@ecs/components/memory.layout'
 
 export class GPURenderSystem implements System {
   public readonly mesh: Mesh<Geometry, Shader>
@@ -27,7 +37,7 @@ export class GPURenderSystem implements System {
   // Система рендера берет только те сущности, которые имеют координаты и цвет
   private readonly REQUIRED_MASK = ComponentMask.Transform | ComponentMask.Render
 
-  constructor(registry: ECSRegistry, atlasTexture: TextureSource) {
+  constructor(registry: ECSRegistry, atlasTexture: TextureSource, root: Container | RenderGroup) {
     // 1. СОЗДАЕМ БУФЕР PIXIJS ПОВЕРХ ПАМЯТИ ECS
     // Мы отдаем Pixi ссылку на f32-представление нашей памяти
     this.gpuBuffer = new Buffer({
@@ -151,6 +161,8 @@ export class GPURenderSystem implements System {
     })
 
     this.mesh = new Mesh<Geometry, Shader>({ geometry, shader })
+
+    root.addChild(this.mesh)
   }
 
   /**

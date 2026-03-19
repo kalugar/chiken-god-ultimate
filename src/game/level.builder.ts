@@ -1,13 +1,13 @@
-import type { Engine } from '@/core/engine'
-import { FastSprite } from '@ecs/components/fast-sprite'
-import { ComponentMask } from '@ecs/components/component-mask'
+import type { Engine } from '@core/engine'
+import { FastSprite } from '@ecs/components/fast.sprite'
+import { ComponentMask } from '@ecs/components/component.mask'
 import {
   OFFSET_ANG_VEL,
   OFFSET_VEL_X,
   OFFSET_VEL_Y,
   PHYSICS_STRIDE_FLOATS,
   STRIDE_FLOATS
-} from '@ecs/components/memory-layout'
+} from '@ecs/components/memory.layout'
 
 export function spawnAsteroidField(engine: Engine, count: number) {
   const { app, ecs, frames } = engine

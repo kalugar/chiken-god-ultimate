@@ -20,11 +20,11 @@ export default defineConfig({
       '@rendering': path.resolve(__dirname, 'src/core/rendering'),
       '@ecs': path.resolve(__dirname, 'src/ecs'),
       '@game': path.resolve(__dirname, 'src/game'),
-      '@utils': path.resolve(__dirname, 'src/utils'),
+      '@utils': path.resolve(__dirname, 'src/utils')
     }
   },
   build: {
-    target: 'esnext',
+    target: 'esnext'
   },
   plugins: [glsl()]
 })

@@ -1,6 +1,6 @@
 import type { System } from '@ecs/system'
-import type { ECSRegistry } from '@ecs/ecs-registry'
-import { ComponentMask } from '@ecs/components/component-mask'
+import type { ECSRegistry } from '@ecs/ecs.registry'
+import { ComponentMask } from '@ecs/components/component.mask'
 import {
   STRIDE_FLOATS,
   PHYSICS_STRIDE_FLOATS,
@@ -8,7 +8,7 @@ import {
   OFFSET_Y,
   OFFSET_VEL_X,
   OFFSET_VEL_Y
-} from '@ecs/components/memory-layout'
+} from '@ecs/components/memory.layout'
 
 export class InteractionSystem implements System {
   private readonly REQUIRED_MASK = ComponentMask.Transform | ComponentMask.Velocity

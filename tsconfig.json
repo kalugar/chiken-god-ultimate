@@ -24,12 +24,11 @@
     "noUncheckedSideEffectImports": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
       "@assets/*": ["public/assets/*"],
       "@core/*": ["src/core/*"],
       "@game/*": ["src/game/*"],
       "@ecs/*": ["src/ecs/*"],
-      "@rendering/*": ["src/core/rendering/*"],
+      "@rendering/*": ["src/core/rendering/*"]
     }
   },
   "include": ["src/**/*", "src/**/*.d.ts"]

@@ -1,5 +1,5 @@
-import type { ECSRegistry } from '@ecs/ecs-registry'
-import type { FrameRegistry } from '@rendering/frame-registry'
+import type { ECSRegistry } from '@ecs/ecs.registry'
+import type { FrameRegistry } from '@core/rendering/frame.registry'
 
 import {
   STRIDE_FLOATS,
@@ -11,7 +11,7 @@ import {
   OFFSET_COLOR_32,
   OFFSET_ORIG_W,
   OFFSET_ORIG_H
-} from './memory-layout'
+} from './memory.layout'
 
 /**
  * Flyweight/Proxy объект.

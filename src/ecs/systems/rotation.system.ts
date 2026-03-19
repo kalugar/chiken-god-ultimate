@@ -1,12 +1,12 @@
 import type { System } from '@ecs/system'
-import type { ECSRegistry } from '@ecs/ecs-registry'
-import { ComponentMask } from '@ecs/components/component-mask'
+import type { ECSRegistry } from '@ecs/ecs.registry'
+import { ComponentMask } from '@ecs/components/component.mask'
 import {
   STRIDE_FLOATS,
   OFFSET_ROTATION,
   PHYSICS_STRIDE_FLOATS,
   OFFSET_ANG_VEL
-} from '@ecs/components/memory-layout'
+} from '@ecs/components/memory.layout'
 
 export class RotationSystem implements System {
   // Вращаем всё, что имеет Transform (т.е. всё, что рендерится)

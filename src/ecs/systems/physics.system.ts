@@ -1,14 +1,14 @@
-import type { ECSRegistry } from '@ecs/ecs-registry'
+import type { ECSRegistry } from '@ecs/ecs.registry'
 import type { System } from '@ecs/system'
 
-import { ComponentMask } from '@ecs/components/component-mask'
+import { ComponentMask } from '@ecs/components/component.mask'
 import {
   OFFSET_VEL_X,
   OFFSET_VEL_Y,
   OFFSET_X,
   OFFSET_Y,
   STRIDE_FLOATS
-} from '@ecs/components/memory-layout'
+} from '@ecs/components/memory.layout'
 
 export class PhysicsSystem implements System {
   private readonly REQUIRED_MASK = ComponentMask.Transform | ComponentMask.Velocity

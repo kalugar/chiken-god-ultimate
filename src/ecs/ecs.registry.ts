@@ -1,5 +1,5 @@
-import { ComponentMask } from '@ecs/components/component-mask'
-import { STRIDE_BYTES } from '@ecs/components/memory-layout'
+import { ComponentMask } from '@ecs/components/component.mask'
+import { STRIDE_BYTES } from '@ecs/components/memory.layout'
 
 export class ECSRegistry {
   private readonly availableIds: number[] = []

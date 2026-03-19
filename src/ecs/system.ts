@@ -1,4 +1,4 @@
-import type { ECSRegistry } from "@ecs/ecs-registry";
+import type { ECSRegistry } from '@ecs/ecs.registry'
 
 /**
  * Базовый контракт для всех логических систем.

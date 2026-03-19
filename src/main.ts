@@ -1,11 +1,12 @@
 console.log('entry point')
 
-import { Engine } from './core/engine'
-import { spawnAsteroidField } from '@game/level-builder'
+import engineConfig from '@core/engine.config'
+import { Engine } from '@core/engine'
+import { spawnAsteroidField } from '@game/level.builder'
 
 async function bootstrap() {
   // Выделяем память под 100 000 объектов!
-  const engine = new Engine(200000)
+  const engine = new Engine(engineConfig, 200000)
 
   // Инициализируем WebGPU и загружаем текстуры
   await engine.init()
