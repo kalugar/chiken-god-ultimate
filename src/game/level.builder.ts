@@ -1,5 +1,5 @@
 import type { Engine } from '@core/engine'
-import { FastSprite } from '@ecs/components/fast.sprite'
+import { FastSprite } from '@utils/sprite/fast.sprite'
 import { ComponentMask } from '@ecs/components/component.mask'
 import {
   OFFSET_ANG_VEL,
@@ -30,9 +30,10 @@ export function spawnAsteroidField(engine: Engine, count: number) {
 
     // Переводим полярные координаты в декартовы X/Y
     sprite.x = centerX + Math.cos(angle) * radius
-    sprite.y = centerY / 1.5 + Math.sin(angle) * radius
-    sprite.scaleX = 0.5
-    sprite.scaleY = 0.5
+    sprite.y = centerY + Math.sin(angle) * radius
+
+    sprite.scaleX = 1
+    sprite.scaleY = 1
 
     sprite.rotation = Math.random() * Math.PI * 2
 

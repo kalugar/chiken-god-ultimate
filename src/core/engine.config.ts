@@ -1,5 +1,5 @@
 export default {
-  backgroundColor: '#52f897ff',
+  backgroundColor: '#1099bb',
   autoDensity: true,
   antialias: true,
   hello: true,

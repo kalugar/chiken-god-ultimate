@@ -20,7 +20,8 @@ export default defineConfig({
       '@rendering': path.resolve(__dirname, 'src/core/rendering'),
       '@ecs': path.resolve(__dirname, 'src/ecs'),
       '@game': path.resolve(__dirname, 'src/game'),
-      '@utils': path.resolve(__dirname, 'src/utils')
+      '@utils': path.resolve(__dirname, 'src/utils'),
+      '@services': path.resolve(__dirname, 'src/services')
     }
   },
   build: {

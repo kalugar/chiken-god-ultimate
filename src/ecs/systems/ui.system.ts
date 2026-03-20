@@ -1,4 +1,4 @@
-import { Container, RenderGroup, Text, TextStyle } from 'pixi.js'
+import { Container, Text, TextStyle } from 'pixi.js'
 import type { System } from '@ecs/system'
 import type { ECSRegistry } from '@ecs/ecs.registry'
 
@@ -8,7 +8,7 @@ export class UISystem implements System {
   private updateTimer: number = 0
   private formatter = new Intl.NumberFormat('de-DE')
 
-  constructor(root: Container | RenderGroup) {
+  constructor(root: Container) {
     const style = new TextStyle({
       fontFamily: 'monospace', // Моноширинный шрифт идеален для дебаг-цифр
       fontSize: 14,

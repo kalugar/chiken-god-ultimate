@@ -11,7 +11,7 @@ import {
   OFFSET_COLOR_32,
   OFFSET_ORIG_W,
   OFFSET_ORIG_H
-} from './memory.layout'
+} from '@ecs/components/memory.layout'
 
 /**
  * Flyweight/Proxy объект.

@@ -6,8 +6,9 @@ import {
   GpuProgram,
   TextureSource,
   GlProgram,
-  RenderGroup,
-  Container
+  Container,
+  UniformGroup,
+  Matrix
 } from 'pixi.js'
 
 import type { ECSRegistry } from '@ecs/ecs.registry'
@@ -33,38 +34,19 @@ import {
 export class GPURenderSystem implements System {
   public readonly mesh: Mesh<Geometry, Shader>
   private readonly gpuBuffer: Buffer
+  // private transformUniforms: UniformGroup
+  // private meshMatrix: Matrix = new Matrix()
 
-  // Система рендера берет только те сущности, которые имеют координаты и цвет
   private readonly REQUIRED_MASK = ComponentMask.Transform | ComponentMask.Render
 
-  constructor(registry: ECSRegistry, atlasTexture: TextureSource, root: Container | RenderGroup) {
-    // 1. СОЗДАЕМ БУФЕР PIXIJS ПОВЕРХ ПАМЯТИ ECS
-    // Мы отдаем Pixi ссылку на f32-представление нашей памяти
+  constructor(registry: ECSRegistry, atlasTexture: TextureSource, root: Container) {
     this.gpuBuffer = new Buffer({
       data: registry.f32,
       usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
     })
 
-    // 2. БАЗОВАЯ ГЕОМЕТРИЯ (Квадрат 1x1)
-    const vertexData = new Float32Array([
-      -0.5,
-      -0.5, // Вершина 0
-      0.5,
-      -0.5, // Вершина 1
-      0.5,
-      0.5, // Вершина 2
-      -0.5,
-      0.5 // Вершина 3
-    ])
-
-    const indexData = new Uint16Array([
-      0,
-      1,
-      2, // Треугольник 1
-      0,
-      2,
-      3 // Треугольник 2
-    ])
+    const vertexData = new Float32Array([-0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, 0.5])
+    const indexData = new Uint16Array([0, 1, 2, 0, 2, 3])
 
     // 2. Формируем геометрию по новому API PixiJS 8
     const geometry = new Geometry()
@@ -134,8 +116,6 @@ export class GPURenderSystem implements System {
       instance: true
     })
 
-    // Создаем WebGPU программу из одного файла
-
     const glProgram = GlProgram.from({
       vertex: glslVertex,
       fragment: glslFragment
@@ -143,13 +123,17 @@ export class GPURenderSystem implements System {
     const gpuProgram = GpuProgram.from({
       vertex: {
         source: unifiedWgsl,
-        entryPoint: 'vs_main' // Указываем точку входа для вершин!
+        entryPoint: 'vs_main'
       },
       fragment: {
         source: unifiedWgsl,
-        entryPoint: 'fs_main' // Указываем точку входа для пикселей!
+        entryPoint: 'fs_main'
       }
     })
+
+    // this.transformUniforms = new UniformGroup({
+    //   uMyMatrix: { value: this.meshMatrix, type: 'mat3x3<f32>' }
+    // })
 
     const shader = new Shader({
       glProgram,
@@ -157,6 +141,7 @@ export class GPURenderSystem implements System {
       resources: {
         uTexture: atlasTexture,
         uSampler: atlasTexture.style
+        // uTransform: this.transformUniforms
       }
     })
 
@@ -165,22 +150,11 @@ export class GPURenderSystem implements System {
     root.addChild(this.mesh)
   }
 
-  /**
-   * Вызывается каждый кадр в главном цикле
-   */
   public update(registry: ECSRegistry, deltaTime: number): void {
-    // Мы могли бы реализовать здесь компактификацию (собрать все отфильтрованные
-    // сущности в плотный массив без пустых дыр), но для начала мы просто
-    // заставляем GPU пробежаться по всему массиву.
-    // Если сущность мертва (aPackedColor.a == 0), GPU просто схлопнет её вершину.
-
-    // Указываем PixiJS, сколько инстансов нужно нарисовать
     this.mesh.geometry.instanceCount = registry.highestEntityId + 1
 
-    // ОТПРАВКА ДАННЫХ В ВИДЕОКАРТУ!
-    // Это главная команда, которая льет мегабайты из RAM в VRAM.
     this.gpuBuffer.update()
-
-    console.log()
+    // this.meshMatrix.copyFrom(this.mesh.worldTransform)
+    // this.transformUniforms.update()
   }
 }

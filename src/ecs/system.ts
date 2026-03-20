@@ -9,5 +9,6 @@ export interface System {
    * @param registry Главный менеджер ECS (хранилище памяти)
    * @param deltaTime Время, прошедшее с предыдущего кадра (в секундах)
    */
+  paused?: boolean
   update(registry: ECSRegistry, deltaTime: number): void
 }
