@@ -1,3 +1,2 @@
-export { PhysicsSystem } from './physics.system'
-export { RotationSystem } from './rotation.system'
-export { UISystem } from './ui.system'
+export * from './movement.system.ts'
+export * from './render.system.ts'

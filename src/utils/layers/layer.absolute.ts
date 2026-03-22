@@ -1,3 +1,4 @@
+import type { RectangleSize } from '@app-types'
 import BaseLayer from './layer.base'
 
 export default class AbsoluteLayer extends BaseLayer {

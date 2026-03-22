@@ -2,6 +2,7 @@ import { Container, Graphics } from 'pixi.js'
 import { BaseService } from './service.base'
 import AbsoluteLayer from '../utils/layers/layer.absolute'
 import BaseLayer from '../utils/layers/layer.base'
+import type { LayersOptions, RectangleSize } from '@app-types'
 
 export default class LayersService extends BaseService {
   #root: Container

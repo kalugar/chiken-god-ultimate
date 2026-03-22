@@ -1,3 +1,4 @@
+import type { RectangleSize } from '@app-types'
 import { Container } from 'pixi.js'
 
 export default class BaseLayer extends Container {

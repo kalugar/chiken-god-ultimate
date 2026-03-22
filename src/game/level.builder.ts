@@ -1,56 +1,132 @@
+import { Application, Assets, Container } from 'pixi.js'
+
+// Ядро ECS
+import { World } from '@ecs/world'
+import type { ViewData } from '@ecs/components'
+// import { InputManager } from '@ecs/utils/input-manager'
+// import { EntityFactory } from '@ecs/utils/entity-factory'
+
+// Чертежи (Blueprints)
+import { createPlayer } from '@utils/factory/blueprints/player.blueprint'
+import { createEnemy } from '@utils/factory/blueprints/enemy.blueprint'
+import { createBullet } from '@utils/factory/blueprints/bullet.blueprint'
+
+// Системы
+// import { InputSystem } from '@ecs/systems/input.system'
+import { MovementSystem, RenderSystem } from '@ecs/systems'
+import { EntityFactory } from '@utils/factory'
 import type { Engine } from '@core/engine'
-import { FastSprite } from '@utils/sprite/fast.sprite'
-import { ComponentMask } from '@ecs/components/component.mask'
-import {
-  OFFSET_ANG_VEL,
-  OFFSET_VEL_X,
-  OFFSET_VEL_Y,
-  PHYSICS_STRIDE_FLOATS,
-  STRIDE_FLOATS
-} from '@ecs/components/memory.layout'
+// import { CollisionSystem } from '@ecs/systems/collision.system'
+// import { LifespanSystem } from '@ecs/systems/lifespan.system'; // Если напишем
 
-export function spawnAsteroidField(engine: Engine, count: number) {
-  const { app, ecs, frames } = engine
-  const centerX = app.screen.width / 2
-  const centerY = app.screen.height / 2
+export async function startLevel(engine: Engine) {
+  // ==========================================
+  // 1. ИНИЦИАЛИЗАЦИЯ PIXI.JS V8
+  // ==========================================
+  // const app = new Application()
+  // await app.init({
+  //   width: 800,
+  //   height: 600,
+  //   backgroundColor: 0x1a1a1a
+  // })
+  // document.body.appendChild(app.canvas)
 
-  for (let i = 0; i < count; i++) {
-    // 1. Выделяем память под сущность
-    const id = ecs.createEntity()
+  // Оптимизированный слой рендера (секрет высокого FPS в v8)
+  // const gameLayer = new Container()
+  // gameLayer.isRenderGroup = true
+  // app.stage.addChild(gameLayer)
 
-    // 2. Навешиваем нужные системы (Физика + Рендер)
-    ecs.addComponent(id, ComponentMask.Transform | ComponentMask.Render | ComponentMask.Velocity)
+  // Загрузка ресурсов
+  const { layers, world } = engine
+  const bunnyTexture = await Assets.load('https://pixijs.com/assets/bunny.png')
+  const textures = { player: bunnyTexture }
 
-    // 3. Используем Proxy для удобной настройки
-    const sprite = new FastSprite(ecs, id)
+  // ==========================================
+  // 2. ИНИЦИАЛИЗАЦИЯ ECS И ФАБРИКИ
+  // ==========================================
+  // const world = new World(5000) // Резервируем память под 5000 объектов
+  // const inputManager = new InputManager()
+  const factory = new EntityFactory(world, layers.getLayerByName('world'), textures)
 
-    const angle = Math.random() * Math.PI * 2
-    // Случайное расстояние от центра (от 50 до 400 пикселей)
-    const radius = 50 + Math.random() * 125
+  // Регистрируем чертежи объектов
+  factory
+    .register('player', createPlayer)
+    .register('enemy', createEnemy)
+    .register('bullet', createBullet)
 
-    // Переводим полярные координаты в декартовы X/Y
-    sprite.x = centerX + Math.cos(angle) * radius
-    sprite.y = centerY + Math.sin(angle) * radius
+  // ==========================================
+  // 3. ПОДКЛЮЧЕНИЕ СИСТЕМ (Порядок важен!)
+  // ==========================================
+  // world.addSystem(new InputSystem(inputManager, 5)) // Читаем ввод
+  world.addSystem(new MovementSystem()) // Двигаем объекты
+  // world.addSystem(new CollisionSystem(world)) // Проверяем столкновения
+  // world.addSystem(new LifespanSystem(world));     // Убиваем старые пули
+  world.addSystem(new RenderSystem()) // Рисуем результат
 
-    sprite.scaleX = 1
-    sprite.scaleY = 1
+  // ==========================================
+  // 4. СБОРКА МУСОРА (GC-FREE ПОДХОД)
+  // ==========================================
+  // Когда Мир убивает сущность, мы должны вернуть её графику в пул
+  // world.events.on('ON_ENTITY_DESTROYED', (entity) => {
+  //   if (entity.has('View')) {
+  //     const view = entity.get<ViewData>('View')
+  //     if (view.release) {
+  //       view.release() // Возвращаем в ObjectPool
+  //     } else {
+  //       // Если пула нет, удаляем навсегда (например, для уникальных боссов)
+  //       view.node.removeFromParent()
+  //       view.node.destroy()
+  //     }
+  //   }
+  // })
 
-    sprite.rotation = Math.random() * Math.PI * 2
+  // ==========================================
+  // 5. СОЗДАНИЕ ИГРОВОГО МИРА (СПАВН)
+  // ==========================================
+  const player = factory.create('player', { x: 0, y: 0 })
 
-    // Случайный цвет (Tint)
-    // sprite.setTintAndAlpha(Math.random() * 0xffffff, 1.0)
-
-    sprite.setTint(0xffffff)
-    sprite.setAlpha(1)
-    // Выбираем кадр из атласа (допустим, у нас есть 3 вида астероидов)
-    const frameName = `ornament_0125`
-    sprite.setFrame(frameName, frames)
-
-    // 4. Задаем физику (Сырой доступ для производительности)
-    // Скорость от -50 до 50 пикселей в секунду
-    const physOffset = id * PHYSICS_STRIDE_FLOATS
-    ecs.velocityF32[physOffset + OFFSET_VEL_X] = (Math.random() - 0.5) * 200
-    ecs.velocityF32[physOffset + OFFSET_VEL_Y] = (Math.random() - 0.5) * 200
-    ecs.velocityF32[physOffset + OFFSET_ANG_VEL] = (Math.random() - 0.5) * Math.PI * 4
+  // Спавним 10 врагов в случайных точках
+  for (let i = 0; i < 10; i++) {
+    factory.create('enemy', {
+      x: Math.random() * 800,
+      y: Math.random() * 600,
+      speed: 1 + Math.random() * 2
+    })
   }
+
+  // ==========================================
+  // 6. ИНТЕРАКТИВ (СТРЕЛЬБА ПО КЛИКУ)
+  // ==========================================
+  window.addEventListener('mousedown', (e) => {
+    if (!player || player.isDestroyed) return
+
+    // Получаем координаты игрока для старта пули
+    const pTransform = player.get<{ x: number; y: number }>('Transform')
+
+    // Вычисляем вектор направления (от игрока к мыши)
+    const dx = e.clientX - pTransform.x
+    const dy = e.clientY - pTransform.y
+    const length = Math.sqrt(dx * dx + dy * dy)
+
+    // Спавним пулю через фабрику (пулы отработают автоматически внутри чертежа)
+    factory.create('bullet', {
+      x: pTransform.x,
+      y: pTransform.y,
+      dirX: dx / length,
+      dirY: dy / length,
+      speed: 15
+    })
+  })
+
+  // ==========================================
+  // 7. ИГРОВОЙ ЦИКЛ (GAMELOOP)
+  // ==========================================
+  // app.ticker.add((ticker) => {
+  //   // ticker.deltaTime в Pixi v8 = 1 при 60 FPS.
+  //   // Передаем его в ECS, чтобы движение было плавным при любой герцовке монитора.
+  //   world.update(ticker.deltaTime)
+  // })
 }
+
+// Запуск
+// initGame()
