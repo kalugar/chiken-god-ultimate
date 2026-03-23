@@ -1,7 +1,8 @@
-import { Container, Texture } from 'pixi.js'
-import { World } from '@ecs/world'
-import { Entity } from '@ecs/entity'
 import type { EntityArgs, FactoryContext, Assembler } from '@app-types'
+
+import { Entity } from '@ecs/entity'
+import { World } from '@ecs/world'
+import { Container, Texture } from 'pixi.js'
 
 export class EntityFactory {
   private context: FactoryContext

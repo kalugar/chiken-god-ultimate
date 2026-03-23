@@ -1,16 +1,16 @@
-import engineConfig from '@core/engine.config'
 import { Engine } from '@core/engine'
+import engineConfig from '@core/engine.config'
 import { startLevel } from '@game/level.builder'
-// import { spawnAsteroidField } from '@game/level.builder'
 
-const engine = new Engine(engineConfig, 200000)
+const engine = new Engine(engineConfig, 200_000)
 
-// Инициализируем WebGPU и загружаем текстуры
-await engine.init().then(() => engine.start())
-// ;(globalThis as any).eee = engine
+try {
+  await engine.init()
+  await engine.start()
+  console.log('🚀 Движок успешно запущен:')
+} catch (error) {
+  console.error('Критическая ошибка при запуске движка:', error)
+  throw error
+}
 
-// Спавним 50 000 астероидов за долю секунды
-// spawnAsteroidField(engine, 100000)
-startLevel(engine)
-
-console.log('🚀 Движок успешно запущен! WebGPU/WebGL2 инстансинг работает.')
+await startLevel(engine)

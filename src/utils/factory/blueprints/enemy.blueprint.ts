@@ -1,5 +1,3 @@
-import { Graphics } from 'pixi.js'
-import { ObjectPool } from '@utils/ecs/object.pool'
 import type { Assembler } from '@app-types'
 import type {
   // ComponentMask,
@@ -8,17 +6,20 @@ import type {
   ViewData
   // ColliderData
 } from '@ecs/components'
-import { ComponentMask } from '@ecs/components/component.mask'
 
-export const createEnemy: Assembler<'enemy'> = (ctx, args) => {
+import { ComponentMask } from '@ecs/components/component.mask'
+import { ObjectPool } from '@utils/ecs/object.pool'
+import { Graphics } from 'pixi.js'
+
+export const createEnemy: Assembler<'enemy'> = (context, args) => {
   // 1. Инициализируем пул врагов, если его еще нет в этом контексте
-  if (!ctx.pools['enemy']) {
-    ctx.pools['enemy'] = new ObjectPool<Graphics>(
+  if (!context.pools['enemy']) {
+    context.pools['enemy'] = new ObjectPool<Graphics>(
       () => {
         // Рисуем красный круг радиусом 15px
-        const g = new Graphics().circle(0, 0, 15).fill(0xff0000)
+        const g = new Graphics().circle(0, 0, 15).fill(0xff_00_00)
         g.visible = false
-        ctx.gameLayer.addChild(g)
+        context.gameLayer.addChild(g)
         return g
       },
       (g) => {
@@ -28,10 +29,10 @@ export const createEnemy: Assembler<'enemy'> = (ctx, args) => {
     )
   }
 
-  const pool = ctx.pools['enemy'] as ObjectPool<Graphics>
+  const pool = context.pools['enemy'] as ObjectPool<Graphics>
 
   // 2. Создаем сущность
-  const entity = ctx.world.createEntity()
+  const entity = context.world.createEntity()
   if (!entity) return null
 
   // 3. Достаем графику из пула
@@ -41,7 +42,7 @@ export const createEnemy: Assembler<'enemy'> = (ctx, args) => {
   graphics.y = args.y
 
   // 4. Навешиваем компоненты
-  ctx.world.addComponent<TransformData>(entity, 'Transform', {
+  context.world.addComponent<TransformData>(entity, 'Transform', {
     x: args.x,
     y: args.y,
     rotation: 0
@@ -50,19 +51,19 @@ export const createEnemy: Assembler<'enemy'> = (ctx, args) => {
   // Даем врагу базовую скорость (если передана в аргументах)
   // Направление можно будет менять отдельной системой EnemyAISystem
   const speed = args.speed || 0
-  ctx.world.addComponent<VelocityData>(entity, 'Velocity', { vx: 0, vy: speed })
+  context.world.addComponent<VelocityData>(entity, 'Velocity', { vx: 0, vy: speed })
 
-  // ctx.world.addComponent<ColliderData>(entity, 'Collider', { radius: 15 })
-  // ctx.world.addComponent<HealthData>(entity, 'Health', { current: 30, max: 30 })
+  // context.world.addComponent<ColliderData>(entity, 'Collider', { radius: 15 })
+  // context.world.addComponent<HealthData>(entity, 'Health', { current: 30, max: 30 })
 
   // 5. Компонент View с функцией ВОЗВРАТА В ПУЛ
-  ctx.world.addComponent<ViewData<Graphics>>(entity, 'View', {
+  context.world.addComponent<ViewData<Graphics>>(entity, 'View', {
     node: graphics,
     release: () => pool.release(graphics)
   })
 
   // 6. Вешаем тег Врага
-  ctx.world.addTag(entity, ComponentMask.Enemy)
+  context.world.addTag(entity, ComponentMask.Enemy)
 
   return entity
 }

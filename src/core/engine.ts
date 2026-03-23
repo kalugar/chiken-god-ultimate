@@ -1,11 +1,12 @@
+import type { EngineState } from '@app-types'
 import type { System } from '@ecs/system'
 import type { ApplicationOptions } from 'pixi.js'
 
-import { Application, UPDATE_PRIORITY } from 'pixi.js'
-import LayersService from '@services/sevice.layers'
-import { LOGICAL_SIZE } from './constants'
-import type { EngineState } from '@app-types'
 import { World } from '@ecs/world'
+import LayersService from '@services/sevice.layers'
+import { Application, UPDATE_PRIORITY } from 'pixi.js'
+
+import { LOGICAL_SIZE } from './constants'
 
 export class Engine {
   public readonly app: Application
@@ -36,7 +37,7 @@ export class Engine {
 
     // this.systems = []
 
-    // console.log(this.layers.getLayerByName('world'))
+    // console.log(this.layers.getLayerByLabel('world'))
 
     this.resize()
     this.state.isRunning = true

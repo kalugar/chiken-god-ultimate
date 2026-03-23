@@ -1,21 +1,19 @@
-import { Application, Assets, Container } from 'pixi.js'
-
-// Ядро ECS
-import { World } from '@ecs/world'
+import type { Engine } from '@core/engine'
 import type { ViewData } from '@ecs/components'
-// import { InputManager } from '@ecs/utils/input-manager'
-// import { EntityFactory } from '@ecs/utils/entity-factory'
-
-// Чертежи (Blueprints)
-import { createPlayer } from '@utils/factory/blueprints/player.blueprint'
-import { createEnemy } from '@utils/factory/blueprints/enemy.blueprint'
-import { createBullet } from '@utils/factory/blueprints/bullet.blueprint'
 
 // Системы
 // import { InputSystem } from '@ecs/systems/input.system'
 import { MovementSystem, RenderSystem } from '@ecs/systems'
+// import { InputManager } from '@ecs/utils/input-manager'
+// import { EntityFactory } from '@ecs/utils/entity-factory'
+// Ядро ECS
+import { World } from '@ecs/world'
 import { EntityFactory } from '@utils/factory'
-import type { Engine } from '@core/engine'
+import { createBullet } from '@utils/factory/blueprints/bullet.blueprint'
+// Чертежи (Blueprints)
+import { createEnemy } from '@utils/factory/blueprints/enemy.blueprint'
+import { createPlayer } from '@utils/factory/blueprints/player.blueprint'
+import { Application, Assets, Container, Texture } from 'pixi.js'
 // import { CollisionSystem } from '@ecs/systems/collision.system'
 // import { LifespanSystem } from '@ecs/systems/lifespan.system'; // Если напишем
 
@@ -38,7 +36,7 @@ export async function startLevel(engine: Engine) {
 
   // Загрузка ресурсов
   const { layers, world } = engine
-  const bunnyTexture = await Assets.load('https://pixijs.com/assets/bunny.png')
+  const bunnyTexture = await Assets.load<Texture>('https://pixijs.com/assets/bunny.png')
   const textures = { player: bunnyTexture }
 
   // ==========================================
@@ -46,7 +44,7 @@ export async function startLevel(engine: Engine) {
   // ==========================================
   // const world = new World(5000) // Резервируем память под 5000 объектов
   // const inputManager = new InputManager()
-  const factory = new EntityFactory(world, layers.getLayerByName('world'), textures)
+  const factory = new EntityFactory(world, layers.getLayerByLabel('world'), textures)
 
   // Регистрируем чертежи объектов
   factory
@@ -97,7 +95,7 @@ export async function startLevel(engine: Engine) {
   // ==========================================
   // 6. ИНТЕРАКТИВ (СТРЕЛЬБА ПО КЛИКУ)
   // ==========================================
-  window.addEventListener('mousedown', (e) => {
+  globalThis.addEventListener('mousedown', (e) => {
     if (!player || player.isDestroyed) return
 
     // Получаем координаты игрока для старта пули
@@ -106,7 +104,7 @@ export async function startLevel(engine: Engine) {
     // Вычисляем вектор направления (от игрока к мыши)
     const dx = e.clientX - pTransform.x
     const dy = e.clientY - pTransform.y
-    const length = Math.sqrt(dx * dx + dy * dy)
+    const length = Math.hypot(dx, dy)
 
     // Спавним пулю через фабрику (пулы отработают автоматически внутри чертежа)
     factory.create('bullet', {

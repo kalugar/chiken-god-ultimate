@@ -2,6 +2,9 @@ import { System } from '@ecs/system'
 import { ComponentMask } from '@ecs/components/component.mask'
 import { Entity } from '@ecs/entity'
 import type { TransformData, VelocityData } from '@ecs/components'
+import { RenderSystem } from './render.system'
+
+RenderSystem
 
 export class MovementSystem extends System {
   constructor() {

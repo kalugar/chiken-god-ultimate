@@ -1,7 +1,7 @@
-import { Container, Texture } from 'pixi.js'
-import { World } from '@ecs/world'
 import { Entity } from '@ecs/entity'
+import { World } from '@ecs/world'
 import { ObjectPool } from '@utils/ecs/object.pool'
+import { Container, Texture } from 'pixi.js'
 
 // 1. СТРОГАЯ КАРТА АРГУМЕНТОВ
 // Здесь мы описываем, что нужно передать для создания каждого типа
@@ -24,6 +24,6 @@ export interface FactoryContext {
 // 3. ТИП "ЧЕРТЕЖА" (Assembler)
 // Функция, которая берет контекст, аргументы и собирает Entity
 export type Assembler<K extends keyof EntityArgs> = (
-  ctx: FactoryContext,
+  context: FactoryContext,
   args: EntityArgs[K]
 ) => Entity | null

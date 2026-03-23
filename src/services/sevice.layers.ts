@@ -1,8 +1,10 @@
+import type { LayersOptions, RectangleSize } from '@app-types'
+
 import { Container, Graphics } from 'pixi.js'
-import { BaseService } from './service.base'
+
 import AbsoluteLayer from '../utils/layers/layer.absolute'
 import BaseLayer from '../utils/layers/layer.base'
-import type { LayersOptions, RectangleSize } from '@app-types'
+import { BaseService } from './service.base'
 
 export default class LayersService extends BaseService {
   #root: Container
@@ -17,55 +19,56 @@ export default class LayersService extends BaseService {
           ['background', new BaseLayer({ label: 'background' })],
           ['world', new BaseLayer({ label: 'world' })],
           ['ui_low', new AbsoluteLayer({ label: 'ui_low' })],
-          ['fx', new AbsoluteLayer({ label: 'fxui_bottom' })],
+          ['fx', new AbsoluteLayer({ label: 'fx' })],
           ['ui_top', new AbsoluteLayer({ label: 'ui_top' })]
         ])
-      : new Map()
+      : new Map<string, BaseLayer>()
 
     if (defaultList) this.#root.addChild(...this.#layers.values())
   }
 
-  #noopLayer(name?: string) {
+  #noopLayer(label?: string) {
     return new Proxy(new Container(), {
       get: () => {
-        throw new Error(`No such layer with name: "${name}"`)
+        throw new Error(`No such layer with label: "${label}"`)
       }
     })
   }
 
-  public add(layers?: string | BaseLayer): void {
-    if (layers) {
-      const newLayers = Array.isArray(layers) ? layers : [layers]
+  public add(layers?: string | BaseLayer | Array<string | BaseLayer>): void {
+    if (!layers) {
+      console.warn('Layer addition without layer label restricted. Set correct layer label')
+      return
+    }
+    const items: Array<string | BaseLayer> = Array.isArray(layers) ? layers : [layers]
 
-      for (const layer of newLayers) {
-        if (this.#layers.has(layer)) {
-          console.warn(`Layer ${layer} already exists. Set other label for new layer`)
-          continue
-        }
-        const targetLayer = layer instanceof BaseLayer ? layer : new BaseLayer({ label: layer })
-        const targetLayerName = layer instanceof BaseLayer ? layer.label : layer
+    for (const item of items) {
+      const label = item instanceof BaseLayer ? item.label : item
+      const layerInstance = item instanceof BaseLayer ? item : new BaseLayer({ label: item })
 
-        this.#layers.set(targetLayerName, targetLayer)
-        this.#root.addChild(layer)
+      if (this.#layers.has(label)) {
+        console.warn(`Layer "${label}" already exists. Set another label for the new layer.`)
+        continue
       }
-    } else {
-      console.warn('Layer addition without layer label restricted. Set correct layer name')
+
+      this.#layers.set(label, layerInstance)
+      this.#root.addChild(layerInstance)
     }
   }
 
-  public getLayerByName(name?: string): Container {
-    if (!name) return this.#noopLayer()
+  public getLayerByLabel(label?: string): Container {
+    if (!label) return this.#noopLayer()
 
-    const layer = this.#layers.get(name)
+    const layer = this.#layers.get(label)
 
     if (!layer) return this.#noopLayer()
 
     return layer
   }
 
-  #moveLayer(subLayerName: string, staticLayerName: string, offset: number) {
-    const subLayer = this.getLayerByName(subLayerName)
-    const staticLayer = this.getLayerByName(staticLayerName)
+  #moveLayer(subLayerLabel: string, staticLayerLabel: string, offset: number) {
+    const subLayer = this.getLayerByLabel(subLayerLabel)
+    const staticLayer = this.getLayerByLabel(staticLayerLabel)
 
     if (!subLayer || !staticLayer) return
 
@@ -77,25 +80,23 @@ export default class LayersService extends BaseService {
     this.#root.setChildIndex(subLayer, clampedIndex)
   }
 
-  public moveLayerAbove(subLayerName: string, staticLayerName: string): void {
-    this.#moveLayer(subLayerName, staticLayerName, 0)
+  public moveLayerAbove(subLayerLabel: string, staticLayerLabel: string): void {
+    this.#moveLayer(subLayerLabel, staticLayerLabel, 0)
   }
-  public moveLayerBelow(subLayerName: string, staticLayerName: string): void {
-    this.#moveLayer(subLayerName, staticLayerName, -1)
+  public moveLayerBelow(subLayerLabel: string, staticLayerLabel: string): void {
+    this.#moveLayer(subLayerLabel, staticLayerLabel, -1)
   }
 
-  setDebugArea(name?: string): void {
-    if (name) {
-      const layer = this.getLayerByName(name)
-      console.log('set debug: ', name)
+  setDebugArea(label?: string): void {
+    if (label) {
+      const layer = this.getLayerByLabel(label)
+      console.log('set debug:', label)
       this.updateDebugArea(layer)
     }
   }
 
   updateDebugArea(layer: Container): void {
-    console.log(layer.getBounds())
-
-    const { x, y, width, height } = layer.getBounds()
+    const { width, height } = layer.getBounds()
 
     if (!width || !height) return
 
@@ -104,8 +105,8 @@ export default class LayersService extends BaseService {
     const drawRect = (debugElement: Graphics) => {
       debugElement
         .rect(-width / 2, -height / 2, width, height)
-        .stroke({ width: 1, color: 0xffff73 })
-        .fill({ color: 0x0000ff, alpha: 0.5 })
+        .stroke({ width: 1, color: 0xff_ff_73 })
+        .fill({ color: 0x00_00_ff, alpha: 0.5 })
     }
 
     if (activeDebugZone) {
@@ -118,20 +119,27 @@ export default class LayersService extends BaseService {
     }
   }
 
-  public remove(layers?: string): void {
-    if (layers) {
-      const target = Array.isArray(layers) ? layers : [layers]
+  public remove(layers?: string | BaseLayer | Array<string | BaseLayer>): void {
+    if (!layers) return
+    const items: Array<string | BaseLayer> = Array.isArray(layers) ? layers : [layers]
 
-      for (const layer of target) {
-        this.#layers.delete(layer)
+    for (const item of items) {
+      const label = item instanceof BaseLayer ? item.label : item
+      const layerInstance = this.#layers.get(label)
+
+      if (!layerInstance) {
+        console.warn(`Cannot remove: Layer "${label}" not found.`)
+        continue
       }
-      this.#root.removeChild(...target)
+
+      this.#layers.delete(label)
+      this.#root.removeChild(layerInstance)
     }
   }
 
   resize(size: RectangleSize) {
-    this.#layers.values().forEach((layer) => {
+    for (const layer of this.#layers.values()) {
       layer.resize(size)
-    })
+    }
   }
 }
