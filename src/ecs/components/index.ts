@@ -1,4 +1,4 @@
-import type { Container } from 'pixi.js'
+import type { ViewContainer } from 'pixi.js'
 
 export interface TransformData {
   x: number
@@ -10,7 +10,7 @@ export interface VelocityData {
   vy: number
 }
 
-export interface ViewData<T extends Container = Container> {
-  node: T
+export interface ViewData {
+  node: ViewContainer
   release?: () => void
 }

@@ -14,7 +14,7 @@ import { Graphics } from 'pixi.js'
 export const createBullet: Assembler<'bullet'> = (context, args) => {
   // 1. Инициализируем (или получаем) пул прямо здесь, "лениво" (Lazy init)
   if (!context.pools['bullet']) {
-    context.pools['bullet'] = new ObjectPool<Graphics>(
+    context.pools['bullet'] = new ObjectPool(
       () => {
         const g = new Graphics().circle(0, 0, 4).fill(0xff_ff_00)
         g.visible = false
@@ -28,7 +28,7 @@ export const createBullet: Assembler<'bullet'> = (context, args) => {
     )
   }
 
-  const pool = context.pools['bullet'] as ObjectPool<Graphics>
+  const pool = context.pools['bullet'] as ObjectPool
 
   // 2. Спавним сущность
   const entity = context.world.createEntity()
@@ -51,7 +51,7 @@ export const createBullet: Assembler<'bullet'> = (context, args) => {
   })
   // context.world.addComponent<ColliderData>(entity, 'Collider', { radius: 4 })
 
-  context.world.addComponent<ViewData<Graphics>>(entity, 'View', {
+  context.world.addComponent<ViewData>(entity, 'View', {
     node: graphics,
     release: () => pool.release(graphics)
   })

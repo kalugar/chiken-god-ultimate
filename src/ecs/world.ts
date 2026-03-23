@@ -13,9 +13,9 @@ export class World {
   private systems: System[]
   // public events: EventEmitter
 
-  constructor(maxEntities: number = 10000) {
-    this.entities = new Array(maxEntities)
-    this.availableIds = new Array(maxEntities)
+  constructor(maxEntities: number = 10_000) {
+    this.entities = Array.from({ length: maxEntities })
+    this.availableIds = Array.from({ length: maxEntities })
     this.activeEntities = new Set()
     this.systems = []
     // this.events = new EventEmitter()

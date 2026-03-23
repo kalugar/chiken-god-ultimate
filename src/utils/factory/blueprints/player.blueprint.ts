@@ -31,7 +31,7 @@ export const createPlayer: Assembler<'player'> = (context, args) => {
   // context.world.addComponent<HealthData>(entity, 'Health', { current: 100, max: 100 })
 
   // 3. Компонент View с функцией ручной очистки (так как нет пула)
-  context.world.addComponent<ViewData<Sprite>>(entity, 'View', {
+  context.world.addComponent<ViewData>(entity, 'View', {
     node: sprite,
     release: () => {
       sprite.removeFromParent()

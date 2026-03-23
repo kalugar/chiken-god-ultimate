@@ -1,10 +1,9 @@
 import type { EngineState } from '@app-types'
-import type { System } from '@ecs/system'
 import type { ApplicationOptions } from 'pixi.js'
 
 import { World } from '@ecs/world'
 import LayersService from '@services/sevice.layers'
-import { Application, UPDATE_PRIORITY } from 'pixi.js'
+import { Application } from 'pixi.js'
 
 import { LOGICAL_SIZE } from './constants'
 

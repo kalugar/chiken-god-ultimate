@@ -14,7 +14,7 @@ import { Graphics } from 'pixi.js'
 export const createEnemy: Assembler<'enemy'> = (context, args) => {
   // 1. Инициализируем пул врагов, если его еще нет в этом контексте
   if (!context.pools['enemy']) {
-    context.pools['enemy'] = new ObjectPool<Graphics>(
+    context.pools['enemy'] = new ObjectPool(
       () => {
         // Рисуем красный круг радиусом 15px
         const g = new Graphics().circle(0, 0, 15).fill(0xff_00_00)
@@ -29,7 +29,7 @@ export const createEnemy: Assembler<'enemy'> = (context, args) => {
     )
   }
 
-  const pool = context.pools['enemy'] as ObjectPool<Graphics>
+  const pool = context.pools['enemy'] as ObjectPool
 
   // 2. Создаем сущность
   const entity = context.world.createEntity()
@@ -57,7 +57,7 @@ export const createEnemy: Assembler<'enemy'> = (context, args) => {
   // context.world.addComponent<HealthData>(entity, 'Health', { current: 30, max: 30 })
 
   // 5. Компонент View с функцией ВОЗВРАТА В ПУЛ
-  context.world.addComponent<ViewData<Graphics>>(entity, 'View', {
+  context.world.addComponent<ViewData>(entity, 'View', {
     node: graphics,
     release: () => pool.release(graphics)
   })

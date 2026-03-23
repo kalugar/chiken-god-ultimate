@@ -1,5 +1,6 @@
 export const ComponentMask = {
   None: 0,
+  // eslint-disable-next-line unicorn/prefer-math-trunc
   Transform: 1 << 0,
   Velocity: 1 << 1,
   Static: 1 << 2,
