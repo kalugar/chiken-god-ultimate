@@ -1,6 +1,8 @@
-import { ComponentMask, type ComponentName } from '@ecs/components/component.mask'
+import { ComponentMask } from '@ecs/components/component.mask'
 import { Entity } from '@ecs/entity'
 import { System } from '@ecs/system'
+
+import type { ComponentName, defaultComponentRegistry } from './components'
 // import { EventEmitter } from './utils/event-emitter'
 
 export class World {
@@ -71,23 +73,16 @@ export class World {
   // 2. УПРАВЛЕНИЕ КОМПОНЕНТАМИ (РОУТЕР)
   // ==========================================
 
-  public addComponent<T>(entity: Entity, name: ComponentName, data: T): void {
+  public addComponent(entity: Entity, name: ComponentName, data: typeof defaultComponentRegistry): void {
     if (entity.isDestroyed || entity.components.has(name)) return
-
-    entity.components.set(name, data)
-    entity.mask |= ComponentMask[name]
-
-    // Маска изменилась -> пересчитываем принадлежность к системам
+    entity.add(name, data)
     this.updateEntityMask(entity)
   }
 
   public removeComponent(entity: Entity, name: ComponentName): void {
     if (entity.isDestroyed || !entity.components.has(name)) return
 
-    entity.components.delete(name)
-    entity.mask &= ~ComponentMask[name]
-
-    // Маска изменилась -> пересчитываем принадлежность к системам
+    entity.remove(name)
     this.updateEntityMask(entity)
   }
 

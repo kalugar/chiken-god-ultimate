@@ -1,4 +1,4 @@
-import type Service from './service.interface'
+import type Service from './service'
 
 export class BaseService implements Service {
   public readonly name: string

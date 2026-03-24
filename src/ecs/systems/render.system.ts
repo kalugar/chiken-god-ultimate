@@ -1,4 +1,3 @@
-import type { TransformData, ViewData } from '@ecs/components'
 import type { Entity } from '@ecs/entity'
 
 import { ComponentMask } from '@ecs/components/component.mask'
@@ -10,11 +9,11 @@ export class RenderSystem extends System {
   }
 
   update(delta: number, entity: Entity) {
-    const transform = entity.get<TransformData>('Transform')
-    const view = entity.get<ViewData>('View')
+    const transform = entity.get('Transform')!
+    const view = entity.get('View')!
 
-    view.node.x = transform.x
-    view.node.y = transform.y
-    view.node.rotation = transform.rotation
+    view.node!.x = transform.x
+    view.node!.y = transform.y
+    view.node!.rotation = transform.rotation
   }
 }

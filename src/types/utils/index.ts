@@ -1,29 +1,30 @@
-import { Entity } from '@ecs/entity'
-import { World } from '@ecs/world'
-import { ObjectPool } from '@utils/ecs/object.pool'
-import { Container, Texture } from 'pixi.js'
+import type { RawViewConfig } from '@utils/factory/view.selector'
 
-// 1. СТРОГАЯ КАРТА АРГУМЕНТОВ
-// Здесь мы описываем, что нужно передать для создания каждого типа
-export type EntityArgs = {
-  player: { x: number; y: number }
-  enemy: { x: number; y: number; speed?: number }
-  bullet: { x: number; y: number; dirX: number; dirY: number; speed: number }
+export type HpData = {
+  curent: number
+  max: number
 }
 
-// 2. КОНТЕКСТ ФАБРИКИ
-// Это то, что передается в каждый чертеж, чтобы он мог работать с миром и пулами
-export interface FactoryContext {
-  world: World
-  gameLayer: Container
-  textures: Record<string, Texture>
-  // Динамическое хранилище пулов (чтобы чертежи могли класть туда свои пулы)
-  pools: Record<string, ObjectPool<any>>
+export interface PrefabConfig {
+  components?: number
+  layer?: string
+  poolSize?: number
+  hp?: number
+  x?: number
+  y?: number
+  rotation?: number
+  vx?: number
+  vy?: number
+  view?: RawViewConfig
 }
 
-// 3. ТИП "ЧЕРТЕЖА" (Assembler)
-// Функция, которая берет контекст, аргументы и собирает Entity
-export type Assembler<K extends keyof EntityArgs> = (
-  context: FactoryContext,
-  args: EntityArgs[K]
-) => Entity | null
+export interface SpawnOverrides {
+  x?: number
+  y?: number
+  vx?: number
+  vy?: number
+  rotation?: number
+  hp?: number
+}
+
+export type SceneConfig = Record<string, PrefabConfig>

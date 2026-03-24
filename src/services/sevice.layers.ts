@@ -56,6 +56,12 @@ export default class LayersService extends BaseService {
     }
   }
 
+  public has(layer?: string | BaseLayer): boolean {
+    if (!layer) return false
+    const layerLabel = typeof layer === 'string' ? layer : layer.label
+    return this.#layers.has(layerLabel)
+  }
+
   public getLayerByLabel(label?: string): Container {
     if (!label) return this.#noopLayer()
 

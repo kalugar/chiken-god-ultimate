@@ -1,10 +1,9 @@
 import {
   AnimatedSprite,
+  Assets,
   BitmapText,
   Container,
-  FillGradient,
   Graphics,
-  GraphicsContext,
   HTMLText,
   MeshPlane,
   MeshRope,
@@ -14,17 +13,16 @@ import {
   PerspectiveMesh,
   Sprite,
   Text,
+  Texture,
   TilingSprite,
-  ViewContainer
-} from "pixi.js";
+  type FillInput
+} from 'pixi.js'
 
 const viewClasses = {
   animation: AnimatedSprite,
   bitmapText: BitmapText,
   container: Container,
   graphics: Graphics,
-  // gradient: FillGradient,
-  // graphicsContext: GraphicsContext,
   htmlText: HTMLText,
   mesh: MeshSimple,
   nineSlice: NineSliceSprite,
@@ -34,36 +32,86 @@ const viewClasses = {
   rope: MeshRope,
   sprite: Sprite,
   text: Text,
-  tile: TilingSprite,
+  tile: TilingSprite
 } as const
 
-type ViewTypeKey = keyof typeof viewClasses;
-type ViewSettings<T extends ViewTypeKey> = ConstructorParameters<typeof viewClasses[T]>[0];
+type ViewTypeKey = keyof typeof viewClasses
+type ViewSettings<T extends ViewTypeKey> = NonNullable<
+  ConstructorParameters<(typeof viewClasses)[T]>[0]
+>
+type SafeContainerConstructor = new (options?: Record<string, unknown>) => Container
 
-// type ExactConstructor<T extends ViewTypeKey> = new (
-//   settings?: ViewSettings<T>
-// ) => InstanceType<typeof viewClasses[T]>;
+export type RawViewConfig<T extends ViewTypeKey = ViewTypeKey> = Omit<
+  ViewSettings<T>,
+  'texture'
+> & {
+  type?: T
+  label?: string
+  texture?: string
+  parent?: string
+  layer?: string
+  width?: number
+  height?: number
+  radius?: number
+  fill?: FillInput
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any
+}
 
-export const createView = (
-  config: ViewConfig, 
-  textures: Record<string, Texture>
-): ViewContainer | Container => { 
-  
-  const { type, sprite, ...pixiOptions } = config;
+export type ViewConfig<T extends ViewTypeKey = ViewTypeKey> = Omit<RawViewConfig<T>, 'parent'> & {
+  parent?: Container
+}
 
-  // if (type === 'sprite') {
-  //   return new Sprite({
-  //     ...pixiOptions,
-  //     texture: sprite ? textures[sprite] : Texture.WHITE
-  //   });
-  // } 
-  
-  if (type === 'graphics') {
-    const g = new Graphics(pixiOptions);
-    g.circle(0, 0, 10).fill(0xff_ff_ff);
-    return g;
+const inferViewType = <T extends ViewTypeKey>(config: ViewConfig<T>): ViewTypeKey | null => {
+  if (config.texture) return 'sprite'
+  if (config.width !== undefined && config.height !== undefined) return 'graphics'
+  if (config.parent || config.layer) return 'container'
+  return null
+}
+
+const buildGraphics = <T extends ViewTypeKey>(config: ViewConfig<T>): Graphics => {
+  const { parent, label, ...shapeSettings } = config
+
+  type GraphicsOpts = ConstructorParameters<typeof Graphics>[0]
+  const g = new Graphics({ parent, label } as unknown as GraphicsOpts)
+
+  const fill = shapeSettings.fill ?? 0xff_ff_ff
+
+  if (shapeSettings.width !== undefined && shapeSettings.height !== undefined) {
+    g.rect(0, 0, shapeSettings.width, shapeSettings.height).fill(fill)
+  } else if (shapeSettings.radius === undefined) {
+    console.warn(`[buildGraphics] У объекта ${label} нет размеров! Рисуем дефолтный квадрат.`)
+    g.rect(0, 0, 50, 50).fill({ color: 0xff_ff_ff, alpha: 0.75 })
+  } else {
+    g.circle(0, 0, shapeSettings.radius).fill(fill)
   }
 
-  const TargetClass = viewClasses[type] || Container;
-  return new TargetClass(pixiOptions);
-};
+  return g
+}
+
+export const createView = <T extends ViewTypeKey>(config: ViewConfig<T>): Container | null => {
+  const { type, texture, ...pixiSettings } = config
+  const finalSettings: Record<string, unknown> = { ...pixiSettings }
+
+  const inferredType = type ?? inferViewType(config)
+
+  if (!inferredType) {
+    console.warn(
+      `[createView] Ошибка: Невозможно определить type! Нет ни texture, ни width/height.`,
+      config.label
+    )
+    return null
+  }
+
+  if (inferredType === 'sprite' && texture) {
+    finalSettings.texture = Assets.get(texture) ?? Texture.WHITE
+  }
+
+  if (inferredType === 'graphics') {
+    return buildGraphics(finalSettings)
+  }
+  const TargetClass = viewClasses[inferredType] || Container
+  const Constructor = TargetClass as unknown as SafeContainerConstructor
+
+  return new Constructor(finalSettings)
+}
