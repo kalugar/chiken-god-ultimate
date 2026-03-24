@@ -1,5 +1,5 @@
 import type { EngineState } from '@app-types'
-import type { ApplicationOptions } from 'pixi.js'
+import type { ApplicationOptions, Ticker } from 'pixi.js'
 
 import { World } from '@ecs/world'
 import LayersService from '@services/sevice.layers'
@@ -13,6 +13,7 @@ export class Engine {
   public layers!: LayersService
   // private systems: System[] = []
   private state: EngineState
+  private resizeTimeout: ReturnType<typeof setTimeout> | null = null
 
   constructor(config: Partial<ApplicationOptions>, maxEntities: number = 10_000) {
     this.state = {
@@ -27,7 +28,7 @@ export class Engine {
     await this.app.init(this.state.settings)
     document.querySelector('#pixi-container')!.append(this.app.canvas)
     // window.addEventListener('resize', this.resize.bind(this))
-    this.app.renderer.on('resize', this.resize.bind(this))
+    this.app.renderer.on('resize', this.onResizeDebounced.bind(this))
   }
 
   public async start(): Promise<void> {
@@ -59,10 +60,23 @@ export class Engine {
     this.app.ticker.speed = value
   }
 
-  private update(ticker: any): void {
+  private update(ticker: Ticker): void {
     if (this.state.isRunning) {
       this.world.update(ticker.deltaTime)
     }
+  }
+
+  private onResizeDebounced() {
+    // Если пользователь все еще тянет окно — отменяем предыдущий таймер
+    if (this.resizeTimeout) {
+      clearTimeout(this.resizeTimeout)
+    }
+
+    // Заводим новый таймер. Код выполнится только если окно не менялось 150мс
+    this.resizeTimeout = setTimeout(() => {
+      this.resize()
+      this.resizeTimeout = null
+    }, 15) // 100-200мс обычно идеальный баланс
   }
 
   private resize() {

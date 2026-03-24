@@ -1,4 +1,4 @@
 export default interface Service {
-  name: string
+  label: string
   registered: boolean
 }

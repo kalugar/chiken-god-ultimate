@@ -1,10 +1,10 @@
 import type Service from './service'
 
 export class BaseService implements Service {
-  public readonly name: string
+  public readonly label: string
   public registered: boolean = false
 
-  constructor(name: string) {
-    this.name = name
+  constructor(label: string) {
+    this.label = label
   }
 }
