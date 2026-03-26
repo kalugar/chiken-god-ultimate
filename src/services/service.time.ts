@@ -1,21 +1,16 @@
 import type { TimeEvent } from '@app-types'
 
-import { Ticker } from 'pixi.js'
-
 import { BaseService } from './service.base'
 
-export default class TimeEventManager extends BaseService {
-  #ticker
-  #timers: Set<TimeEvent> = new Set()
+export default class TimeService extends BaseService {
+  private timers: Set<TimeEvent> = new Set()
 
-  constructor(ticker: Ticker = Ticker.shared) {
+  constructor() {
     super('TimeEventManager')
-    this.#ticker = ticker
-    this.#timers = new Set()
-    this.#ticker.add(this.#update.bind(this))
+    this.timers = new Set()
   }
 
-  public setDelayedCall(delay: number, callback: () => void): TimeEvent {
+  public delayedCall(delay: number, callback: () => void): TimeEvent {
     const timer: TimeEvent = {
       callback,
       delay,
@@ -23,11 +18,11 @@ export default class TimeEventManager extends BaseService {
       elapsed: 0
     }
 
-    this.#timers.add(timer)
+    this.timers.add(timer)
     return timer
   }
 
-  public setInterval(delay: number, callback: () => void): TimeEvent {
+  public interval(delay: number, callback: () => void): TimeEvent {
     const timer: TimeEvent = {
       callback,
       delay,
@@ -35,33 +30,44 @@ export default class TimeEventManager extends BaseService {
       elapsed: 0
     }
 
-    this.#timers.add(timer)
+    this.timers.add(timer)
     return timer
   }
 
-  public clear(timer?: TimeEvent) {
-    if (timer) {
-      this.#timers.delete(timer)
+  public clear(timers?: TimeEvent | TimeEvent[]) {
+    if (timers) {
+      const clearCandidates = Array.isArray(timers) ? timers : [timers]
+      for (const timer of clearCandidates) {
+        this.timers.delete(timer)
+      }
     } else {
-      this.#timers.clear()
+      this.timers.clear()
     }
   }
 
-  #update(t: Ticker): void {
-    const delta = t.deltaMS
+  public update(delta: number): void {
+    const timersToClear: TimeEvent[] = []
 
-    for (const timer of this.#timers) {
+    for (const timer of this.timers) {
       timer.elapsed += delta
 
-      if (timer.elapsed >= timer.delay) {
-        timer.callback()
+      if (timer.repeat) {
+        let iterations = 0
+        const MAX_ITERATIONS = 5
 
-        if (timer.repeat) {
-          timer.elapsed = 0
-        } else {
-          this.#timers.delete(timer)
+        while (timer.elapsed >= timer.delay && iterations < MAX_ITERATIONS) {
+          timer.callback()
+          timer.elapsed -= timer.delay
+          iterations++
         }
+        if (timer.elapsed >= timer.delay) {
+          timer.elapsed = timer.elapsed % timer.delay
+        }
+      } else if (timer.elapsed >= timer.delay) {
+        timer.callback()
+        timersToClear.push(timer)
       }
+      this.clear(timersToClear)
     }
   }
 }

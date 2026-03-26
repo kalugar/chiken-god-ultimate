@@ -1,43 +1,42 @@
-import type { EngineState } from '@app-types'
+import type { EngineState, TimeEvent } from '@app-types'
 import type { ApplicationOptions, Ticker } from 'pixi.js'
 
 import { World } from '@ecs/world'
+import TimeService from '@services/service.time'
 import LayersService from '@services/sevice.layers'
 import { Application } from 'pixi.js'
 
-import { LOGICAL_SIZE } from './constants'
+import { FIXED_TIME_STEP, LOGICAL_SIZE, RESIZE_DEBOUNCE } from './constants'
 
 export class Engine {
   public readonly app: Application
   public readonly world: World
+  public time: TimeService
   public layers!: LayersService
-  // private systems: System[] = []
-  private state: EngineState
-  private resizeTimeout: ReturnType<typeof setTimeout> | null = null
 
-  constructor(config: Partial<ApplicationOptions>, maxEntities: number = 10_000) {
+  private state: EngineState
+  private timeStampAccumulator: number = 0
+  private resizeTimeout: TimeEvent | null = null
+
+  constructor(config: Partial<ApplicationOptions & EngineState>, maxEntities: number = 10_000) {
     this.state = {
       isRunning: false,
       settings: config
     }
     this.app = new Application()
+    this.time = new TimeService()
     this.world = new World(maxEntities)
   }
 
   public async init(): Promise<void> {
     await this.app.init(this.state.settings)
     document.querySelector('#pixi-container')!.append(this.app.canvas)
-    // window.addEventListener('resize', this.resize.bind(this))
+
     this.app.renderer.on('resize', this.onResizeDebounced.bind(this))
   }
 
-  public async start(): Promise<void> {
+  public start(): void {
     this.layers = new LayersService(this.app.stage, { defaultList: true })
-    // await this.frames.loadAtlas('assets/atlas/atlas.json')
-
-    // this.systems = []
-
-    // console.log(this.layers.getLayerByLabel('world'))
 
     this.resize()
     this.state.isRunning = true
@@ -45,15 +44,12 @@ export class Engine {
   }
 
   public pause(): void {
-    // this.app.stop()
     this.state.isRunning = false
-    // this.systems.forEach((system) => {
-    //   if (system.hasOwnProperty('paused')) system.paused = true
-    // })
   }
 
   public resume(): void {
     this.state.isRunning = true
+    this.timeStampAccumulator = 0
   }
 
   public setSpeed(value: number): void {
@@ -61,22 +57,31 @@ export class Engine {
   }
 
   private update(ticker: Ticker): void {
-    if (this.state.isRunning) {
-      this.world.update(ticker.deltaTime)
+    if (!this.state.isRunning) return
+
+    const deltaRealTime = ticker.deltaMS
+
+    if (deltaRealTime > 1000) {
+      console.warn('Обнаружен сильный лаг, пропускаем физику')
+      return
+    }
+
+    this.timeStampAccumulator += deltaRealTime
+    while (this.timeStampAccumulator >= FIXED_TIME_STEP) {
+      this.time.update(FIXED_TIME_STEP)
+      this.world.update(FIXED_TIME_STEP)
+      this.timeStampAccumulator -= FIXED_TIME_STEP
     }
   }
 
   private onResizeDebounced() {
-    // Если пользователь все еще тянет окно — отменяем предыдущий таймер
     if (this.resizeTimeout) {
-      clearTimeout(this.resizeTimeout)
+      this.time.clear(this.resizeTimeout)
     }
-
-    // Заводим новый таймер. Код выполнится только если окно не менялось 150мс
-    this.resizeTimeout = setTimeout(() => {
+    this.resizeTimeout = this.time.delayedCall(RESIZE_DEBOUNCE, () => {
       this.resize()
       this.resizeTimeout = null
-    }, 15) // 100-200мс обычно идеальный баланс
+    })
   }
 
   private resize() {
