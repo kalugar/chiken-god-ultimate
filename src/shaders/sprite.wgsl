@@ -62,7 +62,7 @@ fn vs_main(input: VertexInput) -> VertexOutput {
 @group(1) @binding(1) var uSampler: sampler;
 
 @fragment
-// Обрати внимание: на вход идет та самая структура VertexOutput!
+
 fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
     
     let texColor = textureSample(uTexture, uSampler, input.vUV);

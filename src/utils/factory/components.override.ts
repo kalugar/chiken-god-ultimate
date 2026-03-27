@@ -58,10 +58,6 @@ const applyViewOverrides = (
   viewNode.y = transform.y ?? 0
 }
 
-// ==========================================
-// ОСНОВНАЯ ФУНКЦИЯ (Сложность: 0)
-// ==========================================
-
 export const overrideComponentData = (
   entity: Entity,
   config: PrefabConfig,

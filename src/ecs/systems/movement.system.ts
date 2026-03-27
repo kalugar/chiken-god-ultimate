@@ -1,22 +1,17 @@
-import type { TransformData, VelocityData } from '@ecs/components'
-
-import { ComponentMask } from '@ecs/components/component.mask'
+import { getComponentsMask } from '@ecs/components/components.map'
 import { Entity } from '@ecs/entity'
 import { System } from '@ecs/system'
 
 export class MovementSystem extends System {
   constructor() {
-    // Указываем, какие компоненты нам нужны
-    super(ComponentMask.Transform | ComponentMask.Velocity)
+    super(getComponentsMask('dynamic'))
   }
 
-  // Этот метод будет вызван ТОЛЬКО для тех сущностей,
-  // у которых есть и Transform, и Velocity
   protected update(delta: number, entity: Entity): void {
-    const transform = entity.get<TransformData>('Transform')
-    const velocity = entity.get<VelocityData>('Velocity')
+    const transform = entity.get('Transform')
+    const velocity = entity.get('Velocity')
 
-    transform.x += velocity.vx * delta
-    transform.y += velocity.vy * delta
+    transform!.x += velocity!.vx * delta
+    transform!.y += velocity!.vy * delta
   }
 }

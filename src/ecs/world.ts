@@ -6,14 +6,11 @@ import type { ComponentName, defaultComponentRegistry } from './components'
 // import { EventEmitter } from './utils/event-emitter'
 
 export class World {
+  public readonly activeEntities: Set<Entity>
+  // public events: EventEmitter
   private entities: Entity[]
   private availableIds: number[]
-
-  // Храним все живые сущности (полезно для сохранения игры или дебага)
-  public readonly activeEntities: Set<Entity>
-
   private systems: System[]
-  // public events: EventEmitter
 
   constructor(maxEntities: number = 10_000) {
     this.entities = Array.from({ length: maxEntities })
@@ -24,15 +21,10 @@ export class World {
 
     // Предварительная аллокация памяти (Object Pool)
     for (let i = 0; i < maxEntities; i++) {
-      // Сущность больше ничего не знает про World!
       this.entities[i] = new Entity(i)
       this.availableIds[maxEntities - 1 - i] = i
     }
   }
-
-  // ==========================================
-  // 1. УПРАВЛЕНИЕ ЖИЗНЕННЫМ ЦИКЛОМ СУЩНОСТЕЙ
-  // ==========================================
 
   public createEntity(): Entity | null {
     if (this.availableIds.length === 0) {
@@ -69,24 +61,25 @@ export class World {
     this.availableIds.push(id)
   }
 
-  // ==========================================
-  // 2. УПРАВЛЕНИЕ КОМПОНЕНТАМИ (РОУТЕР)
-  // ==========================================
-
-  public addComponent(entity: Entity, name: ComponentName, data: typeof defaultComponentRegistry): void {
+  public addComponent(
+    entity: Entity,
+    name: ComponentName,
+    data: typeof defaultComponentRegistry
+  ): void {
     if (entity.isDestroyed || entity.components.has(name)) return
-    entity.add(name, data)
+    entity.components.set(name, data)
+    entity.mask |= ComponentMask[name]
     this.updateEntityMask(entity)
   }
 
   public removeComponent(entity: Entity, name: ComponentName): void {
     if (entity.isDestroyed || !entity.components.has(name)) return
 
-    entity.remove(name)
+    entity.components.delete(name)
+    entity.mask &= ~ComponentMask[name]
     this.updateEntityMask(entity)
   }
 
-  // Для компонентов-тегов (без данных)
   public addTag(entity: Entity, tagMask: number): void {
     if (entity.isDestroyed || (entity.mask & tagMask) === tagMask) return
 
@@ -101,15 +94,9 @@ export class World {
     this.updateEntityMask(entity)
   }
 
-  // ==========================================
-  // 3. УПРАВЛЕНИЕ СИСТЕМАМИ И КЭШИРОВАНИЕ
-  // ==========================================
-
   public addSystem(system: System): this {
     this.systems.push(system)
 
-    // Если систему добавили "на лету" посреди игры,
-    // нужно прогнать через неё все уже существующие объекты
     for (const entity of this.activeEntities) {
       this.routeEntityToSystem(entity, system)
     }
@@ -134,15 +121,11 @@ export class World {
     const hasExcluded = (entity.mask & system.excludeMask) !== 0
 
     if (hasRequired && !hasExcluded) {
-      system.entities.add(entity) // Set сам защитит от дублей
+      system.entities.add(entity)
     } else {
-      system.entities.delete(entity) // Безопасно удалит, даже если объекта там нет
+      system.entities.delete(entity)
     }
   }
-
-  // ==========================================
-  // 4. ИГРОВОЙ ЦИКЛ
-  // ==========================================
 
   public update(delta: number): void {
     for (let i = 0; i < this.systems.length; i++) {

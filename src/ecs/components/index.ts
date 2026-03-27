@@ -40,7 +40,6 @@ export interface ComponentRegistry {
 }
 
 export type ComponentName = keyof ComponentRegistry
-
 export const DefaultHealth: HealthData = { current: 1, max: 1 }
 export const DefaultVelocity: VelocityData = { vx: 0, vy: 0 }
 export const DefaultTransform: TransformData = { x: 0, y: 0, rotation: 0 }

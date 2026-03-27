@@ -1,6 +1,6 @@
 import type { SceneConfig } from '@app-types'
 
-import { getComponentsMask } from '@utils/factory/components.map'
+import { getComponentsMask } from '@ecs/components/components.map'
 
 export default {
   player: {

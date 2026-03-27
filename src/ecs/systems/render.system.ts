@@ -1,11 +1,11 @@
 import type { Entity } from '@ecs/entity'
 
-import { ComponentMask } from '@ecs/components/component.mask'
+import { getComponentsMask } from '@ecs/components/components.map'
 import { System } from '@ecs/system'
 
 export class RenderSystem extends System {
   constructor() {
-    super(ComponentMask.Transform | ComponentMask.View)
+    super(getComponentsMask('default'))
   }
 
   update(delta: number, entity: Entity) {

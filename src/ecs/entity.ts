@@ -15,26 +15,19 @@ export class Entity {
     this.isDestroyed = false
   }
 
-  public add<K extends ComponentName>(name: K, data: ComponentRegistry[K]): void {
-    this.components.set(name, data);
-    this.mask |= ComponentMask[name];
-  }
+  public get<K extends ComponentName>(
+    identifier: K | ComponentMask
+  ): ComponentRegistry[K] | undefined {
+    const name: ComponentName =
+      typeof identifier === 'string' ? identifier : (MaskToName[identifier] as K)
 
-  public remove(name: ComponentName): void {
-    this.components.delete(name);
-    this.mask &= ~ComponentMask[name];
-  }
-
-  public get<K extends ComponentName>(identifier: K | ComponentMask): ComponentRegistry[K] | undefined {
-    const name: ComponentName | undefined  = typeof identifier === 'string' ? identifier : MaskToName[identifier] as K;
-
-    return this.components.get(name) as ComponentRegistry[K];
+    return this.components.get(name) as ComponentRegistry[K]
   }
 
   public has(identifier: ComponentName | ComponentMask): boolean {
     if (typeof identifier === 'string') {
-      return this.components.has(identifier);
+      return this.components.has(identifier)
     }
-    return (this.mask & identifier) !== 0;
+    return (this.mask & identifier) !== 0
   }
 }
