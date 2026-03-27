@@ -1,17 +1,18 @@
 import type { EngineState, TimeEvent } from '@app-types'
-import type { ApplicationOptions, Ticker } from 'pixi.js'
+import type { ApplicationOptions } from 'pixi.js'
 
 import { World } from '@ecs/world'
 import TimeService from '@services/service.time'
 import LayersService from '@services/sevice.layers'
-import { Application } from 'pixi.js'
+import { Ticker, Application } from 'pixi.js'
 
 import { FIXED_TIME_STEP, LOGICAL_SIZE, RESIZE_DEBOUNCE } from './constants'
 
 export class Engine {
   public readonly app: Application
   public readonly world: World
-  public time: TimeService
+  public gameTime: TimeService
+  public systemTime: TimeService
   public layers!: LayersService
 
   private state: EngineState
@@ -24,7 +25,9 @@ export class Engine {
       settings: config
     }
     this.app = new Application()
-    this.time = new TimeService()
+    this.gameTime = new TimeService()
+    this.systemTime = new TimeService()
+    Ticker.shared.add((ticker) => this.systemTime.update(ticker.deltaMS))
     this.world = new World(maxEntities)
   }
 
@@ -68,7 +71,7 @@ export class Engine {
 
     this.timeStampAccumulator += deltaRealTime
     while (this.timeStampAccumulator >= FIXED_TIME_STEP) {
-      this.time.update(FIXED_TIME_STEP)
+      this.gameTime.update(FIXED_TIME_STEP)
       this.world.update(FIXED_TIME_STEP)
       this.timeStampAccumulator -= FIXED_TIME_STEP
     }
@@ -76,9 +79,9 @@ export class Engine {
 
   private onResizeDebounced() {
     if (this.resizeTimeout) {
-      this.time.clear(this.resizeTimeout)
+      this.systemTime.clear(this.resizeTimeout)
     }
-    this.resizeTimeout = this.time.delayedCall(RESIZE_DEBOUNCE, () => {
+    this.resizeTimeout = this.systemTime.delayedCall(RESIZE_DEBOUNCE, () => {
       this.resize()
       this.resizeTimeout = null
     })
