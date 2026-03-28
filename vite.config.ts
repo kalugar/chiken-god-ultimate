@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite'
 import glsl from 'vite-plugin-glsl'
-import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
   server: {
@@ -16,5 +15,8 @@ export default defineConfig({
   build: {
     target: 'esnext'
   },
-  plugins: [glsl(), tsconfigPaths()]
+  resolve: {
+    tsconfigPaths: true
+  },
+  plugins: [glsl()]
 })

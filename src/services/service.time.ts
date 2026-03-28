@@ -6,7 +6,7 @@ export default class TimeService extends BaseService {
   private timers: Set<TimeEvent> = new Set()
 
   constructor() {
-    super('TimeEventManager')
+    super('TimeService')
     this.timers = new Set()
   }
 

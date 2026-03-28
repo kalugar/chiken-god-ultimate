@@ -5,6 +5,8 @@ import { SceneFactory } from '@utils/factory'
 import { Assets, Texture } from 'pixi.js'
 
 import levelConfig from './level.config'
+import type { World } from '@ecs/world'
+import LayersService from '@services/sevice.layers'
 
 // import type { ViewData } from '@ecs/components'
 
@@ -24,8 +26,8 @@ import levelConfig from './level.config'
 // import { CollisionSystem } from '@ecs/systems/collision.system'
 // import { LifespanSystem } from '@ecs/systems/lifespan.system'; // Если напишем
 
-export async function startLevel(engine: Engine) {
-  const { layers, world } = engine
+export async function startLevel(world: World) {
+  const { services } = world
 
   await Assets.load<Texture>({ alias: 'bunny', src: 'https://pixijs.com/assets/bunny.png' })
   world.addSystem(new MovementSystem()) // Двигаем объекты
@@ -33,9 +35,8 @@ export async function startLevel(engine: Engine) {
   // world.addSystem(new LifespanSystem(world));     // Убиваем старые пули
   world.addSystem(new RenderSystem()) // Рисуем результат
 
-  const factory = new SceneFactory(world, layers)
+  const factory = new SceneFactory(world, services.get(LayersService))
 
-  console.log(Assets)
 
   factory.loadScene(levelConfig)
 

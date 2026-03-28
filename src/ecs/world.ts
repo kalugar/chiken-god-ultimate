@@ -3,19 +3,22 @@ import { Entity } from '@ecs/entity'
 import { System } from '@ecs/system'
 
 import type { ComponentName, defaultComponentRegistry } from './components'
+import type { ServiceLocator } from '@services/locator'
 // import { EventEmitter } from './utils/event-emitter'
 
 export class World {
   public readonly activeEntities: Set<Entity>
+  public readonly services: ServiceLocator
   // public events: EventEmitter
   private entities: Entity[]
   private availableIds: number[]
   private systems: System[]
 
-  constructor(maxEntities: number = 10_000) {
+  constructor(maxEntities: number = 10_000, services: ServiceLocator) {
     this.entities = Array.from({ length: maxEntities })
     this.availableIds = Array.from({ length: maxEntities })
     this.activeEntities = new Set()
+    this.services = services
     this.systems = []
     // this.events = new EventEmitter()
 

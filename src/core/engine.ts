@@ -7,30 +7,50 @@ import LayersService from '@services/sevice.layers'
 import { Ticker, Application } from 'pixi.js'
 
 import { FIXED_TIME_STEP, LOGICAL_SIZE, RESIZE_DEBOUNCE } from './constants'
+import { ServiceLocator } from '@services/locator'
+import SystemTimeService from '@services/service.system.time'
+import { EngineControl } from './engine.control'
 
 export class Engine {
   public readonly app: Application
   public readonly world: World
-  public gameTime: TimeService
-  public systemTime: TimeService
   public layers!: LayersService
+  public readonly services: ServiceLocator;
 
   private state: EngineState
   private timeStampAccumulator: number = 0
   private resizeTimeout: TimeEvent | null = null
 
-  constructor(config: Partial<ApplicationOptions & EngineState>, maxEntities: number = 10_000) {
+  constructor(config: Partial<ApplicationOptions>, maxEntities: number = 10_000) {
     this.state = {
       isRunning: false,
       settings: config
     }
-    this.app = new Application()
-    this.gameTime = new TimeService()
-    this.systemTime = new TimeService()
-    Ticker.shared.add((ticker) => this.systemTime.update(ticker.deltaMS))
-    this.world = new World(maxEntities)
-  }
 
+    this.app = new Application()
+    this.services = new ServiceLocator()
+
+    const gameTime = new TimeService()
+    const systemTime = new SystemTimeService()
+
+    const self = this
+    const controlPanel = new (class extends EngineControl {
+      public pause(): void { self.pause() }
+      public resume(): void { self.resume() }
+      public setSpeed(v: number): void { self.setSpeed(v) }
+      public get isPaused(): boolean { return !self.state.isRunning }
+    })();
+
+    this.services.register(TimeService, gameTime)
+    this.services.register(SystemTimeService, systemTime)
+    this.services.register(EngineControl, controlPanel);
+
+    Ticker.shared.add((ticker) => systemTime.update(ticker.deltaMS))
+
+    this.world = new World(maxEntities, this.services)
+    
+  }
+  
   public async init(): Promise<void> {
     await this.app.init(this.state.settings)
     document.querySelector('#pixi-container')!.append(this.app.canvas)
@@ -39,7 +59,8 @@ export class Engine {
   }
 
   public start(): void {
-    this.layers = new LayersService(this.app.stage, { defaultList: true })
+    const layers = new LayersService(this.app.stage, {defaultList: true})
+    this.services.register(LayersService, layers)
 
     this.resize()
     this.state.isRunning = true
@@ -71,7 +92,7 @@ export class Engine {
 
     this.timeStampAccumulator += deltaRealTime
     while (this.timeStampAccumulator >= FIXED_TIME_STEP) {
-      this.gameTime.update(FIXED_TIME_STEP)
+      this.services.get(TimeService).update(FIXED_TIME_STEP)
       this.world.update(FIXED_TIME_STEP)
       this.timeStampAccumulator -= FIXED_TIME_STEP
     }
@@ -79,9 +100,9 @@ export class Engine {
 
   private onResizeDebounced() {
     if (this.resizeTimeout) {
-      this.systemTime.clear(this.resizeTimeout)
+      this.services.get(SystemTimeService).clear(this.resizeTimeout)
     }
-    this.resizeTimeout = this.systemTime.delayedCall(RESIZE_DEBOUNCE, () => {
+    this.resizeTimeout = this.services.get(SystemTimeService).delayedCall(RESIZE_DEBOUNCE, () => {
       this.resize()
       this.resizeTimeout = null
     })
@@ -109,6 +130,6 @@ export class Engine {
       scale
     }
 
-    this.layers?.resize(newSize)
+    this.services.get(LayersService)?.resize(newSize)
   }
 }

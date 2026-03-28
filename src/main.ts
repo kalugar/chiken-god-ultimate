@@ -13,4 +13,4 @@ try {
   throw error
 }
 
-await startLevel(engine)
+await startLevel(engine.world)
