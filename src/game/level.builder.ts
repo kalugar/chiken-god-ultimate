@@ -7,6 +7,8 @@ import { Assets, Texture } from 'pixi.js'
 import levelConfig from './level.config'
 import type { World } from '@ecs/world'
 import LayersService from '@services/sevice.layers'
+import { InputSystem } from '@ecs/systems/input.system'
+import TimeService from '@services/service.time'
 
 // import type { ViewData } from '@ecs/components'
 
@@ -30,6 +32,7 @@ export async function startLevel(world: World) {
   const { services } = world
 
   await Assets.load<Texture>({ alias: 'bunny', src: 'https://pixijs.com/assets/bunny.png' })
+  world.addSystem(new InputSystem()) // Двигаем объекты
   world.addSystem(new MovementSystem()) // Двигаем объекты
   // world.addSystem(new CollisionSystem(world)) // Проверяем столкновения
   // world.addSystem(new LifespanSystem(world));     // Убиваем старые пули
@@ -43,7 +46,21 @@ export async function startLevel(world: World) {
   factory.spawn('enemy')
   factory.spawn('bullet')
 
-  console.log(factory.structuralViews)
+  const player = world.getEntityByTag('player')
+
+  console.log(player)
+  // console.log(factory.structuralViews)
+
+  world.services.get(TimeService).delayedCall(5000, ()=> {
+    console.log('speed doubled')
+    player!.get('Stats')!.speed*=2
+  })
+  world.services.get(TimeService).delayedCall(10000, ()=> {
+    console.log("you're exausted")
+    player!.get('Stats')!.speed/=4
+  })
+
+
 
   // ==========================================
   // 1. ИНИЦИАЛИЗАЦИЯ PIXI.JS V8

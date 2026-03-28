@@ -25,21 +25,50 @@ const applyTransformOverrides = (
   return transform
 }
 
-const applyVelocityOverrides = (entity: Entity, overrides?: SpawnOverrides): void => {
+const applyVelocityOverrides = (
+  entity: Entity,
+  config: PrefabConfig,
+  overrides?: SpawnOverrides
+): void => {
   if (!entity.has('Velocity')) return
 
   const velocity = entity.get('Velocity')!
 
   if (overrides?.vx !== undefined) velocity.vx = overrides.vx
+  else if (config.vx !== undefined) velocity.vx = config.vx
   if (overrides?.vy !== undefined) velocity.vy = overrides.vy
+  else if (config.vy !== undefined) velocity.vy = config.vy
 }
 
-const applyHealthOverrides = (entity: Entity, config: PrefabConfig): void => {
+const applyStatsOverrides = (
+  entity: Entity,
+  config: PrefabConfig,
+  overrides?: SpawnOverrides
+): void => {
+  if (!entity.has('Stats')) return
+  
+  const stats = entity.get('Stats')!
+
+  if (overrides?.speed !== undefined) stats.speed = overrides.speed
+  else if (config.speed !== undefined) stats.speed = config.speed
+}
+
+const applyHealthOverrides = (
+  entity: Entity,
+  config: PrefabConfig,
+  overrides?: SpawnOverrides
+): void => {
   if (!entity.has('Health') || config.hp === undefined) return
 
   const health = entity.get('Health')!
-  health.max = config.hp
-  health.current = config.hp
+  if (overrides?.hp !== undefined) {
+    health.max = overrides.hp
+    health.current = overrides.hp
+  }
+  else if (config.hp !== undefined) {
+    health.max = config.hp
+    health.current = config.hp
+  }
 }
 
 const applyViewOverrides = (
@@ -66,7 +95,8 @@ export const overrideComponentData = (
   poolId?: string
 ): void => {
   const transform = applyTransformOverrides(entity, config, overrides)
-  applyVelocityOverrides(entity, overrides)
-  applyHealthOverrides(entity, config)
+  applyVelocityOverrides(entity, config, overrides)
+  applyStatsOverrides(entity, config, overrides)
+  applyHealthOverrides(entity, config, overrides)
   applyViewOverrides(entity, transform, viewNode, poolId)
 }

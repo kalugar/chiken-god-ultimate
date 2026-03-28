@@ -1,11 +1,13 @@
 import { Entity } from './entity'
+import type { World } from './world';
 
 export abstract class System {
+  public world!: World;
   public mask: number
   public excludeMask: number
   public entities: Set<Entity> = new Set()
 
-  constructor(requiredMask: number, excludeMask: number) {
+  constructor(requiredMask: number, excludeMask: number = 0) {
     this.mask = requiredMask
     this.excludeMask = excludeMask
   }

@@ -6,7 +6,8 @@ export const ComponentMask = {
   View: 1 << 2,
   Player: 1 << 3,
   Enemy: 1 << 4,
-  Health: 1 << 5
+  Health: 1 << 5,
+  Stats: 1 << 6,
 } as const
 
 export type ComponentMask = (typeof ComponentMask)[keyof typeof ComponentMask]

@@ -10,3 +10,5 @@ export type TimeEvent = {
   repeat: boolean
   elapsed: number
 }
+
+export type InputAction = 'up' | 'down' | 'left' | 'right' | 'fire';

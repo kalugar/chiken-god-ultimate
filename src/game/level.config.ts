@@ -9,6 +9,7 @@ export default {
     hp: 200,
     x: 100,
     y: 100,
+    speed: 0.25,
     view: {
       texture: 'bunny',
       alpha: 0.89,

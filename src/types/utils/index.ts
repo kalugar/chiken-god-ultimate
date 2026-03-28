@@ -15,6 +15,7 @@ export interface PrefabConfig {
   rotation?: number
   vx?: number
   vy?: number
+  speed?: number
   view?: RawViewConfig
 }
 
@@ -23,6 +24,7 @@ export interface SpawnOverrides {
   y?: number
   vx?: number
   vy?: number
+  speed?: number
   rotation?: number
   hp?: number
 }

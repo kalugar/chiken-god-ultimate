@@ -10,10 +10,13 @@ export class RenderSystem extends System {
 
   update(delta: number, entity: Entity) {
     const transform = entity.get('Transform')!
-    const view = entity.get('View')!
+    const view = entity.get('View')
 
-    view.node!.x = transform.x
-    view.node!.y = transform.y
-    view.node!.rotation = transform.rotation
+    if(view?.node) {
+      view.node.x = transform.x
+      view.node.y = transform.y
+      if(transform.rotation !== undefined)
+      view.node.rotation = transform.rotation
+    }
   }
 }

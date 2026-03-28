@@ -120,9 +120,10 @@ export class SceneFactory {
         view.visible = true
       } else {
         const targetParent = this.resolveParent(config.layer, viewData.parent)
-        view = createView({ ...viewData, parent: targetParent })
+        view = createView({ ...viewData, label: prefabId, parent: targetParent })
         if (view) {
           this.structuralViews.set(prefabId, view)
+          this.world.setTag(prefabId, entity);
         }
       }
     }

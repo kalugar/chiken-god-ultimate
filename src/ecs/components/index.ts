@@ -12,6 +12,11 @@ export interface VelocityData {
   vy: number
 }
 
+export interface StatsData {
+  speed: number
+}
+
+
 export interface ViewData {
   node: Container | null
   poolId?: number | string
@@ -37,6 +42,7 @@ export interface ComponentRegistry {
   Health: HealthData
   Player: PlayerData
   Enemy: EnemyData
+  Stats: StatsData
 }
 
 export type ComponentName = keyof ComponentRegistry
@@ -46,6 +52,7 @@ export const DefaultTransform: TransformData = { x: 0, y: 0, rotation: 0 }
 export const DefaultView: ViewData = { node: null }
 export const DefaultPlayer: PlayerData = { score: 0 }
 export const DefaultEnemy: EnemyData = { state: 0 }
+export const DefaultStats: EnemyData = { speed: 0 }
 
 export const defaultComponentRegistry = {
   Transform: DefaultTransform,
@@ -53,5 +60,6 @@ export const defaultComponentRegistry = {
   Health: DefaultHealth,
   View: DefaultView,
   Player: DefaultPlayer,
-  Enemy: DefaultEnemy
+  Enemy: DefaultEnemy,
+  Stats: DefaultStats,
 }

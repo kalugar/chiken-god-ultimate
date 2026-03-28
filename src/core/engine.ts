@@ -10,6 +10,7 @@ import { FIXED_TIME_STEP, LOGICAL_SIZE, RESIZE_DEBOUNCE } from './constants'
 import { ServiceLocator } from '@services/locator'
 import SystemTimeService from '@services/service.system.time'
 import { EngineControl } from './engine.control'
+import { InputService } from '@services/services.input'
 
 export class Engine {
   public readonly app: Application
@@ -43,6 +44,7 @@ export class Engine {
 
     this.services.register(TimeService, gameTime)
     this.services.register(SystemTimeService, systemTime)
+    this.services.register(InputService, new InputService())
     this.services.register(EngineControl, controlPanel);
 
     Ticker.shared.add((ticker) => systemTime.update(ticker.deltaMS))
@@ -65,6 +67,24 @@ export class Engine {
     this.resize()
     this.state.isRunning = true
     this.app.ticker.add(this.update.bind(this))
+    window.addEventListener('blur', () => {
+      if (!this.state.isRunning) return; // Если уже на паузе, ничего не делаем
+      
+      this.pause();
+      console.log('Игра поставлена на паузу (потеря фокуса)');
+      
+      // Позже здесь ты вызовешь глобальное событие, чтобы показать HTML-меню паузы
+      // globalEvents.emit('cmd:show_pause_menu');
+    });
+
+    window.addEventListener('focus', () => {
+      // Здесь мы НЕ вызываем this.resume()!
+      // Мы просто логируем или меняем состояние UI, если нужно.
+      // Снять с паузы игрок должен сам, кликнув по экрану или нажав ESC.
+      this.resume() //временная залушка
+
+      console.log('Фокус возвращен. Ждем команду от игрока для продолжения.');
+    });
   }
 
   public pause(): void {
@@ -72,8 +92,9 @@ export class Engine {
   }
 
   public resume(): void {
-    this.state.isRunning = true
     this.timeStampAccumulator = 0
+    this.services.get(InputService).clearAll();
+    this.state.isRunning = true
   }
 
   public setSpeed(value: number): void {
@@ -109,7 +130,6 @@ export class Engine {
   }
 
   private resize() {
-    console.log('resize')
     const screenWidth = this.app.screen.width
     const screenHeight = this.app.screen.height
 

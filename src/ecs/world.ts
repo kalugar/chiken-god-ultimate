@@ -11,6 +11,7 @@ export class World {
   public readonly services: ServiceLocator
   // public events: EventEmitter
   private entities: Entity[]
+  private taggedEntities: Map<string, Entity> = new Map();
   private availableIds: number[]
   private systems: System[]
 
@@ -59,9 +60,14 @@ export class World {
     entity.components.clear()
     entity.mask = ComponentMask.None
 
+    
     this.updateEntityMask(entity)
     this.activeEntities.delete(entity)
     this.availableIds.push(id)
+    if (entity.tag) {
+      this.taggedEntities.delete(entity.tag);
+      entity.tag = undefined;
+    }
   }
 
   public addComponent(
@@ -83,21 +89,28 @@ export class World {
     this.updateEntityMask(entity)
   }
 
-  public addTag(entity: Entity, tagMask: number): void {
-    if (entity.isDestroyed || (entity.mask & tagMask) === tagMask) return
+  public setTag(tag: string, entity: Entity): void {
+    // 1. Защита: Если у сущности УЖЕ был какой-то тег
+    if (entity.tag && entity.tag !== tag) {
+      this.taggedEntities.delete(entity.tag);
+    }
 
-    entity.mask |= tagMask
-    this.updateEntityMask(entity)
+    // 2. Предупреждение: Если этот тег уже занят кем-то другим
+    if (this.taggedEntities.has(tag)) {
+      console.warn(`[World] Внимание: Сущность с тегом "${tag}" уже существует! Старая сущность потеряет тег.`);
+      const oldEntity = this.taggedEntities.get(tag)!;
+      oldEntity.tag = undefined;
+    }
+    entity.tag = tag;
+    this.taggedEntities.set(tag, entity);
   }
 
-  public removeTag(entity: Entity, tagMask: number): void {
-    if (entity.isDestroyed || (entity.mask & tagMask) === 0) return
-
-    entity.mask &= ~tagMask
-    this.updateEntityMask(entity)
+  public getEntityByTag(tag: string): Entity | undefined {
+    return this.taggedEntities.get(tag);
   }
 
   public addSystem(system: System): this {
+    system.world = this
     this.systems.push(system)
 
     for (const entity of this.activeEntities) {

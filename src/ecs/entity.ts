@@ -7,6 +7,7 @@ export class Entity {
   public components: Map<ComponentName, ComponentRegistry[ComponentName]> = new Map()
   public mask: number = ComponentMask.None
   public isDestroyed: boolean = false
+  public tag?: string
 
   constructor(id: number) {
     this.id = id
