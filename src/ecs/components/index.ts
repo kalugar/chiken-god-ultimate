@@ -16,7 +16,6 @@ export interface StatsData {
   speed: number
 }
 
-
 export interface ViewData {
   node: Container | null
   poolId?: number | string
@@ -61,5 +60,5 @@ export const defaultComponentRegistry = {
   View: DefaultView,
   Player: DefaultPlayer,
   Enemy: DefaultEnemy,
-  Stats: DefaultStats,
+  Stats: DefaultStats
 }

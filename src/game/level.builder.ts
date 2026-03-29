@@ -1,14 +1,13 @@
-import type { Engine } from '@core/engine'
+import type { World } from '@ecs/world'
 
 import { MovementSystem, RenderSystem } from '@ecs/systems'
+import { InputSystem } from '@ecs/systems/input.system'
+import TimeService from '@services/service.time'
+import LayersService from '@services/sevice.layers'
 import { SceneFactory } from '@utils/factory'
 import { Assets, Texture } from 'pixi.js'
 
 import levelConfig from './level.config'
-import type { World } from '@ecs/world'
-import LayersService from '@services/sevice.layers'
-import { InputSystem } from '@ecs/systems/input.system'
-import TimeService from '@services/service.time'
 
 // import type { ViewData } from '@ecs/components'
 
@@ -40,7 +39,6 @@ export async function startLevel(world: World) {
 
   const factory = new SceneFactory(world, services.get(LayersService))
 
-
   factory.loadScene(levelConfig)
 
   factory.spawn('enemy')
@@ -51,16 +49,14 @@ export async function startLevel(world: World) {
   console.log(player)
   // console.log(factory.structuralViews)
 
-  world.services.get(TimeService).delayedCall(5000, ()=> {
+  world.services.get(TimeService).delayedCall(5000, () => {
     console.log('speed doubled')
-    player!.get('Stats')!.speed*=2
+    player!.get('Stats')!.speed *= 2
   })
-  world.services.get(TimeService).delayedCall(10000, ()=> {
+  world.services.get(TimeService).delayedCall(10_000, () => {
     console.log("you're exausted")
-    player!.get('Stats')!.speed/=4
+    player!.get('Stats')!.speed /= 4
   })
-
-
 
   // ==========================================
   // 1. ИНИЦИАЛИЗАЦИЯ PIXI.JS V8

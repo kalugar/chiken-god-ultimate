@@ -13,14 +13,13 @@ const applyTransformOverrides = (
 
   const transform = entity.get('Transform')!
 
-  if (overrides?.x !== undefined) transform.x = overrides.x
-  else if (config.x !== undefined) transform.x = config.x
+  const targetX = overrides?.x ?? config.x
+  const targetY = overrides?.y ?? config.y
+  const targetRotation = overrides?.rotation ?? config.rotation
 
-  if (overrides?.y !== undefined) transform.y = overrides.y
-  else if (config.y !== undefined) transform.y = config.y
-
-  if (overrides?.rotation !== undefined) transform.rotation = overrides.rotation
-  else if (config.rotation !== undefined) transform.rotation = config.rotation
+  if (targetX) transform.x = targetX
+  if (targetY) transform.y = targetY
+  if (targetRotation) transform.rotation = targetRotation
 
   return transform
 }
@@ -34,10 +33,11 @@ const applyVelocityOverrides = (
 
   const velocity = entity.get('Velocity')!
 
-  if (overrides?.vx !== undefined) velocity.vx = overrides.vx
-  else if (config.vx !== undefined) velocity.vx = config.vx
-  if (overrides?.vy !== undefined) velocity.vy = overrides.vy
-  else if (config.vy !== undefined) velocity.vy = config.vy
+  const targetVelocityX = overrides?.vx ?? config.vx
+  const targetVelocityY = overrides?.vy ?? config.vy
+
+  if (targetVelocityX) velocity.vx = targetVelocityX
+  if (targetVelocityY) velocity.vy = targetVelocityY
 }
 
 const applyStatsOverrides = (
@@ -46,11 +46,12 @@ const applyStatsOverrides = (
   overrides?: SpawnOverrides
 ): void => {
   if (!entity.has('Stats')) return
-  
+
   const stats = entity.get('Stats')!
 
-  if (overrides?.speed !== undefined) stats.speed = overrides.speed
-  else if (config.speed !== undefined) stats.speed = config.speed
+  const targetSpeed = overrides?.speed ?? config.speed
+
+  if (targetSpeed) stats.speed = targetSpeed
 }
 
 const applyHealthOverrides = (
@@ -58,17 +59,14 @@ const applyHealthOverrides = (
   config: PrefabConfig,
   overrides?: SpawnOverrides
 ): void => {
-  if (!entity.has('Health') || config.hp === undefined) return
-
+  if (!entity.has('Health')) return
   const health = entity.get('Health')!
-  if (overrides?.hp !== undefined) {
-    health.max = overrides.hp
-    health.current = overrides.hp
-  }
-  else if (config.hp !== undefined) {
-    health.max = config.hp
-    health.current = config.hp
-  }
+
+  const targetHealthCurrent = overrides?.hp ?? config.hp
+  const targetHealthMax = overrides?.hp ?? config.hp
+
+  if (targetHealthMax) health.max = targetHealthMax
+  if (targetHealthCurrent) health.current = targetHealthCurrent
 }
 
 const applyViewOverrides = (
