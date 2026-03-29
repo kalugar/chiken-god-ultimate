@@ -1,3 +1,4 @@
+import type { StatsData } from '@ecs/components'
 import type { RawViewConfig } from '@utils/factory/view.selector'
 
 export type HpData = {
@@ -9,14 +10,13 @@ export interface PrefabConfig {
   components?: number
   layer?: string
   poolSize?: number
-  hp?: number
   x?: number
   y?: number
   rotation?: number
   vx?: number
   vy?: number
-  speed?: number
   view?: RawViewConfig
+  stats?: StatsData
 }
 
 export interface SpawnOverrides {
@@ -24,9 +24,8 @@ export interface SpawnOverrides {
   y?: number
   vx?: number
   vy?: number
-  speed?: number
   rotation?: number
-  hp?: number
+  stats?: StatsData
 }
 
 export type SceneConfig = Record<string, PrefabConfig>

@@ -1,8 +1,7 @@
 import type { World } from '@ecs/world'
 
-import { MovementSystem, RenderSystem } from '@ecs/systems'
-import { InputSystem } from '@ecs/systems/input.system'
-import TimeService from '@services/service.time'
+import { MovementSystem, RenderSystem, InputSystem } from '@ecs/systems'
+// import TimeService from '@services/service.time'
 import LayersService from '@services/sevice.layers'
 import { SceneFactory } from '@utils/factory'
 import { Assets, Texture } from 'pixi.js'
@@ -47,16 +46,16 @@ export async function startLevel(world: World) {
   const player = world.getEntityByTag('player')
 
   console.log(player)
-  // console.log(factory.structuralViews)
+  // // console.log(factory.structuralViews)
 
-  world.services.get(TimeService).delayedCall(5000, () => {
-    console.log('speed doubled')
-    player!.get('Stats')!.speed *= 2
-  })
-  world.services.get(TimeService).delayedCall(10_000, () => {
-    console.log("you're exausted")
-    player!.get('Stats')!.speed /= 4
-  })
+  // world.services.get(TimeService).delayedCall(5000, () => {
+  //   console.log('speed doubled')
+  //   player!.get('Stats')!.speed *= 2
+  // })
+  // world.services.get(TimeService).delayedCall(10_000, () => {
+  //   console.log("you're exausted")
+  //   player!.get('Stats')!.speed /= 4
+  // })
 
   // ==========================================
   // 1. ИНИЦИАЛИЗАЦИЯ PIXI.JS V8

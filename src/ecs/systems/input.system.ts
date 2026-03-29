@@ -1,4 +1,4 @@
-import { ComponentMask } from '@ecs/components/component.mask'
+import { getComponentsMask } from '@ecs/components/components.map'
 import { InputService } from '@services/services.input'
 
 import type { Entity } from '../entity'
@@ -12,7 +12,7 @@ export class InputSystem extends System {
   private isFiring = false
 
   constructor() {
-    super(ComponentMask.Player | ComponentMask.Velocity)
+    super(getComponentsMask('player'))
   }
 
   // Переопределяем общий цикл, чтобы подготовить данные ОДИН раз за кадр
@@ -47,9 +47,11 @@ export class InputSystem extends System {
     const velocity = entity.get('Velocity')!
     const stats = entity.get('Stats')!
 
-    // Умножаем направление на личную скорость сущности
-    velocity.vx = this.currentDirX * stats.speed
-    velocity.vy = this.currentDirY * stats.speed
+    const speed = stats.speed ?? 0
+
+    // 2. Применяем скорость к вектору движения
+    velocity.vx = this.currentDirX * speed
+    velocity.vy = this.currentDirY * speed
 
     if (this.isFiring) {
       // Здесь можно будет дернуть Factory для создания пули

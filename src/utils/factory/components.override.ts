@@ -4,6 +4,8 @@ import type { Container } from 'pixi.js'
 
 import { DefaultTransform, type TransformData } from '@ecs/components'
 
+import { normalizeStat } from './normalize.stat'
+
 const applyTransformOverrides = (
   entity: Entity,
   config: PrefabConfig,
@@ -49,24 +51,20 @@ const applyStatsOverrides = (
 
   const stats = entity.get('Stats')!
 
-  const targetSpeed = overrides?.speed ?? config.speed
+  const overStats = overrides?.stats
+  const confStats = config?.stats
 
-  if (targetSpeed) stats.speed = targetSpeed
-}
+  const targetSpeed = overStats?.speed ?? confStats?.speed
+  const targetHp = overStats?.hp ?? confStats?.hp
+  const targetMp = overStats?.mp ?? confStats?.mp
+  const targetStamina = overStats?.stamina ?? confStats?.stamina
+  const targetShield = overStats?.shield ?? confStats?.shield
 
-const applyHealthOverrides = (
-  entity: Entity,
-  config: PrefabConfig,
-  overrides?: SpawnOverrides
-): void => {
-  if (!entity.has('Health')) return
-  const health = entity.get('Health')!
-
-  const targetHealthCurrent = overrides?.hp ?? config.hp
-  const targetHealthMax = overrides?.hp ?? config.hp
-
-  if (targetHealthMax) health.max = targetHealthMax
-  if (targetHealthCurrent) health.current = targetHealthCurrent
+  if (targetSpeed !== undefined) stats.speed = targetSpeed
+  if (targetHp !== undefined) stats.hp = normalizeStat(targetHp)
+  if (targetMp !== undefined) stats.mp = normalizeStat(targetMp)
+  if (targetStamina !== undefined) stats.stamina = normalizeStat(targetStamina)
+  if (targetShield !== undefined) stats.shield = normalizeStat(targetShield)
 }
 
 const applyViewOverrides = (
@@ -95,6 +93,5 @@ export const overrideComponentData = (
   const transform = applyTransformOverrides(entity, config, overrides)
   applyVelocityOverrides(entity, config, overrides)
   applyStatsOverrides(entity, config, overrides)
-  applyHealthOverrides(entity, config, overrides)
   applyViewOverrides(entity, transform, viewNode, poolId)
 }

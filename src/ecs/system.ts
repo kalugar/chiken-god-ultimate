@@ -1,8 +1,9 @@
+import type { World } from './world'
+
 import { Entity } from './entity'
-import type { World } from './world';
 
 export abstract class System {
-  public world!: World;
+  public world!: World
   public mask: number
   public excludeMask: number
   public entities: Set<Entity> = new Set()

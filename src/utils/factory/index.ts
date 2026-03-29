@@ -123,7 +123,7 @@ export class SceneFactory {
         view = createView({ ...viewData, label: prefabId, parent: targetParent })
         if (view) {
           this.structuralViews.set(prefabId, view)
-          this.world.setTag(prefabId, entity);
+          this.world.setTag(prefabId, entity)
         }
       }
     }

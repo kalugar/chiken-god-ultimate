@@ -1,9 +1,10 @@
+import type { ServiceLocator } from '@services/locator'
+
 import { ComponentMask } from '@ecs/components/component.mask'
 import { Entity } from '@ecs/entity'
 import { System } from '@ecs/system'
 
 import type { ComponentName, defaultComponentRegistry } from './components'
-import type { ServiceLocator } from '@services/locator'
 // import { EventEmitter } from './utils/event-emitter'
 
 export class World {
@@ -11,7 +12,7 @@ export class World {
   public readonly services: ServiceLocator
   // public events: EventEmitter
   private entities: Entity[]
-  private taggedEntities: Map<string, Entity> = new Map();
+  private taggedEntities: Map<string, Entity> = new Map()
   private availableIds: number[]
   private systems: System[]
 
@@ -60,13 +61,12 @@ export class World {
     entity.components.clear()
     entity.mask = ComponentMask.None
 
-    
     this.updateEntityMask(entity)
     this.activeEntities.delete(entity)
     this.availableIds.push(id)
     if (entity.tag) {
-      this.taggedEntities.delete(entity.tag);
-      entity.tag = undefined;
+      this.taggedEntities.delete(entity.tag)
+      entity.tag = undefined
     }
   }
 
@@ -92,21 +92,23 @@ export class World {
   public setTag(tag: string, entity: Entity): void {
     // 1. Защита: Если у сущности УЖЕ был какой-то тег
     if (entity.tag && entity.tag !== tag) {
-      this.taggedEntities.delete(entity.tag);
+      this.taggedEntities.delete(entity.tag)
     }
 
     // 2. Предупреждение: Если этот тег уже занят кем-то другим
     if (this.taggedEntities.has(tag)) {
-      console.warn(`[World] Внимание: Сущность с тегом "${tag}" уже существует! Старая сущность потеряет тег.`);
-      const oldEntity = this.taggedEntities.get(tag)!;
-      oldEntity.tag = undefined;
+      console.warn(
+        `[World] Внимание: Сущность с тегом "${tag}" уже существует! Старая сущность потеряет тег.`
+      )
+      const oldEntity = this.taggedEntities.get(tag)!
+      oldEntity.tag = undefined
     }
-    entity.tag = tag;
-    this.taggedEntities.set(tag, entity);
+    entity.tag = tag
+    this.taggedEntities.set(tag, entity)
   }
 
   public getEntityByTag(tag: string): Entity | undefined {
-    return this.taggedEntities.get(tag);
+    return this.taggedEntities.get(tag)
   }
 
   public addSystem(system: System): this {
