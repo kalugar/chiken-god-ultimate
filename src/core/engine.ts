@@ -3,6 +3,7 @@ import type { ApplicationOptions } from 'pixi.js'
 
 import { World } from '@ecs/world'
 import { ServiceLocator } from '@services/locator'
+import { FactoryService } from '@services/service.factory'
 import SystemTimeService from '@services/service.system.time'
 import TimeService from '@services/service.time'
 import { InputService } from '@services/services.input'
@@ -59,6 +60,8 @@ export class Engine {
     Ticker.shared.add((ticker) => systemTime.update(ticker.deltaMS))
 
     this.world = new World(maxEntities, this.services)
+
+    this.services.register(FactoryService, new FactoryService(this.world))
   }
 
   public async init(): Promise<void> {

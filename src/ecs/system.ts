@@ -15,6 +15,8 @@ export abstract class System {
 
   public execute(delta: number): void {
     for (const entity of this.entities) {
+      // eslint-disable-next-line sonarjs/todo-tag
+      //TODO: if(entity.isDestroyed) return
       this.update(delta, entity)
     }
   }

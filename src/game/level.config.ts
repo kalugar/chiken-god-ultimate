@@ -1,5 +1,6 @@
 import type { SceneConfig } from '@app-types'
 
+import { ComponentMask } from '@ecs/components/component.mask'
 import { getComponentsMask } from '@ecs/components/components.map'
 
 export default {
@@ -45,18 +46,19 @@ export default {
     }
   },
   bullet: {
-    components: getComponentsMask('dynamic'),
+    components: getComponentsMask('dynamic') | ComponentMask.LifeTime,
     layer: 'world',
     poolSize: 400,
     x: 0,
     y: 0,
+    lifeTime: 500,
     view: {
       type: 'graphics',
       parent: 'bulletsPool',
-      radius: 5,
+      radius: 3,
       fill: {
-        color: 0xff_00_00,
-        alpha: 0.75
+        color: 0xff_00_00
+        // alpha: 0.75
       }
     }
   }

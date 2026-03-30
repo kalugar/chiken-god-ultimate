@@ -16,7 +16,7 @@ export class World {
   private availableIds: number[]
   private systems: System[]
 
-  constructor(maxEntities: number = 10_000, services: ServiceLocator) {
+  constructor(maxEntities: number = 1000, services: ServiceLocator) {
     this.entities = Array.from({ length: maxEntities })
     this.availableIds = Array.from({ length: maxEntities })
     this.activeEntities = new Set()
@@ -58,6 +58,7 @@ export class World {
     // this.events.emit('ON_ENTITY_DESTROYED', entity);
 
     entity.isDestroyed = true
+    entity.get('View')?.node?.destroy()
     entity.components.clear()
     entity.mask = ComponentMask.None
 

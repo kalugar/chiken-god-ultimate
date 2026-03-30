@@ -8,6 +8,7 @@ export class MovementSystem extends System {
   }
 
   protected update(delta: number, entity: Entity): void {
+    if (entity.isDestroyed) return
     const transform = entity.get('Transform')!
     const velocity = entity.get('Velocity')!
 

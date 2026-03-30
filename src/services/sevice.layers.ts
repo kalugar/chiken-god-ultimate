@@ -2,9 +2,29 @@ import type { LayersOptions, RectangleSize } from '@app-types'
 
 import { Container, Graphics } from 'pixi.js'
 
-import AbsoluteLayer from '../utils/layers/layer.absolute'
-import BaseLayer from '../utils/layers/layer.base'
 import { BaseService } from './service.base'
+
+export class BaseLayer extends Container {
+  resize(size: RectangleSize): void {
+    const { width, height, scale = 1 } = size
+
+    this.scale.set(scale)
+    const x = width / 2
+    const y = height / 2
+    this.position.set(x, y)
+  }
+}
+
+export class AbsoluteLayer extends BaseLayer {
+  resize(size: RectangleSize): void {
+    const { width, height, scale } = size
+
+    this.scale.set(scale)
+    // const x = width / 2
+    // const y = height / 2
+    // this.position.set(x, y)
+  }
+}
 
 export default class LayersService extends BaseService {
   #root: Container

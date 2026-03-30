@@ -54,6 +54,7 @@ export type RawViewConfig<T extends ViewTypeKey = ViewTypeKey> = Omit<
   height?: number
   radius?: number
   fill?: FillInput
+  anchor?: number | { x: number; y: number }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any
 }

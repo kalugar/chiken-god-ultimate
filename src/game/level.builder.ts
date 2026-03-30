@@ -1,9 +1,11 @@
 import type { World } from '@ecs/world'
 
 import { MovementSystem, RenderSystem, InputSystem } from '@ecs/systems'
+import { LifeTimeSystem } from '@ecs/systems/lifetime.system'
+import { WeaponSystem } from '@ecs/systems/weapon.system'
+import { FactoryService } from '@services/service.factory'
 // import TimeService from '@services/service.time'
-import LayersService from '@services/sevice.layers'
-import { SceneFactory } from '@utils/factory'
+// import LayersService from '@services/sevice.layers'
 import { Assets, Texture } from 'pixi.js'
 
 import levelConfig from './level.config'
@@ -27,21 +29,21 @@ import levelConfig from './level.config'
 // import { LifespanSystem } from '@ecs/systems/lifespan.system'; // Если напишем
 
 export async function startLevel(world: World) {
-  const { services } = world
-
   await Assets.load<Texture>({ alias: 'bunny', src: 'https://pixijs.com/assets/bunny.png' })
   world.addSystem(new InputSystem()) // Двигаем объекты
   world.addSystem(new MovementSystem()) // Двигаем объекты
+  world.addSystem(new WeaponSystem()) // Двигаем объекты
+  world.addSystem(new LifeTimeSystem()) // Двигаем объекты
   // world.addSystem(new CollisionSystem(world)) // Проверяем столкновения
   // world.addSystem(new LifespanSystem(world));     // Убиваем старые пули
   world.addSystem(new RenderSystem()) // Рисуем результат
 
-  const factory = new SceneFactory(world, services.get(LayersService))
+  const factory = world.services.get(FactoryService)
 
   factory.loadScene(levelConfig)
 
-  factory.spawn('enemy')
-  factory.spawn('bullet')
+  // factory.spawn('enemy')
+  // factory.spawn('bullet')
 
   const player = world.getEntityByTag('player')
 

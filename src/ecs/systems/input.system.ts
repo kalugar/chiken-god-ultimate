@@ -1,3 +1,4 @@
+import { ComponentMask } from '@ecs/components/component.mask'
 import { getComponentsMask } from '@ecs/components/components.map'
 import { InputService } from '@services/services.input'
 
@@ -53,10 +54,19 @@ export class InputSystem extends System {
     velocity.vx = this.currentDirX * speed
     velocity.vy = this.currentDirY * speed
 
-    if (this.isFiring) {
-      // Здесь можно будет дернуть Factory для создания пули
+    // eslint-disable-next-line sonarjs/todo-tag
+    //TODO: добавить систему спринта по нажатию клавиши SHIFT и расхода стамины, stamina refill
+    // eslint-disable-next-line sonarjs/todo-tag
+    //TODO: добавить систему DASH и dash quantity, dash refill
 
-      console.log('Fire!')
+    if (!entity.has(ComponentMask.Weapon)) return
+
+    const weapon = entity.get('Weapon')!
+    weapon.isFiring = this.isFiring
+
+    if (this.currentDirX !== 0 || this.currentDirY !== 0) {
+      weapon.aimX = this.currentDirX
+      weapon.aimY = this.currentDirY
     }
   }
 }

@@ -1,27 +1,22 @@
 import type { SceneConfig, PrefabConfig, SpawnOverrides } from '@app-types'
-import type LayersService from '@services/sevice.layers'
 
 import { ComponentMask } from '@ecs/components/component.mask'
 import { Entity } from '@ecs/entity'
 import { World } from '@ecs/world'
 import { PoolManager } from '@services/service.object.pool'
-import { ObjectPool } from '@utils/ecs/object.pool'
-import { createView } from '@utils/factory/view.selector'
+import LayersService from '@services/sevice.layers'
+import { ObjectPool } from '@utils/object.pool'
+import { createView, type RawViewConfig } from '@utils/view.selector'
 import { Container } from 'pixi.js'
 
-import { attachComponents } from './components.builder'
-import { overrideComponentData } from './components.override'
+import { attachComponents } from '../utils/components.builder'
+import { overrideComponentData } from '../utils/components.override'
 
-export class SceneFactory {
-  private world: World
-  private layers: LayersService
+export class FactoryService {
   private prefabs: Map<string, PrefabConfig> = new Map()
   public structuralViews: Map<string, Container> = new Map()
 
-  constructor(world: World, layers: LayersService) {
-    this.world = world
-    this.layers = layers
-  }
+  constructor(private world: World) {}
 
   public loadScene(config: SceneConfig): void {
     this.prefabs.clear()
@@ -57,7 +52,7 @@ export class SceneFactory {
           )
 
         view.visible = false
-
+        this.resolveAnchor(view, config.view)
         return view
       },
       (view) => {
@@ -79,11 +74,22 @@ export class SceneFactory {
       }
     }
 
-    if (this.layers.has(layerLabel)) {
-      return this.layers.getLayerByLabel(layerLabel)
+    const layers = this.world.services.get(LayersService)
+
+    if (!layers)
+      throw new Error('[FactoryService] resolveParent dropped. Layers service is not registred')
+
+    if (layers.has(layerLabel)) {
+      return layers.getLayerByLabel(layerLabel)
     }
 
-    return this.layers.getLayerByLabel('world')
+    return layers.getLayerByLabel('world')
+  }
+
+  private resolveAnchor(view: Container, config?: RawViewConfig): void {
+    if ('anchor' in view) {
+      ;(view as { anchor: unknown }).anchor = config?.anchor ?? 0.5
+    }
   }
 
   public spawn(prefabId: string, overrides?: SpawnOverrides): Entity | null {
@@ -122,6 +128,7 @@ export class SceneFactory {
         const targetParent = this.resolveParent(config.layer, viewData.parent)
         view = createView({ ...viewData, label: prefabId, parent: targetParent })
         if (view) {
+          this.resolveAnchor(view, viewData)
           this.structuralViews.set(prefabId, view)
           this.world.setTag(prefabId, entity)
         }

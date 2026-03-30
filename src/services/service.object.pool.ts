@@ -1,6 +1,6 @@
 import type { Container } from 'pixi.js'
 
-import { ObjectPool } from '@utils/ecs/object.pool'
+import { ObjectPool } from '@utils/object.pool'
 
 import { BaseService } from './service.base'
 

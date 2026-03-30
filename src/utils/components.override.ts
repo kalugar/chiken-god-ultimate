@@ -42,6 +42,20 @@ const applyVelocityOverrides = (
   if (targetVelocityY) velocity.vy = targetVelocityY
 }
 
+const applyLifeTimeOverrides = (
+  entity: Entity,
+  config: PrefabConfig,
+  overrides?: SpawnOverrides
+): void => {
+  if (!entity.has('LifeTime')) return
+
+  const velocity = entity.get('LifeTime')!
+
+  const targetLifeTime = overrides?.lifeTime ?? config.lifeTime
+
+  if (targetLifeTime) velocity.lifeTime = targetLifeTime
+}
+
 const applyStatsOverrides = (
   entity: Entity,
   config: PrefabConfig,
@@ -94,4 +108,5 @@ export const overrideComponentData = (
   applyVelocityOverrides(entity, config, overrides)
   applyStatsOverrides(entity, config, overrides)
   applyViewOverrides(entity, transform, viewNode, poolId)
+  applyLifeTimeOverrides(entity, config, overrides)
 }
