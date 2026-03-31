@@ -4,12 +4,11 @@ import { ComponentMask } from '@ecs/components/component.mask'
 import { System } from '@ecs/system'
 
 export class LifeTimeSystem extends System {
-  constructor() {
+  constructor(private destroyEntity: (entityId: number) => void) {
     super(ComponentMask.LifeTime)
   }
 
   protected update(delta: number, entity: Entity): void {
-    console.log('lifetime updater')
     if (entity.isDestroyed) return
 
     const lifeTime = entity.get('LifeTime')!
@@ -18,7 +17,7 @@ export class LifeTimeSystem extends System {
     if (lifeTime.lifeTime <= 0) {
       // Сущность умирает. World сам почистит View через свою логику,
       // вернет Entity в пул и уберет её из всех систем!
-      this.world.destroyEntity(entity.id)
+      this.destroyEntity(entity.id)
     }
   }
 }

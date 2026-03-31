@@ -19,9 +19,9 @@ const applyTransformOverrides = (
   const targetY = overrides?.y ?? config.y
   const targetRotation = overrides?.rotation ?? config.rotation
 
-  if (targetX) transform.x = targetX
-  if (targetY) transform.y = targetY
-  if (targetRotation) transform.rotation = targetRotation
+  if (targetX !== undefined) transform.x = targetX
+  if (targetY !== undefined) transform.y = targetY
+  if (targetRotation !== undefined) transform.rotation = targetRotation
 
   return transform
 }
@@ -38,8 +38,8 @@ const applyVelocityOverrides = (
   const targetVelocityX = overrides?.vx ?? config.vx
   const targetVelocityY = overrides?.vy ?? config.vy
 
-  if (targetVelocityX) velocity.vx = targetVelocityX
-  if (targetVelocityY) velocity.vy = targetVelocityY
+  if (targetVelocityX !== undefined) velocity.vx = targetVelocityX
+  if (targetVelocityY !== undefined) velocity.vy = targetVelocityY
 }
 
 const applyLifeTimeOverrides = (
@@ -53,7 +53,21 @@ const applyLifeTimeOverrides = (
 
   const targetLifeTime = overrides?.lifeTime ?? config.lifeTime
 
-  if (targetLifeTime) velocity.lifeTime = targetLifeTime
+  if (targetLifeTime !== undefined) velocity.lifeTime = targetLifeTime
+}
+
+const applyColliderOverrides = (
+  entity: Entity,
+  config: PrefabConfig,
+  overrides?: SpawnOverrides
+): void => {
+  if (!entity.has('Collider')) return
+
+  const velocity = entity.get('Collider')!
+
+  const targetColliderRadius = overrides?.colliderRadius ?? config.colliderRadius
+
+  if (targetColliderRadius !== undefined) velocity.colliderRadius = targetColliderRadius
 }
 
 const applyStatsOverrides = (
@@ -79,6 +93,30 @@ const applyStatsOverrides = (
   if (targetMp !== undefined) stats.mp = normalizeStat(targetMp)
   if (targetStamina !== undefined) stats.stamina = normalizeStat(targetStamina)
   if (targetShield !== undefined) stats.shield = normalizeStat(targetShield)
+}
+const applyWeaponOverrides = (
+  entity: Entity,
+  config: PrefabConfig,
+  overrides?: SpawnOverrides
+): void => {
+  if (!entity.has('Weapon')) return
+
+  const stats = entity.get('Weapon')!
+
+  const overWeapon = overrides?.weapon
+  const confWeapon = config?.weapon
+
+  const targetisFiring = overWeapon?.isFiring ?? confWeapon?.isFiring
+  const targetFireRate = overWeapon?.fireRate ?? confWeapon?.fireRate
+  const targetCooldownTimer = overWeapon?.cooldownTimer ?? confWeapon?.cooldownTimer
+  const targetAimX = overWeapon?.aimX ?? confWeapon?.aimX
+  const targetAimY = overWeapon?.aimY ?? confWeapon?.aimY
+
+  if (targetisFiring !== undefined) stats.isFiring = targetisFiring
+  if (targetFireRate !== undefined) stats.fireRate = targetFireRate
+  if (targetCooldownTimer !== undefined) stats.cooldownTimer = targetCooldownTimer
+  if (targetAimX !== undefined) stats.aimX = targetAimX
+  if (targetAimY !== undefined) stats.aimY = targetAimY
 }
 
 const applyViewOverrides = (
@@ -107,6 +145,8 @@ export const overrideComponentData = (
   const transform = applyTransformOverrides(entity, config, overrides)
   applyVelocityOverrides(entity, config, overrides)
   applyStatsOverrides(entity, config, overrides)
-  applyViewOverrides(entity, transform, viewNode, poolId)
   applyLifeTimeOverrides(entity, config, overrides)
+  applyColliderOverrides(entity, config, overrides)
+  applyWeaponOverrides(entity, config, overrides)
+  applyViewOverrides(entity, transform, viewNode, poolId)
 }

@@ -3,7 +3,6 @@ import type { SceneConfig, PrefabConfig, SpawnOverrides } from '@app-types'
 import { ComponentMask } from '@ecs/components/component.mask'
 import { Entity } from '@ecs/entity'
 import { World } from '@ecs/world'
-import { PoolManager } from '@services/service.object.pool'
 import LayersService from '@services/sevice.layers'
 import { ObjectPool } from '@utils/object.pool'
 import { createView, type RawViewConfig } from '@utils/view.selector'
@@ -11,8 +10,9 @@ import { Container } from 'pixi.js'
 
 import { attachComponents } from '../utils/components.builder'
 import { overrideComponentData } from '../utils/components.override'
+import PoolService from './service.object.pool'
 
-export class FactoryService {
+export default class FactoryService {
   private prefabs: Map<string, PrefabConfig> = new Map()
   public structuralViews: Map<string, Container> = new Map()
 
@@ -22,7 +22,7 @@ export class FactoryService {
     this.prefabs.clear()
     this.structuralViews.clear()
 
-    PoolManager.clearAll()
+    PoolService.clearAll()
 
     for (const [prefabId, prefabConfig] of Object.entries(config)) {
       this.prefabs.set(prefabId, prefabConfig)
@@ -61,7 +61,7 @@ export class FactoryService {
       config.poolSize
     )
 
-    PoolManager.register(config.view.parent ?? prefabId, pool)
+    PoolService.register(config.view.parent ?? prefabId, pool)
   }
 
   private resolveParent(layerLabel?: string, parentPrefab?: string | Container): Container {
@@ -116,13 +116,13 @@ export class FactoryService {
 
     const viewComponent = entity.get('View')
     const poolId = (viewData && viewData.parent) ?? prefabId
-    const hasPool = PoolManager.has(poolId)
+    const hasPool = PoolService.has(poolId)
 
     let view: Container | null = null
 
     if (viewData && viewComponent) {
       if (hasPool) {
-        view = PoolManager.get(poolId)!
+        view = PoolService.get(poolId)!
         view.visible = true
       } else {
         const targetParent = this.resolveParent(config.layer, viewData.parent)

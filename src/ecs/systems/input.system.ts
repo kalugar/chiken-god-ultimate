@@ -1,6 +1,6 @@
 import { ComponentMask } from '@ecs/components/component.mask'
 import { getComponentsMask } from '@ecs/components/components.map'
-import { InputService } from '@services/services.input'
+import InputService from '@services/services.input'
 
 import type { Entity } from '../entity'
 
@@ -18,8 +18,7 @@ export class InputSystem extends System {
 
   // Переопределяем общий цикл, чтобы подготовить данные ОДИН раз за кадр
   public execute(delta: number): void {
-    const input = this.world.services.get(InputService)
-
+    const input = this.services.get(InputService)
     this.currentDirX = 0
     this.currentDirY = 0
 
@@ -62,11 +61,20 @@ export class InputSystem extends System {
     if (!entity.has(ComponentMask.Weapon)) return
 
     const weapon = entity.get('Weapon')!
+    const transform = entity.get('Transform')!
+    const input = this.services.get(InputService)
     weapon.isFiring = this.isFiring
 
-    if (this.currentDirX !== 0 || this.currentDirY !== 0) {
-      weapon.aimX = this.currentDirX
-      weapon.aimY = this.currentDirY
+    const aimDx = input.mouseX - transform.x
+    const aimDy = input.mouseY - transform.y
+
+    // 2. Высчитываем длину вектора (Теорема Пифагора)
+    const length = Math.hypot(aimDx, aimDy)
+
+    // 3. Нормализуем вектор (чтобы пули летели с одинаковой скоростью)
+    if (length > 0) {
+      weapon.aimX = aimDx / length
+      weapon.aimY = aimDy / length
     }
   }
 }

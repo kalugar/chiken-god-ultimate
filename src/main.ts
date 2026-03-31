@@ -5,7 +5,6 @@ import { startLevel } from '@game/level.builder'
 const engine = new Engine(engineConfig, 200_000)
 
 try {
-  await engine.init()
   await engine.start()
   console.log('🚀 Движок успешно запущен:')
 } catch (error) {

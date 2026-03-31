@@ -31,6 +31,9 @@ export interface ViewData {
 export interface PlayerData extends Component {
   score?: number
 }
+export interface ColliderData extends Component {
+  colliderRadius: number
+}
 
 export interface EnemyData extends Component {
   state?: number
@@ -57,6 +60,7 @@ export interface ComponentRegistry {
   Stats: StatsData
   Weapon: WeaponData
   LifeTime: LifeTimeData
+  Collider: ColliderData
 }
 
 export type ComponentName = keyof ComponentRegistry
@@ -64,9 +68,10 @@ export const DefaultVelocity: VelocityData = { vx: 0, vy: 0 }
 export const DefaultTransform: TransformData = { x: 0, y: 0, rotation: 0 }
 export const DefaultView: ViewData = { node: null }
 export const DefaultPlayer: PlayerData = { score: 0 }
+export const DefaultCollider: ColliderData = { colliderRadius: 0 }
 export const DefaultEnemy: EnemyData = { state: 0 }
-export const DefaultLifeTime: EnemyData = { lifeTime: 1000 }
-export const DefaultStat: EnemyData = {
+export const DefaultLifeTime: LifeTimeData = { lifeTime: 1000 }
+export const DefaultStat: StatsData = {
   speed: 0,
   hp: normalizeStat(1),
   mp: normalizeStat(1),
@@ -89,5 +94,6 @@ export const defaultComponentRegistry = {
   Enemy: DefaultEnemy,
   Stats: DefaultStat,
   LifeTime: DefaultLifeTime,
-  Weapon: DefaultWeapon
+  Weapon: DefaultWeapon,
+  Collider: DefaultCollider
 }

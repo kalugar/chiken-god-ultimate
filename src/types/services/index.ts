@@ -1,4 +1,4 @@
-import type { StatsData } from '@ecs/components'
+import type { StatsData, WeaponData } from '@ecs/components'
 import type { RawViewConfig } from '@utils/view.selector'
 
 export interface PrefabConfig {
@@ -13,6 +13,8 @@ export interface PrefabConfig {
   view?: RawViewConfig
   stats?: StatsData
   lifeTime?: number
+  weapon?: WeaponData
+  colliderRadius?: number
 }
 
 export interface SpawnOverrides {
@@ -23,6 +25,8 @@ export interface SpawnOverrides {
   rotation?: number
   stats?: StatsData
   lifeTime?: number
+  weapon?: WeaponData
+  colliderRadius?: number
 }
 
 export type SceneConfig = Record<string, PrefabConfig>

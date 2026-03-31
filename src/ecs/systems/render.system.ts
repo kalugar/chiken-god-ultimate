@@ -8,7 +8,7 @@ export class RenderSystem extends System {
     super(getComponentsMask('default'))
   }
 
-  update(delta: number, entity: Entity) {
+  protected update(delta: number, entity: Entity) {
     const transform = entity.get('Transform')!
     const view = entity.get('View')
 

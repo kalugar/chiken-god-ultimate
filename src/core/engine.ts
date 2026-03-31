@@ -1,27 +1,26 @@
-import type { EngineState, TimeEvent } from '@app-types'
+import type { EngineState } from '@app-types'
 import type { ApplicationOptions } from 'pixi.js'
 
 import { World } from '@ecs/world'
 import { ServiceLocator } from '@services/locator'
-import { FactoryService } from '@services/service.factory'
+import FactoryService from '@services/service.factory'
+import ResizeService from '@services/service.resize'
 import SystemTimeService from '@services/service.system.time'
 import TimeService from '@services/service.time'
-import { InputService } from '@services/services.input'
+import InputService from '@services/services.input'
 import LayersService from '@services/sevice.layers'
-import { Ticker, Application } from 'pixi.js'
+import { Ticker, Application, Rectangle } from 'pixi.js'
 
-import { FIXED_TIME_STEP, LOGICAL_SIZE, RESIZE_DEBOUNCE } from './constants'
+import { FIXED_TIME_STEP } from './constants'
 import { EngineControl } from './engine.control'
 
 export class Engine {
   public readonly app: Application
   public readonly world: World
-  public layers!: LayersService
   public readonly services: ServiceLocator
 
   private state: EngineState
   private timeStampAccumulator: number = 0
-  private resizeTimeout: TimeEvent | null = null
 
   constructor(config: Partial<ApplicationOptions>, maxEntities: number = 10_000) {
     this.state = {
@@ -50,6 +49,9 @@ export class Engine {
       public get isPaused(): boolean {
         return !self.state.isRunning
       }
+      public get settings(): Partial<ApplicationOptions> {
+        return self.state.settings
+      }
     })()
 
     this.services.register(TimeService, gameTime)
@@ -64,20 +66,41 @@ export class Engine {
     this.services.register(FactoryService, new FactoryService(this.world))
   }
 
-  public async init(): Promise<void> {
+  public async start(): Promise<void> {
     await this.app.init(this.state.settings)
     document.querySelector('#pixi-container')!.append(this.app.canvas)
 
-    this.app.renderer.on('resize', this.onResizeDebounced.bind(this))
-  }
+    const resize = new ResizeService(this.app, this.services, this.world.systems)
+    this.services.register(ResizeService, resize)
 
-  public start(): void {
+    this.app.renderer.on('resize', resize.resizeDebounced.bind(resize))
+
     const layers = new LayersService(this.app.stage, { defaultList: true })
     this.services.register(LayersService, layers)
 
-    this.resize()
     this.state.isRunning = true
+
     this.app.ticker.add(this.update.bind(this))
+
+    this.app.stage.eventMode = 'static'
+    // Чтобы Pixi ловил мышь ВЕЗДЕ, даже если фон прозрачный:
+    this.app.stage.hitArea = new Rectangle(-9999, -9999, 9999 * 2, 9999 * 2)
+
+    // Ловим глобальное движение мыши с идеальными логическими координатами
+    this.app.stage.on('globalpointermove', (e) => {
+      const input = this.services.get(InputService)
+      const layers = this.services.get(LayersService) // Достаем сервис слоев
+
+      // Получаем наш центрированный слой мира
+      const worldLayer = layers.getLayerByLabel('world')
+
+      // === ПЕРЕВОД КООРДИНАТ ===
+      // Pixi сам вычтет смещение width/2 и height/2, а также учтет scale слоя!
+      const localPos = worldLayer.toLocal(e.global)
+      input.mouseX = localPos.x
+      input.mouseY = localPos.y
+    })
+
     window.addEventListener('blur', () => {
       if (!this.state.isRunning) return // Если уже на паузе, ничего не делаем
 
@@ -128,39 +151,5 @@ export class Engine {
       this.world.update(FIXED_TIME_STEP)
       this.timeStampAccumulator -= FIXED_TIME_STEP
     }
-  }
-
-  private onResizeDebounced() {
-    if (this.resizeTimeout) {
-      this.services.get(SystemTimeService).clear(this.resizeTimeout)
-    }
-    this.resizeTimeout = this.services.get(SystemTimeService).delayedCall(RESIZE_DEBOUNCE, () => {
-      this.resize()
-      this.resizeTimeout = null
-    })
-  }
-
-  private resize() {
-    const screenWidth = this.app.screen.width
-    const screenHeight = this.app.screen.height
-
-    const logicalWidth = this.state.settings.width ?? LOGICAL_SIZE.width
-    const logicalHeight = this.state.settings.height ?? LOGICAL_SIZE.height
-
-    const cssW = Math.max(screenWidth, 1)
-    const cssH = Math.max(screenHeight, 1)
-
-    this.app.canvas.style.width = cssW + 'px'
-    this.app.canvas.style.height = cssH + 'px'
-
-    const scale = Math.max(cssW / logicalWidth, cssH / logicalHeight)
-
-    const newSize = {
-      width: cssW,
-      height: cssH,
-      scale
-    }
-
-    this.services.get(LayersService)?.resize(newSize)
   }
 }

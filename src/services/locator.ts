@@ -1,4 +1,4 @@
-import type { ServiceToken } from '@app-types'
+import type { RectangleSize, ServiceToken } from '@app-types'
 
 export class ServiceLocator {
   private services: Map<ServiceToken, any> = new Map()
@@ -38,4 +38,6 @@ export class ServiceLocator {
   public clear(): void {
     this.services.clear()
   }
+
+  public resize(newSize: RectangleSize): void {}
 }

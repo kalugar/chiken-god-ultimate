@@ -1,5 +1,6 @@
 import type { SceneConfig } from '@app-types'
 
+import { DefaultWeapon } from '@ecs/components'
 import { ComponentMask } from '@ecs/components/component.mask'
 import { getComponentsMask } from '@ecs/components/components.map'
 
@@ -7,8 +8,11 @@ export default {
   player: {
     components: getComponentsMask('player'),
     layer: 'world',
-    x: 100,
-    y: 100,
+    colliderRadius: 0,
+    weapon: {
+      ...DefaultWeapon,
+      fireRate: 16.7
+    },
     stats: {
       hp: 200,
       speed: 0.25
@@ -51,11 +55,11 @@ export default {
     poolSize: 400,
     x: 0,
     y: 0,
-    lifeTime: 500,
+    lifeTime: 750,
     view: {
       type: 'graphics',
       parent: 'bulletsPool',
-      radius: 3,
+      radius: 5,
       fill: {
         color: 0xff_00_00
         // alpha: 0.75

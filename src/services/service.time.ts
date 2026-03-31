@@ -1,12 +1,9 @@
 import type { TimeEvent } from '@app-types'
 
-import { BaseService } from './service.base'
-
-export default class TimeService extends BaseService {
+export default class TimeService {
   private timers: Set<TimeEvent> = new Set()
 
   constructor() {
-    super('TimeService')
     this.timers = new Set()
   }
 

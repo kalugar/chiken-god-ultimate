@@ -59,6 +59,7 @@ export default defineConfig([
       'import-x/no-cycle': ['error', { maxDepth: 10, ignoreExternal: true }],
 
       'no-unused-vars': 'off',
+      'no-explicit-any': 'off',
       'no-var': 'error',
       'no-console': 'off',
       'no-new': 'warn',
@@ -74,6 +75,7 @@ export default defineConfig([
       'unicorn/no-null': 'off',
       'unicorn/prefer-modern-math-apis': 'error',
       'unicorn/prefer-dom-node-remove': 'off',
+      'unicorn/prefer-global-this': 'off',
       'unicorn/prevent-abbreviations': 'off'
     }
   },

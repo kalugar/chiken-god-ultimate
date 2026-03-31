@@ -10,12 +10,12 @@ export default {
   eventFeatures: {
     move: true,
     click: true,
-    wheel: false,
-    globalMove: false
+    wheel: true,
+    globalMove: true
   },
   height: 720,
   preference: 'webgpu' as const,
-  // eslint-disable-next-line unicorn/prefer-global-this
+
   resizeTo: window,
   resolution: Math.max(window.devicePixelRatio ?? 1, 1),
   width: 1280

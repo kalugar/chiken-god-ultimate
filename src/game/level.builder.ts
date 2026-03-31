@@ -1,9 +1,11 @@
 import type { World } from '@ecs/world'
 
 import { MovementSystem, RenderSystem, InputSystem } from '@ecs/systems'
+import { BoundsSystem } from '@ecs/systems/bound.system'
 import { LifeTimeSystem } from '@ecs/systems/lifetime.system'
 import { WeaponSystem } from '@ecs/systems/weapon.system'
-import { FactoryService } from '@services/service.factory'
+import FactoryService from '@services/service.factory'
+import ResizeService from '@services/service.resize'
 // import TimeService from '@services/service.time'
 // import LayersService from '@services/sevice.layers'
 import { Assets, Texture } from 'pixi.js'
@@ -30,13 +32,17 @@ import levelConfig from './level.config'
 
 export async function startLevel(world: World) {
   await Assets.load<Texture>({ alias: 'bunny', src: 'https://pixijs.com/assets/bunny.png' })
+
   world.addSystem(new InputSystem()) // Двигаем объекты
   world.addSystem(new MovementSystem()) // Двигаем объекты
   world.addSystem(new WeaponSystem()) // Двигаем объекты
-  world.addSystem(new LifeTimeSystem()) // Двигаем объекты
+  // world.addSystem(new BoundsSystem()) // Двигаем объекты
+  world.addSystem(new LifeTimeSystem(world.destroyEntity.bind(world))) // Двигаем объекты
   // world.addSystem(new CollisionSystem(world)) // Проверяем столкновения
   // world.addSystem(new LifespanSystem(world));     // Убиваем старые пули
   world.addSystem(new RenderSystem()) // Рисуем результат
+
+  world.services.get(ResizeService).resize()
 
   const factory = world.services.get(FactoryService)
 

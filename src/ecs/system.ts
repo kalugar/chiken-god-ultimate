@@ -1,9 +1,10 @@
-import type { World } from './world'
+import type { RectangleSize } from '@app-types'
+import type { ServiceLocator } from '@services/locator'
 
 import { Entity } from './entity'
 
 export abstract class System {
-  public world!: World
+  public services!: ServiceLocator
   public mask: number
   public excludeMask: number
   public entities: Set<Entity> = new Set()
@@ -22,4 +23,5 @@ export abstract class System {
   }
 
   protected abstract update(delta: number, entity: Entity): void
+  public resize(_newSize: RectangleSize): void {}
 }

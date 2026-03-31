@@ -8,7 +8,8 @@ export const ComponentMask = {
   Enemy: 1 << 4,
   Stats: 1 << 5,
   Weapon: 1 << 6,
-  LifeTime: 1 << 7
+  LifeTime: 1 << 7,
+  Collider: 1 << 8
 } as const
 
 export type ComponentMask = (typeof ComponentMask)[keyof typeof ComponentMask]

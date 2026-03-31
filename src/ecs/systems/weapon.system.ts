@@ -1,5 +1,5 @@
 import { ComponentMask } from '@ecs/components/component.mask'
-import { FactoryService } from '@services/service.factory'
+import FactoryService from '@services/service.factory'
 
 import type { Entity } from '../entity'
 
@@ -27,18 +27,15 @@ export class WeaponSystem extends System {
       const transform = entity.get('Transform')!
 
       // Достаем Фабрику из нашего любимого ServiceLocator
-      const factory = this.world.services.get(FactoryService)
+      const factory = this.services.get(FactoryService)
 
       // Спавним пулю (передаем координаты стрелка и направление)
-      console.log('spawn bullet')
-      const bullet = factory.spawn('bullet', {
+      factory.spawn('bullet', {
         x: transform.x,
         y: transform.y,
         vx: weapon.aimX * this.bulletSpeed,
         vy: weapon.aimY * this.bulletSpeed
       })
-
-      console.log(bullet)
 
       // Сбрасываем таймер выстрела
       weapon.cooldownTimer = weapon.fireRate

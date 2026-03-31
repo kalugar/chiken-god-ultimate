@@ -10,11 +10,11 @@ import type { ComponentName, defaultComponentRegistry } from './components'
 export class World {
   public readonly activeEntities: Set<Entity>
   public readonly services: ServiceLocator
+  public systems: System[]
   // public events: EventEmitter
   private entities: Entity[]
   private taggedEntities: Map<string, Entity> = new Map()
   private availableIds: number[]
-  private systems: System[]
 
   constructor(maxEntities: number = 1000, services: ServiceLocator) {
     this.entities = Array.from({ length: maxEntities })
@@ -113,7 +113,7 @@ export class World {
   }
 
   public addSystem(system: System): this {
-    system.world = this
+    system.services = this.services
     this.systems.push(system)
 
     for (const entity of this.activeEntities) {

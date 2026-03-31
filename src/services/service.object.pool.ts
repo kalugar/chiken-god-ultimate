@@ -2,9 +2,7 @@ import type { Container } from 'pixi.js'
 
 import { ObjectPool } from '@utils/object.pool'
 
-import { BaseService } from './service.base'
-
-export class PoolManager extends BaseService {
+export default class PoolService {
   private static pools = new Map<string, ObjectPool<Container>>()
 
   public static register(poolLabel: string | Container, pool: ObjectPool<Container>) {
