@@ -26,6 +26,7 @@ export interface ViewData {
   node: Container | null
   poolId?: number | string
   type?: string
+  currentFrameIndex?: number
 }
 
 export interface PlayerData extends Component {

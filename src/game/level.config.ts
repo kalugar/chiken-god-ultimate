@@ -18,9 +18,10 @@ export default {
       speed: 0.25
     },
     view: {
-      texture: 'bunny',
+      texture: 'player_idle/0',
       alpha: 0.89,
-      scale: 1.2
+      scale: 0.5,
+      zIndex: 10
     }
   },
   enemiesPool: {
@@ -46,7 +47,8 @@ export default {
   },
   bulletsPool: {
     view: {
-      type: 'container'
+      type: 'container',
+      zIndex: 1
     }
   },
   bullet: {
@@ -55,11 +57,11 @@ export default {
     poolSize: 400,
     x: 0,
     y: 0,
-    lifeTime: 750,
+    lifeTime: 650,
     view: {
       type: 'graphics',
       parent: 'bulletsPool',
-      radius: 5,
+      radius: 3,
       fill: {
         color: 0xff_00_00
         // alpha: 0.75

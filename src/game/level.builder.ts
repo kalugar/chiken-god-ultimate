@@ -8,7 +8,7 @@ import FactoryService from '@services/service.factory'
 import ResizeService from '@services/service.resize'
 // import TimeService from '@services/service.time'
 // import LayersService from '@services/sevice.layers'
-import { Assets, Texture } from 'pixi.js'
+import { Assets, Cache, Spritesheet, Texture } from 'pixi.js'
 
 import levelConfig from './level.config'
 
@@ -31,7 +31,11 @@ import levelConfig from './level.config'
 // import { LifespanSystem } from '@ecs/systems/lifespan.system'; // Если напишем
 
 export async function startLevel(world: World) {
-  await Assets.load<Texture>({ alias: 'bunny', src: 'https://pixijs.com/assets/bunny.png' })
+  // await Assets.load<Texture>({ alias: 'bunny', src: 'https://pixijs.com/assets/bunny.png' })
+  const sheet = await Assets.load<Spritesheet>('assets/atlas/player_idle.json')
+
+  console.log(sheet)
+  console.log(Cache)
 
   world.addSystem(new InputSystem()) // Двигаем объекты
   world.addSystem(new MovementSystem()) // Двигаем объекты
