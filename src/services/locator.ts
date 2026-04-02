@@ -1,6 +1,7 @@
 import type { RectangleSize, ServiceToken } from '@app-types'
 
 export class ServiceLocator {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private services: Map<ServiceToken, any> = new Map()
 
   /**
@@ -16,6 +17,7 @@ export class ServiceLocator {
   }
 
   public get<T>(token: ServiceToken<T>): T {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const service = this.services.get(token)
 
     if (!service) {
@@ -24,6 +26,7 @@ export class ServiceLocator {
       )
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return service
   }
 
@@ -39,5 +42,5 @@ export class ServiceLocator {
     this.services.clear()
   }
 
-  public resize(newSize: RectangleSize): void {}
+  public resize(_newSize: RectangleSize): void {}
 }

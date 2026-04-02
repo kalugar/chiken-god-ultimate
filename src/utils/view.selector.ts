@@ -35,42 +35,39 @@ const viewClasses = {
   tile: TilingSprite
 } as const
 
-type ViewTypeKey = keyof typeof viewClasses
-type ViewSettings<T extends ViewTypeKey> = NonNullable<
-  ConstructorParameters<(typeof viewClasses)[T]>[0]
->
-type SafeContainerConstructor = new (options?: Record<string, unknown>) => Container
+export type ViewTypeKey = keyof typeof viewClasses
 
-export type RawViewConfig<T extends ViewTypeKey = ViewTypeKey> = Omit<
-  ViewSettings<T>,
-  'texture'
-> & {
-  type?: T
+type ExtractOptions<T> = T extends abstract new (...args: infer Args) => unknown
+  ? NonNullable<Args[0]>
+  : never
+
+type CustomExtensions = {
+  type?: ViewTypeKey
   label?: string
-  texture?: string
-  parent?: string
   layer?: string
+  parent?: Container
+  texture?: string
   width?: number
   height?: number
   radius?: number
   fill?: FillInput
   anchor?: number | { x: number; y: number }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any
-}
 
-export type ViewConfig<T extends ViewTypeKey = ViewTypeKey> = Omit<RawViewConfig<T>, 'parent'> & {
-  parent?: Container
+  [key: string]: unknown
 }
+export type ViewConfig = {
+  [K in ViewTypeKey]: Omit<ExtractOptions<(typeof viewClasses)[K]>, keyof CustomExtensions> &
+    CustomExtensions
+}[ViewTypeKey]
 
-const inferViewType = <T extends ViewTypeKey>(config: ViewConfig<T>): ViewTypeKey | null => {
+const inferViewType = (config: ViewConfig): ViewTypeKey | null => {
   if (config.texture) return 'sprite'
   if (config.width !== undefined && config.height !== undefined) return 'graphics'
   if (config.parent || config.layer) return 'container'
   return null
 }
 
-const buildGraphics = <T extends ViewTypeKey>(config: ViewConfig<T>): Graphics => {
+const buildGraphics = (config: ViewConfig): Graphics => {
   const { parent, label, ...shapeSettings } = config
 
   type GraphicsOpts = ConstructorParameters<typeof Graphics>[0]
@@ -90,29 +87,24 @@ const buildGraphics = <T extends ViewTypeKey>(config: ViewConfig<T>): Graphics =
   return g
 }
 
-export const createView = <T extends ViewTypeKey>(config: ViewConfig<T>): Container | null => {
-  const { type, texture, ...pixiSettings } = config
-  const finalSettings: Record<string, unknown> = { ...pixiSettings }
-
+export const createView = (config: ViewConfig): Container | null => {
+  const { type, texture, ...pixiOptions } = config
   const inferredType = type ?? inferViewType(config)
 
   if (!inferredType) {
-    console.warn(
-      `[createView] Ошибка: Невозможно определить type! Нет ни texture, ни width/height.`,
-      config.label
-    )
+    console.warn(`[createView] Ошибка: Невозможно определить type!`, config.label)
     return null
   }
 
-  if (inferredType === 'sprite' && texture) {
-    finalSettings.texture = Assets.get(texture) ?? Texture.WHITE
+  if (inferredType === 'graphics') {
+    return buildGraphics(config)
   }
 
-  if (inferredType === 'graphics') {
-    return buildGraphics(finalSettings)
+  if (inferredType === 'sprite' && texture) {
+    pixiOptions.texture = Assets.get(texture) ?? Texture.WHITE
   }
   const TargetClass = viewClasses[inferredType] || Container
-  const Constructor = TargetClass as unknown as SafeContainerConstructor
+  type DynamicConstructor = new (options: typeof pixiOptions) => Container
 
-  return new Constructor(finalSettings)
+  return new (TargetClass as DynamicConstructor)(pixiOptions)
 }

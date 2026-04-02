@@ -4,7 +4,7 @@ import { ComponentMask } from '@ecs/components/component.mask'
 import { Entity } from '@ecs/entity'
 import { System } from '@ecs/system'
 
-import type { ComponentName, defaultComponentRegistry } from './components'
+import type { ComponentDataInput, ComponentName } from './components'
 // import { EventEmitter } from './utils/event-emitter'
 
 export class World {
@@ -71,10 +71,10 @@ export class World {
     }
   }
 
-  public addComponent(
+  public addComponent<T extends ComponentName>(
     entity: Entity,
-    name: ComponentName,
-    data: typeof defaultComponentRegistry
+    name: T,
+    data: ComponentDataInput<T>
   ): void {
     if (entity.isDestroyed || entity.components.has(name)) return
     entity.components.set(name, data)

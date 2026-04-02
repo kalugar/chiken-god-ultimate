@@ -1,17 +1,16 @@
 import { ComponentMask, MaskToName } from '@ecs/components/component.mask'
 
-import type { ComponentName, ComponentRegistry } from './components'
+import type { ComponentDataInput, ComponentName, ComponentRegistry } from './components'
 
 export class Entity {
   public id: number
-  public components: Map<ComponentName, ComponentRegistry[ComponentName]> = new Map()
+  public components: Map<ComponentName, ComponentDataInput<ComponentName>> = new Map()
   public mask: number = ComponentMask.None
   public isDestroyed: boolean = false
   public tag?: string
 
   constructor(id: number) {
     this.id = id
-    this.components = new Map()
     this.mask = ComponentMask.None
     this.isDestroyed = false
   }

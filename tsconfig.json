@@ -22,16 +22,15 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-    "baseUrl": ".",
     "paths": {
-      "@assets/*": ["public/assets/*"],
-      "@core/*": ["src/core/*"],
-      "@ecs/*": ["src/ecs/*"],
-      "@game/*": ["src/game/*"],
-      "@utils/*": ["src/utils/*"],
-      "@services/*": ["src/services/*"],
-      "@rendering/*": ["src/core/rendering/*"],
-      "@app-types": ["src/types/index.ts"]
+      "@assets/*": ["./public/assets/*"],
+      "@core/*": ["./src/core/*"],
+      "@ecs/*": ["./src/ecs/*"],
+      "@game/*": ["./src/game/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@services/*": ["./src/services/*"],
+      "@rendering/*": ["./src/core/rendering/*"],
+      "@app-types": ["./src/types/index.ts"]
     }
   },
   "include": ["src/**/*", "src/**/*.d.ts", "src/**/*.tsx", "vite.config.ts"]

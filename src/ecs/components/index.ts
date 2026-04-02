@@ -33,14 +33,14 @@ export interface PlayerData extends Component {
   score?: number
 }
 export interface ColliderData extends Component {
-  colliderRadius: number
+  radius: number
 }
 
 export interface EnemyData extends Component {
   state?: number
 }
 export interface LifeTimeData extends Component {
-  lifeTime: number
+  value: number
 }
 
 export interface WeaponData extends Component {
@@ -65,36 +65,44 @@ export interface ComponentRegistry {
 }
 
 export type ComponentName = keyof ComponentRegistry
-export const DefaultVelocity: VelocityData = { vx: 0, vy: 0 }
-export const DefaultTransform: TransformData = { x: 0, y: 0, rotation: 0 }
-export const DefaultView: ViewData = { node: null }
-export const DefaultPlayer: PlayerData = { score: 0 }
-export const DefaultCollider: ColliderData = { colliderRadius: 0 }
-export const DefaultEnemy: EnemyData = { state: 0 }
-export const DefaultLifeTime: LifeTimeData = { lifeTime: 1000 }
-export const DefaultStat: StatsData = {
+export type ComponentFactoryRegistry = {
+  [T in ComponentName]: () => ComponentRegistry[T]
+}
+
+export type ComponentDataInput<T extends ComponentName> =
+  | ComponentRegistry[T]
+  | (() => ComponentRegistry[T])
+
+export const createDefaultTransform = (): TransformData => ({ x: 0, y: 0, rotation: 0 })
+export const createDefaultVelocity = (): VelocityData => ({ vx: 0, vy: 0 })
+export const createDefaultView = (): ViewData => ({ node: null })
+export const createDefaultPlayer = (): PlayerData => ({ score: 0 })
+export const createDefaultCollider = (): ColliderData => ({ radius: 0 })
+export const createDefaultEnemy = (): EnemyData => ({ state: 0 })
+export const createDefaultLifeTime = (): LifeTimeData => ({ value: 1000 })
+export const createDefaultStat = (): StatsData => ({
   speed: 0,
   hp: normalizeStat(1),
   mp: normalizeStat(1),
   stamina: normalizeStat(1),
   shield: normalizeStat(0)
-}
-export const DefaultWeapon: WeaponData = {
+})
+export const createDefaultWeapon = (): WeaponData => ({
   isFiring: false,
   fireRate: 500,
   cooldownTimer: 0,
   aimX: 0,
   aimY: -1
-}
+})
 
 export const defaultComponentRegistry = {
-  Transform: DefaultTransform,
-  Velocity: DefaultVelocity,
-  View: DefaultView,
-  Player: DefaultPlayer,
-  Enemy: DefaultEnemy,
-  Stats: DefaultStat,
-  LifeTime: DefaultLifeTime,
-  Weapon: DefaultWeapon,
-  Collider: DefaultCollider
-}
+  Transform: createDefaultTransform,
+  Velocity: createDefaultVelocity,
+  View: createDefaultView,
+  Player: createDefaultPlayer,
+  Enemy: createDefaultEnemy,
+  Stats: createDefaultStat,
+  LifeTime: createDefaultLifeTime,
+  Weapon: createDefaultWeapon,
+  Collider: createDefaultCollider
+} satisfies ComponentFactoryRegistry

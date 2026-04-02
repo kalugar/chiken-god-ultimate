@@ -1,15 +1,18 @@
 import type { SceneConfig, PrefabConfig, SpawnOverrides } from '@app-types'
 
-import { ComponentMask } from '@ecs/components/component.mask'
+import {
+  defaultComponentRegistry,
+  type ComponentName,
+  type ComponentRegistry
+} from '@ecs/components'
 import { Entity } from '@ecs/entity'
 import { World } from '@ecs/world'
 import LayersService from '@services/sevice.layers'
 import { ObjectPool } from '@utils/object.pool'
-import { createView, type RawViewConfig } from '@utils/view.selector'
+import { resolveAnchor } from '@utils/resolve.anchor'
+import { createView, type ViewConfig } from '@utils/view.selector'
 import { Container } from 'pixi.js'
 
-import { attachComponents } from '../utils/components.builder'
-import { overrideComponentData } from '../utils/components.override'
 import PoolService from './service.object.pool'
 
 export default class FactoryService {
@@ -39,59 +42,6 @@ export default class FactoryService {
     console.log(`[SceneFactory] Сцена загружена. Префабов: ${this.prefabs.size}`)
   }
 
-  private initPool(prefabId: string, config: PrefabConfig): void {
-    if (!config.view) return
-
-    const pool = new ObjectPool<Container>(
-      () => {
-        const targetParent = this.resolveParent(config.layer, config.view!.parent)
-        const view = createView({ label: prefabId, ...config.view, parent: targetParent })
-        if (!view)
-          throw new Error(
-            `[initPool] не получилось создать view для ${prefabId}, проверьте настройки конфигурации`
-          )
-
-        view.visible = false
-        this.resolveAnchor(view, config.view)
-        return view
-      },
-      (view) => {
-        view.visible = false
-      },
-      config.poolSize
-    )
-
-    PoolService.register(config.view.parent ?? prefabId, pool)
-  }
-
-  private resolveParent(layerLabel?: string, parentPrefab?: string | Container): Container {
-    if (parentPrefab) {
-      if (typeof parentPrefab !== 'string') {
-        return parentPrefab
-      } else if (!this.structuralViews.has(parentPrefab)) {
-        this.spawn(parentPrefab)
-        return this.structuralViews.get(parentPrefab)!
-      }
-    }
-
-    const layers = this.world.services.get(LayersService)
-
-    if (!layers)
-      throw new Error('[FactoryService] resolveParent dropped. Layers service is not registred')
-
-    if (layers.has(layerLabel)) {
-      return layers.getLayerByLabel(layerLabel)
-    }
-
-    return layers.getLayerByLabel('world')
-  }
-
-  private resolveAnchor(view: Container, config?: RawViewConfig): void {
-    if ('anchor' in view) {
-      ;(view as { anchor: unknown }).anchor = config?.anchor ?? 0.5
-    }
-  }
-
   public spawn(prefabId: string, overrides?: SpawnOverrides): Entity | null {
     const config = this.prefabs.get(prefabId)
 
@@ -100,42 +50,138 @@ export default class FactoryService {
       return null
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { components, poolSize, layer, view: viewData, ...componentRawData } = config
-
     const entity = this.world.createEntity()
     if (!entity) return null
 
-    let componentMask = components
-    if (componentMask === undefined) {
-      const defaultMask = ComponentMask.Transform | ComponentMask.View
-      componentMask = viewData ? defaultMask : ComponentMask.None
-    }
+    if (config.components) {
+      for (const [key, prefabData] of Object.entries(config.components)) {
+        const compName = key as ComponentName
 
-    attachComponents(this.world, entity, componentMask)
-
-    const viewComponent = entity.get('View')
-    const poolId = (viewData && viewData.parent) ?? prefabId
-    const hasPool = PoolService.has(poolId)
-
-    let view: Container | null = null
-
-    if (viewData && viewComponent) {
-      if (hasPool) {
-        view = PoolService.get(poolId)!
-        view.visible = true
-      } else {
-        const targetParent = this.resolveParent(config.layer, viewData.parent)
-        view = createView({ ...viewData, label: prefabId, parent: targetParent })
-        if (view) {
-          this.resolveAnchor(view, viewData)
-          this.structuralViews.set(prefabId, view)
-          this.world.setTag(prefabId, entity)
+        if (compName === 'View') {
+          this.attachView(entity, prefabId, config, prefabData as ViewConfig)
+          continue
         }
+
+        const typedPrefabData = prefabData as ComponentRegistry[typeof compName]
+        const defaultData = defaultComponentRegistry[compName]?.() || {}
+        const overrideData = overrides?.components?.[compName] || {}
+
+        const finalData = {
+          ...defaultData,
+          ...typedPrefabData,
+          ...overrideData
+        }
+        this.world.addComponent(entity, compName, finalData)
       }
     }
-    overrideComponentData(entity, componentRawData, overrides, view, hasPool ? poolId : undefined)
+    this.applyTopLevelOverrides(entity, overrides)
 
     return entity
+  }
+
+  private initPool(prefabId: string, config: PrefabConfig): void {
+    const viewConfig = config?.components?.View
+    if (!viewConfig) {
+      console.warn(`[initPool] Пропуск пула для "${prefabId}": нет конфига или компонента View.`)
+      return
+    }
+
+    const targetParent = this.resolveParent(config.layer, viewConfig.parent)
+    const itemOptions = {
+      label: prefabId,
+      ...viewConfig,
+      parent: targetParent
+    }
+    const pool = new ObjectPool<Container>(
+      () => this.createPoolItem(itemOptions),
+      (view) => (view.visible = false),
+      config.poolSize
+    )
+
+    PoolService.register(viewConfig.parent ?? prefabId, pool)
+  }
+
+  private createPoolItem(viewConfig: ViewConfig): Container {
+    const view = createView(viewConfig)
+
+    if (!view) {
+      throw new Error(
+        `[initPool] Не удалось создать View для "${viewConfig.label}". Проверьте настройки.`
+      )
+    }
+    view.visible = false
+    resolveAnchor(view, viewConfig)
+    return view
+  }
+
+  private resolveParent(layerLabel?: string, parentPrefab?: string | Container): Container {
+    if (parentPrefab) {
+      if (typeof parentPrefab !== 'string') {
+        return parentPrefab
+      }
+      if (!this.structuralViews.has(parentPrefab)) {
+        this.spawn(parentPrefab)
+      }
+      return this.structuralViews.get(parentPrefab)!
+    }
+
+    const layers = this.world.services.get(LayersService)
+
+    if (!layers) {
+      throw new Error('[FactoryService] resolveParent failed: LayersService is not registered.')
+    }
+
+    return layers.has(layerLabel)
+      ? layers.getLayerByLabel(layerLabel)
+      : layers.getLayerByLabel('world')
+  }
+
+  private attachView(
+    entity: Entity,
+    prefabId: string,
+    config: PrefabConfig,
+    viewConfig: ViewConfig
+  ): void {
+    const poolId = config.components.View?.parent ?? prefabId
+    const hasPool = PoolService.has(poolId)
+
+    let viewNode: Container | null
+
+    if (hasPool) {
+      viewNode = PoolService.get(poolId)!
+      viewNode.visible = true
+    } else {
+      const targetParent = this.resolveParent(config.layer, viewConfig.parent)
+      viewNode = createView({ ...viewConfig, label: prefabId, parent: targetParent })
+
+      if (viewNode) {
+        resolveAnchor(viewNode, viewConfig)
+        this.structuralViews.set(prefabId, viewNode)
+        this.world.setTag(prefabId, entity)
+      }
+    }
+    if (viewNode) {
+      this.world.addComponent(entity, 'View', {
+        node: viewNode,
+        poolId: hasPool ? poolId : undefined
+      })
+    }
+  }
+
+  private applyTopLevelOverrides(entity: Entity, overrides?: SpawnOverrides): void {
+    if (!overrides) return
+
+    const transform = entity.get('Transform')
+    if (transform) {
+      transform.x = overrides.x ?? transform.x
+      transform.y = overrides.y ?? transform.y
+      transform.rotation = overrides.rotation ?? transform.rotation
+    }
+
+    const velocity = entity.get('Velocity')
+    if (velocity) {
+      velocity.vx = overrides.vx ?? velocity.vx
+      velocity.vy = overrides.vy ?? velocity.vy
+    }
   }
 }
