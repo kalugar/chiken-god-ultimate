@@ -1,8 +1,14 @@
 import type { SceneConfig } from '@app-types'
 
 import {
+  createDefaultDash,
   createDefaultEnemy,
+  createDefaultHealth,
+  createDefaultMana,
+  createDefaultMovementSpeed,
   createDefaultPlayer,
+  createDefaultShield,
+  createDefaultStamina,
   createDefaultTransform,
   createDefaultVelocity,
   createDefaultWeapon
@@ -15,8 +21,21 @@ export default {
       Player: createDefaultPlayer(),
       Transform: createDefaultTransform(),
       Velocity: createDefaultVelocity(),
-      Stats: { hp: 200, speed: 0.25 },
-      Weapon: { ...createDefaultWeapon(), fireRate: 120 },
+      Health: createDefaultHealth(),
+      MovementSpeed: {
+        ...createDefaultMovementSpeed(),
+        acceleration: 500,
+        deceleration: 2000
+      },
+      Mana: createDefaultMana(),
+      Stamina: createDefaultStamina(),
+      Shield: createDefaultShield(),
+      Dash: createDefaultDash(),
+      Weapon: {
+        ...createDefaultWeapon(),
+        fireRate: 0.06,
+        bulletSpeed: 300
+      },
       Collider: { radius: 25 },
       View: {
         texture: 'player_idle/0',
@@ -41,6 +60,8 @@ export default {
       Enemy: createDefaultEnemy(),
       Transform: createDefaultTransform(),
       Velocity: createDefaultVelocity(),
+      Health: createDefaultHealth(),
+      MovementSpeed: createDefaultMovementSpeed(),
       View: {
         type: 'graphics',
         parent: 'enemyPool',
@@ -65,7 +86,7 @@ export default {
     components: {
       Transform: createDefaultTransform(),
       Velocity: createDefaultVelocity(),
-      LifeTime: { value: 650 },
+      LifeTime: { value: 1 },
       View: {
         type: 'graphics',
         parent: 'bulletPool',

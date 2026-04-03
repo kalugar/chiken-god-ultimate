@@ -2,7 +2,7 @@ import type { ServiceLocator } from '@services/locator'
 
 import { ComponentMask } from '@ecs/components/component.mask'
 import { Entity } from '@ecs/entity'
-import { System } from '@ecs/system'
+import { System } from '@ecs/systems/system'
 
 import type { ComponentDataInput, ComponentName } from './components'
 // import { EventEmitter } from './utils/event-emitter'

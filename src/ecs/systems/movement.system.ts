@@ -1,14 +1,12 @@
-import { getComponentsMask } from '@ecs/components/components.map'
 import { Entity } from '@ecs/entity'
-import { System } from '@ecs/system'
+import { System } from '@ecs/systems/system'
 
 export class MovementSystem extends System {
   constructor() {
-    super(getComponentsMask('dynamic'))
+    super(['Transform', 'Velocity'])
   }
 
   protected update(delta: number, entity: Entity): void {
-    if (entity.isDestroyed) return
     const transform = entity.get('Transform')!
     const velocity = entity.get('Velocity')!
 

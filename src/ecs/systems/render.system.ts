@@ -1,14 +1,13 @@
 import type { Entity } from '@ecs/entity'
 
 import { ComponentMask } from '@ecs/components/component.mask'
-import { getComponentsMask } from '@ecs/components/components.map'
-import { System } from '@ecs/system'
+import { System } from '@ecs/systems/system'
 import { getNWayDirection } from '@utils/get.n.way.direction'
 import { Assets, Sprite } from 'pixi.js'
 
 export class RenderSystem extends System {
   constructor() {
-    super(getComponentsMask('default'))
+    super(['Transform', 'View'])
   }
 
   protected update(delta: number, entity: Entity) {
@@ -19,14 +18,14 @@ export class RenderSystem extends System {
     if (view.node) {
       view.node.x = transform.x
       view.node.y = transform.y
-      // view.node.rotation = transform.rotation
+      view.node.rotation = transform.rotation
     }
 
     if (entity.has(ComponentMask.Player) && view.node instanceof Sprite) {
-      const weapon = entity.get('Weapon')!
+      const player = entity.get('Player')!
 
       // Считаем, куда смотрим сейчас
-      const newDirection = getNWayDirection(8, weapon.aimX, weapon.aimY)
+      const newDirection = getNWayDirection(8, player.aimX, player.aimY)
 
       // Сравниваем с тем, что было в прошлом кадре!
       if (view.currentFrameIndex !== newDirection) {

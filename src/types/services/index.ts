@@ -39,4 +39,4 @@ export type TimeEvent = {
   elapsed: number
 }
 
-export type InputAction = 'up' | 'down' | 'left' | 'right' | 'fire'
+export type InputAction = 'up' | 'down' | 'left' | 'right' | 'fire' | 'dash' | 'sprint'

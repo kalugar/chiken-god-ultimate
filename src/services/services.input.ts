@@ -16,7 +16,11 @@ export default class InputService {
     ArrowLeft: 'left',
     KeyD: 'right',
     ArrowRight: 'right',
-    Space: 'fire',
+    Space: 'dash',
+
+    ShiftLeft: 'sprint',
+    ShiftRight: 'sprint',
+
     MouseLeft: 'fire'
   }
 

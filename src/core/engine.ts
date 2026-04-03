@@ -147,8 +147,9 @@ export class Engine {
 
     this.timeStampAccumulator += deltaRealTime
     while (this.timeStampAccumulator >= FIXED_TIME_STEP) {
+      const deltaInSeconds = FIXED_TIME_STEP / 1000
       this.services.get(TimeService).update(FIXED_TIME_STEP)
-      this.world.update(FIXED_TIME_STEP)
+      this.world.update(deltaInSeconds)
       this.timeStampAccumulator -= FIXED_TIME_STEP
     }
   }

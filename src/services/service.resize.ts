@@ -1,5 +1,5 @@
 import type { RectangleSize, TimeEvent } from '@app-types'
-import type { System } from '@ecs/system'
+import type { System } from '@ecs/systems/system'
 import type { Application } from 'pixi.js'
 
 import { LOGICAL_SIZE, RESIZE_DEBOUNCE } from '@core/constants'
@@ -9,7 +9,6 @@ import type { ServiceLocator } from './locator'
 
 import SystemTimeService from './service.system.time'
 import LayersService from './sevice.layers'
-// import LayersService from './sevice.layers'
 
 export default class ResizeService {
   private scaleFactor: number = 1
@@ -81,10 +80,10 @@ export default class ResizeService {
     return isLandscape ? 'landscape' : 'portrait'
   }
 
-  public getScreenSize (): RectangleSize {
+  public getScreenSize(): RectangleSize {
     const width = this.app.screen.width
     const height = this.app.screen.height
-    const size = { width, height} 
+    const size = { width, height }
     return size
   }
 }

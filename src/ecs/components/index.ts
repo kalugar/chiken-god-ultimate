@@ -1,4 +1,3 @@
-import { normalizeStat } from '@utils/normalize.stat'
 import { Container } from 'pixi.js'
 
 export type Component = Record<string, unknown>
@@ -14,12 +13,39 @@ export interface VelocityData {
   vy: number
 }
 
-export interface StatsData {
-  speed?: number
-  hp?: defaultStat
-  mp?: defaultStat
-  stamina?: defaultStat
-  shield?: defaultStat
+export interface HealthData {
+  current: number
+  max: number
+  rechargeRate?: number
+  rechargeDelay?: number
+}
+
+export interface ManaData {
+  current: number
+  max: number
+  rechargeRate?: number
+  rechargeDelay?: number
+}
+
+export interface StaminaData {
+  current: number
+  max: number
+  rechargeRate: number
+  rechargeDelay: number
+}
+
+export interface ShieldData {
+  current: number
+  max: number
+  rechargeRate?: number
+  rechargeDelay?: number
+}
+
+export interface MovementSpeedData {
+  base: number
+  current: number
+  acceleration?: number
+  deceleration?: number
 }
 
 export interface ViewData {
@@ -31,6 +57,12 @@ export interface ViewData {
 
 export interface PlayerData extends Component {
   score?: number
+  moveX: number
+  moveY: number
+  intentFire: boolean
+  intentSprint: boolean
+  aimX: number
+  aimY: number
 }
 export interface ColliderData extends Component {
   radius: number
@@ -47,9 +79,25 @@ export interface WeaponData extends Component {
   isFiring: boolean
   fireRate: number
   cooldownTimer: number
+  bulletSpeed: number
 
   aimX: number
   aimY: number
+}
+
+export interface DashData {
+  // --- Конфигурация (задается в префабе) ---
+  distance: number // Дальность рывка в пикселях
+  duration: number // Длительность самого перемещения (мс)
+  cooldown: number // Время восстановления одного заряда (мс)
+  maxCharges: number // Максимальное количество рывков
+
+  // --- Состояние (меняется в рантайме) ---
+  currentCharges: number // Доступно рывков сейчас
+  cooldownTimer: number // Таймер до восстановления следующего заряда
+  dashTimer: number // Таймер активного рывка (если > 0, сущность "летит")
+  directionX: number // Направление текущего рывка
+  directionY: number
 }
 
 export interface ComponentRegistry {
@@ -58,10 +106,15 @@ export interface ComponentRegistry {
   View: ViewData
   Player: PlayerData
   Enemy: EnemyData
-  Stats: StatsData
+  Health: HealthData
+  Mana: ManaData
+  Shield: ShieldData
+  MovementSpeed: MovementSpeedData
+  Stamina: StaminaData
   Weapon: WeaponData
   LifeTime: LifeTimeData
   Collider: ColliderData
+  Dash: DashData
 }
 
 export type ComponentName = keyof ComponentRegistry
@@ -76,23 +129,51 @@ export type ComponentDataInput<T extends ComponentName> =
 export const createDefaultTransform = (): TransformData => ({ x: 0, y: 0, rotation: 0 })
 export const createDefaultVelocity = (): VelocityData => ({ vx: 0, vy: 0 })
 export const createDefaultView = (): ViewData => ({ node: null })
-export const createDefaultPlayer = (): PlayerData => ({ score: 0 })
-export const createDefaultCollider = (): ColliderData => ({ radius: 0 })
-export const createDefaultEnemy = (): EnemyData => ({ state: 0 })
-export const createDefaultLifeTime = (): LifeTimeData => ({ value: 1000 })
-export const createDefaultStat = (): StatsData => ({
-  speed: 0,
-  hp: normalizeStat(1),
-  mp: normalizeStat(1),
-  stamina: normalizeStat(1),
-  shield: normalizeStat(0)
-})
-export const createDefaultWeapon = (): WeaponData => ({
-  isFiring: false,
-  fireRate: 500,
-  cooldownTimer: 0,
+export const createDefaultPlayer = (): PlayerData => ({
+  score: 0,
+  moveX: 0,
+  moveY: 0,
+  intentFire: false,
+  intentSprint: false,
   aimX: 0,
   aimY: -1
+})
+export const createDefaultCollider = (): ColliderData => ({ radius: 0 })
+export const createDefaultEnemy = (): EnemyData => ({ state: 0 })
+export const createDefaultLifeTime = (): LifeTimeData => ({ value: 1 })
+export const createDefaultHealth = (): HealthData => ({ current: 100, max: 100 })
+export const createDefaultMana = (): ManaData => ({ current: 100, max: 100 })
+export const createDefaultShield = (): ShieldData => ({ current: 100, max: 100 })
+export const createDefaultMovementSpeed = (): MovementSpeedData => ({
+  base: 250,
+  current: 250
+})
+export const createDefaultStamina = (): StaminaData => ({
+  current: 100,
+  max: 100,
+  rechargeRate: 1,
+  rechargeDelay: 250
+})
+
+export const createDefaultWeapon = (): WeaponData => ({
+  isFiring: false,
+  fireRate: 0.12,
+  cooldownTimer: 0,
+  aimX: 0,
+  aimY: -1,
+  bulletSpeed: 800
+})
+export const createDefaultDash = (): DashData => ({
+  distance: 150,
+  duration: 200,
+  cooldown: 2000,
+  maxCharges: 2,
+
+  currentCharges: 2,
+  cooldownTimer: 0,
+  dashTimer: 0,
+  directionX: 0,
+  directionY: 0
 })
 
 export const defaultComponentRegistry = {
@@ -101,8 +182,13 @@ export const defaultComponentRegistry = {
   View: createDefaultView,
   Player: createDefaultPlayer,
   Enemy: createDefaultEnemy,
-  Stats: createDefaultStat,
   LifeTime: createDefaultLifeTime,
   Weapon: createDefaultWeapon,
-  Collider: createDefaultCollider
+  Collider: createDefaultCollider,
+  Health: createDefaultHealth,
+  Mana: createDefaultMana,
+  Shield: createDefaultShield,
+  MovementSpeed: createDefaultMovementSpeed,
+  Stamina: createDefaultStamina,
+  Dash: createDefaultDash
 } satisfies ComponentFactoryRegistry

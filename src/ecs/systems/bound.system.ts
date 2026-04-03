@@ -3,7 +3,7 @@ import type { Entity } from '@ecs/entity'
 
 import { LOGICAL_SIZE } from '@core/constants'
 import { ComponentMask } from '@ecs/components/component.mask'
-import { System } from '@ecs/system'
+import { System } from '@ecs/systems/system'
 import ResizeService from '@services/service.resize'
 
 // private bounds = {
@@ -27,26 +27,26 @@ import ResizeService from '@services/service.resize'
 //   console.log('x:', Math.floor(transform.x), 'y:', Math.floor(transform.y))
 //   // --- Проверка по оси X ---
 //   // Левая граница экрана (0)
-//   if (transform.x - collider.colliderRadius < this.bounds.left) {
+//   if (transform.x - collider.radius < this.bounds.left) {
 //     console.log('граница ;bounds.left; -', this.bounds.left)
-//     transform.x = this.bounds.left + collider.colliderRadius
+//     transform.x = this.bounds.left + collider.radius
 //   }
 //   // Правая граница экрана
-//   else if (transform.x + collider.colliderRadius > this.bounds.right) {
+//   else if (transform.x + collider.radius > this.bounds.right) {
 //     console.log('граница ;bounds.right; -', this.bounds.right)
-//     transform.x = this.bounds.right - collider.colliderRadius
+//     transform.x = this.bounds.right - collider.radius
 //   }
 
 //   // --- Проверка по оси Y ---
 //   // Верхняя граница экрана (0)
-//   if (transform.y - collider.colliderRadius < this.bounds.top) {
+//   if (transform.y - collider.radius < this.bounds.top) {
 //     console.log('граница ;bounds.top; -', this.bounds.top)
-//     transform.y = this.bounds.top + collider.colliderRadius
+//     transform.y = this.bounds.top + collider.radius
 //   }
 //   // Нижняя граница экрана
-//   else if (transform.y + collider.colliderRadius > this.bounds.bottom) {
+//   else if (transform.y + collider.radius > this.bounds.bottom) {
 //     console.log('граница ;bounds.bottom; -', this.bounds.bottom)
-//     transform.y = this.bounds.bottom - collider.colliderRadius
+//     transform.y = this.bounds.bottom - collider.radius
 //   }
 // }
 
@@ -72,26 +72,26 @@ export class BoundsSystem extends System {
     console.log('x:', Math.floor(transform.x), 'y:', Math.floor(transform.y))
     // --- Проверка по оси X ---
     // Левая граница экрана (0)
-    if (transform.x - collider.colliderRadius < -LOGICAL_SIZE.width / 2) {
+    if (transform.x - collider.radius < -LOGICAL_SIZE.width / 2) {
       console.log('граница ;bounds.left; -', -LOGICAL_SIZE.width / 2)
-      transform.x = -LOGICAL_SIZE.width / 2 + collider.colliderRadius
+      transform.x = -LOGICAL_SIZE.width / 2 + collider.radius
     }
     // Правая граница экрана
-    else if (transform.x + collider.colliderRadius > LOGICAL_SIZE.width / 2) {
+    else if (transform.x + collider.radius > LOGICAL_SIZE.width / 2) {
       console.log('граница ;bounds.right; -', LOGICAL_SIZE.width / 2)
-      transform.x = LOGICAL_SIZE.width / 2 - collider.colliderRadius
+      transform.x = LOGICAL_SIZE.width / 2 - collider.radius
     }
 
     // --- Проверка по оси Y ---
     // Верхняя граница экрана (0)
-    if (transform.y - collider.colliderRadius < -LOGICAL_SIZE.height / 2) {
+    if (transform.y - collider.radius < -LOGICAL_SIZE.height / 2) {
       console.log('граница ;bounds.top; -', -LOGICAL_SIZE.height / 2)
-      transform.y = -LOGICAL_SIZE.height / 2 + collider.colliderRadius
+      transform.y = -LOGICAL_SIZE.height / 2 + collider.radius
     }
     // Нижняя граница экрана
-    else if (transform.y + collider.colliderRadius > LOGICAL_SIZE.width / 2) {
+    else if (transform.y + collider.radius > LOGICAL_SIZE.width / 2) {
       console.log('граница ;bounds.bottom; -', LOGICAL_SIZE.height / 2)
-      transform.y = LOGICAL_SIZE.height / 2 - collider.colliderRadius
+      transform.y = LOGICAL_SIZE.height / 2 - collider.radius
     }
   }
 

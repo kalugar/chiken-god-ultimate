@@ -6,10 +6,15 @@ export const ComponentMask = {
   View: 1 << 2,
   Player: 1 << 3,
   Enemy: 1 << 4,
-  Stats: 1 << 5,
+  Dash: 1 << 5,
   Weapon: 1 << 6,
   LifeTime: 1 << 7,
-  Collider: 1 << 8
+  Collider: 1 << 8,
+  Health: 1 << 9,
+  Mana: 1 << 10,
+  Shield: 1 << 11,
+  MovementSpeed: 1 << 12,
+  Stamina: 1 << 13
 } as const
 
 export type ComponentMask = (typeof ComponentMask)[keyof typeof ComponentMask]

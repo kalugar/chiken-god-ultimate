@@ -1,80 +1,60 @@
-import { ComponentMask } from '@ecs/components/component.mask'
-import { getComponentsMask } from '@ecs/components/components.map'
 import InputService from '@services/services.input'
 
 import type { Entity } from '../entity'
 
-import { System } from '../system'
+import { System } from './system'
 
 export class InputSystem extends System {
-  // Кешируем данные ввода на текущий кадр
-  private currentDirX = 0
-  private currentDirY = 0
+  private dirX = 0
+  private dirY = 0
   private isFiring = false
+  private isSprint = false
+  private mouseX = 0
+  private mouseY = 0
 
   constructor() {
-    super(getComponentsMask('player'))
+    super(['Player', 'Transform'])
   }
-
-  // Переопределяем общий цикл, чтобы подготовить данные ОДИН раз за кадр
   public execute(delta: number): void {
     const input = this.services.get(InputService)
-    this.currentDirX = 0
-    this.currentDirY = 0
 
-    if (input.isActionActive('up')) this.currentDirY -= 1
-    if (input.isActionActive('down')) this.currentDirY += 1
-    if (input.isActionActive('left')) this.currentDirX -= 1
-    if (input.isActionActive('right')) this.currentDirX += 1
+    this.dirX = 0
+    this.dirY = 0
+    if (input.isActionActive('up')) this.dirY -= 1
+    if (input.isActionActive('down')) this.dirY += 1
+    if (input.isActionActive('left')) this.dirX -= 1
+    if (input.isActionActive('right')) this.dirX += 1
 
-    // Нормализация вектора по диагонали
-    if (this.currentDirX !== 0 && this.currentDirY !== 0) {
-      const length = Math.hypot(this.currentDirX, this.currentDirY)
-      this.currentDirX /= length
-      this.currentDirY /= length
+    if (this.dirX !== 0 && this.dirY !== 0) {
+      const length = Math.hypot(this.dirX, this.dirY)
+      this.dirX /= length
+      this.dirY /= length
     }
 
     this.isFiring = input.isActionActive('fire')
+    this.isSprint = input.isActionActive('sprint')
+    this.mouseX = input.mouseX
+    this.mouseY = input.mouseY
 
-    // Запускаем цикл из базового класса (он вызовет this.update для каждого игрока)
     super.execute(delta)
   }
 
-  // Этот метод вызывается автоматически базовым классом для каждой подходящей сущности
   protected update(delta: number, entity: Entity): void {
-    if (entity.isDestroyed) return
-
-    const velocity = entity.get('Velocity')!
-    const stats = entity.get('Stats')!
-
-    const speed = stats.speed ?? 0
-
-    // 2. Применяем скорость к вектору движения
-    velocity.vx = this.currentDirX * speed
-    velocity.vy = this.currentDirY * speed
-
-    // eslint-disable-next-line sonarjs/todo-tag
-    //TODO: добавить систему спринта по нажатию клавиши SHIFT и расхода стамины, stamina refill
-    // eslint-disable-next-line sonarjs/todo-tag
-    //TODO: добавить систему DASH и dash quantity, dash refill
-
-    if (!entity.has(ComponentMask.Weapon)) return
-
-    const weapon = entity.get('Weapon')!
+    const player = entity.get('Player')!
     const transform = entity.get('Transform')!
-    const input = this.services.get(InputService)
-    weapon.isFiring = this.isFiring
 
-    const aimDx = input.mouseX - transform.x
-    const aimDy = input.mouseY - transform.y
+    player.moveX = this.dirX
+    player.moveY = this.dirY
+    player.intentFire = this.isFiring
+    player.intentSprint = this.isSprint
 
-    // 2. Высчитываем длину вектора (Теорема Пифагора)
+    const aimDx = this.mouseX - transform.x
+    const aimDy = this.mouseY - transform.y
     const length = Math.hypot(aimDx, aimDy)
 
-    // 3. Нормализуем вектор (чтобы пули летели с одинаковой скоростью)
     if (length > 0) {
-      weapon.aimX = aimDx / length
-      weapon.aimY = aimDy / length
+      player.aimX = aimDx / length
+      player.aimY = aimDy / length
     }
   }
 }
