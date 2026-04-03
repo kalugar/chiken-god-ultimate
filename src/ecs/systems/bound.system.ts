@@ -59,7 +59,7 @@ export class BoundsSystem extends System {
   // private scaleFactor = 1
   constructor() {
     // Нам нужны и координаты (чтобы их менять), и коллайдер (чтобы знать радиус/размер)
-    super(ComponentMask.Transform | ComponentMask.Collider)
+    super(['Transform', 'Collider'])
   }
 
   // Используем твой красивый абстрактный метод update для каждой сущности

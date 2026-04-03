@@ -13,6 +13,9 @@ export class PlayerLocomotionSystem extends System {
     const player = entity.get('Player')!
     const speed = entity.get('MovementSpeed')!
     const velocity = entity.get('Velocity')!
+    const dash = entity.get('Dash')!
+
+    if (dash && dash.dashTimer > 0) return
 
     const sprintMultiplier = player.intentSprint ? 1.5 : 1
     const finalSpeed = speed.current * sprintMultiplier

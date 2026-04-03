@@ -9,6 +9,7 @@ export class InputSystem extends System {
   private dirY = 0
   private isFiring = false
   private isSprint = false
+  private isDash = false
   private mouseX = 0
   private mouseY = 0
 
@@ -33,6 +34,7 @@ export class InputSystem extends System {
 
     this.isFiring = input.isActionActive('fire')
     this.isSprint = input.isActionActive('sprint')
+    this.isDash = input.isActionActive('dash')
     this.mouseX = input.mouseX
     this.mouseY = input.mouseY
 
@@ -47,6 +49,7 @@ export class InputSystem extends System {
     player.moveY = this.dirY
     player.intentFire = this.isFiring
     player.intentSprint = this.isSprint
+    player.intentDash = this.isDash
 
     const aimDx = this.mouseX - transform.x
     const aimDy = this.mouseY - transform.y

@@ -86,7 +86,7 @@ export default {
     components: {
       Transform: createDefaultTransform(),
       Velocity: createDefaultVelocity(),
-      LifeTime: { value: 1 },
+      LifeTime: { value: 1.5 },
       View: {
         type: 'graphics',
         parent: 'bulletPool',

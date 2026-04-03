@@ -25,7 +25,6 @@ export default class InputService {
   }
 
   constructor() {
-    // Используем стрелочные функции, чтобы не потерять контекст this
     window.addEventListener('keydown', this.onKeyDown)
     window.addEventListener('keyup', this.onKeyUp)
 
@@ -37,6 +36,7 @@ export default class InputService {
   }
 
   private onKeyDown = (e: KeyboardEvent): void => {
+    if (e.repeat) return
     this.activeKeys.add(e.code)
   }
 

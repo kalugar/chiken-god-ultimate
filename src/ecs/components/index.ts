@@ -61,6 +61,7 @@ export interface PlayerData extends Component {
   moveY: number
   intentFire: boolean
   intentSprint: boolean
+  intentDash: boolean
   aimX: number
   aimY: number
 }
@@ -98,6 +99,12 @@ export interface DashData {
   dashTimer: number // Таймер активного рывка (если > 0, сущность "летит")
   directionX: number // Направление текущего рывка
   directionY: number
+  isKeyLocked?: boolean
+
+  startX: number
+  startY: number
+  targetX: number
+  targetY: number
 }
 
 export interface ComponentRegistry {
@@ -135,6 +142,7 @@ export const createDefaultPlayer = (): PlayerData => ({
   moveY: 0,
   intentFire: false,
   intentSprint: false,
+  intentDash: false,
   aimX: 0,
   aimY: -1
 })
@@ -165,15 +173,19 @@ export const createDefaultWeapon = (): WeaponData => ({
 })
 export const createDefaultDash = (): DashData => ({
   distance: 150,
-  duration: 200,
-  cooldown: 2000,
+  duration: 0.12,
+  cooldown: 2,
   maxCharges: 2,
 
   currentCharges: 2,
   cooldownTimer: 0,
   dashTimer: 0,
   directionX: 0,
-  directionY: 0
+  directionY: 0,
+  startX: 0,
+  startY: 0,
+  targetX: 0,
+  targetY: 0
 })
 
 export const defaultComponentRegistry = {

@@ -1,6 +1,7 @@
 import type { World } from '@ecs/world'
 
 import { MovementSystem, RenderSystem, InputSystem } from '@ecs/systems'
+import { DashSystem } from '@ecs/systems/dash.system'
 import { LifeTimeSystem } from '@ecs/systems/lifetime.system'
 import { PlayerCombatSystem } from '@ecs/systems/player.combat.system'
 import { PlayerLocomotionSystem } from '@ecs/systems/player.locomotion.system'
@@ -16,6 +17,7 @@ export async function startLevel(world: World) {
 
   world.addSystem(new InputSystem())
   world.addSystem(new PlayerLocomotionSystem())
+  world.addSystem(new DashSystem())
   world.addSystem(new MovementSystem())
   world.addSystem(new PlayerCombatSystem())
   world.addSystem(new WeaponSystem())
