@@ -43,6 +43,9 @@ export default class FactoryService {
   }
 
   public spawn(prefabId: string, overrides?: SpawnOverrides): Entity | null {
+    if (!this.prefabs.has(prefabId) && overrides) {
+      this.prefabs.set(prefabId, overrides as PrefabConfig)
+    }
     const config = this.prefabs.get(prefabId)
 
     if (!config) {

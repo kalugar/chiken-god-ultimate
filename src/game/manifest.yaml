@@ -1,0 +1,21 @@
+bundles:
+  - name: fonts
+    assets:
+      - alias: MainMenuFont1
+        src: /assets/fonts/MagicSchoolOne.ttf
+      - alias: MainMenuFont2
+        src: /assets/fonts/MagicSchoolTwo.ttf
+      - alias: PowerofDragon
+        src: /assets/fonts/PowerofDragon-Regular.ttf
+      - alias: AngelFont
+        src: /assets/fonts/AngelBanditDemoRegular.ttf
+      - alias: RingFont
+        src: /assets/fonts/RINGM.ttf
+  - name: images
+    assets:
+      - alias: bg
+        src: public/assets/images/mm_bg.jpg
+      - alias: ornament
+        src: public/assets/images/ornament_0125.png
+      - alias: player_idle
+        src: assets/atlas/player_idle.json

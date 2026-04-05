@@ -21,7 +21,7 @@ export interface SpawnOverrides {
   rotation?: number
   vx?: number
   vy?: number
-  components?: Partial<ComponentRegistry>
+  components?: PrefabComponents
 }
 export type SceneConfig = Record<string, PrefabConfig>
 

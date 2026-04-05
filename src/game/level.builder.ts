@@ -8,12 +8,25 @@ import { PlayerLocomotionSystem } from '@ecs/systems/player.locomotion.system'
 import { WeaponSystem } from '@ecs/systems/weapon.system'
 import FactoryService from '@services/service.factory'
 import ResizeService from '@services/service.resize'
-import { Assets, Spritesheet } from 'pixi.js'
+import { Assets, Cache } from 'pixi.js'
 
 import levelConfig from './level.config'
+import manifest from './manifest.json'
+
+async function assetsProcessor() {
+  await Assets.init({ manifest })
+  const bundleIds = manifest.bundles.map((bundle) => bundle.name)
+
+  await Assets.loadBundle(bundleIds, (progress) => {
+    console.log(`Загрузка ресурсов: ${Math.floor(progress * 100)}%`)
+  })
+
+  await document.fonts.ready
+}
 
 export async function startLevel(world: World) {
-  await Assets.load<Spritesheet>('assets/atlas/player_idle.json')
+  console.log(manifest)
+  await assetsProcessor()
 
   world.addSystem(new InputSystem())
   world.addSystem(new PlayerLocomotionSystem())

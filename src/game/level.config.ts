@@ -39,7 +39,6 @@ export default {
       Collider: { radius: 25 },
       View: {
         texture: 'player_idle/0',
-        alpha: 0.89,
         scale: 0.5,
         zIndex: 10
       }
@@ -93,6 +92,19 @@ export default {
         radius: 3,
         fill: {
           color: 0xff_00_00
+        }
+      }
+    }
+  },
+  score: {
+    components: {
+      View: {
+        text: 'Hello Pixi',
+        style: {
+          fontFamily: 'PowerofDragon',
+          fontSize: 128,
+          fill: 0xff_10_10,
+          align: 'center'
         }
       }
     }
