@@ -138,11 +138,11 @@ export default class CameraService implements IResizable {
       if (this.shakeIntensity < 0.1) this.shakeIntensity = 0
     }
 
-    // 4. Применяем математику к слою PixiJS
-    this.worldLayer.scale.set(this.currentZoom)
+    this.worldUpdate(offsetX, offsetY)
+  }
 
-    // Чтобы центрировать экран на (this.x, this.y),
-    // сдвигаем мир на половину экрана, а затем вычитаем координаты камеры, умноженные на зум
+  private worldUpdate(offsetX: number = 0, offsetY: number = 0): void {
+    this.worldLayer.scale.set(this.currentZoom)
     this.worldLayer.x = this.screenWidth / 2 - (this.x + offsetX) * this.currentZoom
     this.worldLayer.y = this.screenHeight / 2 - (this.y + offsetY) * this.currentZoom
   }
@@ -151,5 +151,6 @@ export default class CameraService implements IResizable {
     const { width, height } = newSize
     this.screenWidth = width
     this.screenHeight = height
+    this.worldUpdate()
   }
 }

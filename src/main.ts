@@ -2,7 +2,7 @@ import { Engine } from '@core/engine'
 import engineConfig from '@core/engine.config'
 import { startLevel } from '@game/level.builder'
 
-const engine = new Engine(engineConfig, 200_000)
+const engine = new Engine(engineConfig, 10_000)
 
 try {
   await engine.start()
