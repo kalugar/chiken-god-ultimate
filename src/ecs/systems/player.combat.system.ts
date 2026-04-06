@@ -7,7 +7,6 @@ import { System } from './system'
 
 export class PlayerCombatSystem extends System {
   constructor() {
-    // Нас интересует игрок, у которого есть оружие и координаты
     super(['Player', 'Weapon'])
   }
 

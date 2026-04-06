@@ -12,8 +12,6 @@ export class LifeTimeSystem extends System {
     lifeTime.value -= delta
 
     if (lifeTime.value <= 0) {
-      // Сущность умирает. World сам почистит View через свою логику,
-      // вернет Entity в пул и уберет её из всех систем!
       this.destroyEntity(entity.id)
     }
   }

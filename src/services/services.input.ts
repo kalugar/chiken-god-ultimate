@@ -154,8 +154,12 @@ export default class InputService {
     window.removeEventListener('keydown', this.onKeyDown)
     window.removeEventListener('keyup', this.onKeyUp)
     window.removeEventListener('pointerdown', this.onPointerDown)
+    window.removeEventListener('pointermove', this.onPointerMove)
     window.removeEventListener('pointerup', this.onPointerUp)
+    window.removeEventListener('pointercancel', this.onPointerUp)
+    window.removeEventListener('pointerout', this.onPointerUp)
     window.removeEventListener('blur', this.handleClear)
     window.removeEventListener('contextmenu', this.handleClear)
+    window.removeEventListener('wheel', this.onWheelScroll)
   }
 }

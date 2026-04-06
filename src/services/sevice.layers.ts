@@ -160,7 +160,6 @@ export default class LayersService {
   }
 
   resize(size: RectangleSize) {
-    // console.log('layers resize')
     for (const layer of this.#layers.values()) {
       layer.resize(size)
     }

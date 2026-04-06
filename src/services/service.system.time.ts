@@ -1,3 +1,3 @@
-import TimeService from "./service.time";
+import TimeService from './service.time'
 
-export default class SystemTimeService extends TimeService{}
+export default class SystemTimeService extends TimeService {}

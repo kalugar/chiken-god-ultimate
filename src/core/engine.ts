@@ -171,11 +171,7 @@ export class Engine {
       if (this.services.has(CameraService)) {
         const camera = this.services.get(CameraService)
         const input = this.services.get(InputService)
-
-        // Сначала передаем инпут камере (чтобы она поняла, тащат ли её)
         camera.processInput(input)
-
-        // Затем заставляем камеру пересчитать свою математику
         camera.update(deltaInSeconds)
       }
 

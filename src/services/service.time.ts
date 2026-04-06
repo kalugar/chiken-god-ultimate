@@ -21,9 +21,6 @@ export default class TimeService {
 
   public wait(delay: number): Promise<void> {
     return new Promise((resolve) => {
-      // Мы переиспользуем твой же delayedCall,
-      // но вместо обычного коллбека передаем функцию resolve,
-      // которая "разрешит" (завершит) Промис!
       this.delayedCall(delay, () => {
         resolve()
       })

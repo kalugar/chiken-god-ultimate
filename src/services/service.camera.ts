@@ -37,14 +37,7 @@ export default class CameraService implements IResizable {
   private cameraStartX: number = 0
   private cameraStartY: number = 0
 
-  constructor(private worldLayer: Container) {
-    // this.worldLayer = worldLayer
-    // Обновляем центр при ресайзе окна
-    // window.addEventListener('resize', () => {
-    //   this.screenWidth = window.innerWidth
-    //   this.screenHeight = window.innerHeight
-    // })
-  }
+  constructor(private worldLayer: Container) {}
 
   // === ПУБЛИЧНЫЙ API ===
 
