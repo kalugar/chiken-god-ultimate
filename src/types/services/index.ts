@@ -54,4 +54,5 @@ export type GlobalEvents = {
   'engine:pause': void
   'engine:resume': void
   'engine:resize': void
+  'engine:speed': number
 }

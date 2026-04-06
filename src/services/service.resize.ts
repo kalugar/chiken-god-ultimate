@@ -1,8 +1,7 @@
-import type { RectangleSize } from '@app-types'
+import type { GlobalEvents, RectangleSize } from '@app-types'
 import type { Application } from 'pixi.js'
 
 import { LOGICAL_SIZE } from '@core/constants'
-import { EngineControl } from '@core/engine.control'
 
 import type EventService from './service.events'
 
@@ -11,9 +10,8 @@ export default class ResizeService {
   // private resizeTimeout: TimeEvent | null = null
   constructor(
     private app: Application,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private events: EventService<Record<string, any>>,
-    private engineControl?: EngineControl
+    private events: EventService<GlobalEvents>,
+    private appSize: RectangleSize = { width: LOGICAL_SIZE.width, height: LOGICAL_SIZE.height }
   ) {
     if (!this.app) {
       console.warn(
@@ -34,13 +32,10 @@ export default class ResizeService {
     const screenWidth = this.app.screen.width
     const screenHeight = this.app.screen.height
 
-    const logicalWidth = this.engineControl?.settings.width ?? LOGICAL_SIZE.width
-    const logicalHeight = this.engineControl?.settings.height ?? LOGICAL_SIZE.height
-
     const cssW = Math.max(screenWidth, 1)
     const cssH = Math.max(screenHeight, 1)
 
-    this.scaleFactor = Math.max(cssW / logicalWidth, cssH / logicalHeight)
+    this.scaleFactor = Math.max(cssW / this.appSize.width, cssH / this.appSize.height)
 
     const newSize = {
       width: cssW,

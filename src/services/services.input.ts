@@ -1,4 +1,7 @@
-import type { InputAction } from '@app-types'
+import type { GlobalEvents, InputAction } from '@app-types'
+import type { Container } from 'pixi.js'
+
+import type EventService from './service.events'
 
 export default class InputService {
   public mouseX: number = 0
@@ -31,7 +34,7 @@ export default class InputService {
     MouseLeft: 'fire'
   }
 
-  constructor() {
+  constructor(private events: EventService<GlobalEvents>) {
     this.bindEvents()
   }
 
@@ -47,6 +50,7 @@ export default class InputService {
 
     window.addEventListener('blur', this.handleClear)
     window.addEventListener('contextmenu', this.handleClear)
+    window.addEventListener('focus', () => this.events.emit('engine:resume'))
 
     window.addEventListener('wheel', this.onWheelScroll, { passive: true })
   }
@@ -56,6 +60,20 @@ export default class InputService {
     this.zoomDelta = 0
     return delta
   }
+
+  /**
+   * Пересчитывает физические координаты экрана в мировые координаты.
+   * Должен вызываться каждый кадр, чтобы учитывать движение камеры!
+   */
+  public updateWorldMouse(worldLayer: Container): void {
+    // Используем встроенную математику PixiJS для перевода координат.
+    // Она сама учтет зум, скейл и x/y смещение камеры.
+    const localPos = worldLayer.toLocal({ x: this.screenX, y: this.screenY })
+
+    this.mouseX = localPos.x
+    this.mouseY = localPos.y
+  }
+
   private onWheelScroll = (e: WheelEvent): void => {
     this.zoomDelta += Math.sign(e.deltaY) * 0.2
   }
@@ -131,15 +149,16 @@ export default class InputService {
   }
 
   private handleClear = (): void => {
+    this.events.emit('engine:pause')
     this.activeActions.clear()
     this.activePointers.clear()
     this.lastPinchDistance = null
     this.zoomDelta = 0
   }
 
-  public clearAll(): void {
-    this.handleClear()
-  }
+  // public clearAll(): void {
+  //   this.handleClear()
+  // }
 
   private updateScreenCoords(e: PointerEvent): void {
     // Берем координаты только основного курсора

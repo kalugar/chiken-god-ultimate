@@ -1,5 +1,6 @@
 import type { World } from '@ecs/world'
 
+import { GamePipeline } from '@ecs/pipeline'
 import { MovementSystem, RenderSystem, InputSystem } from '@ecs/systems'
 import { DashSystem } from '@ecs/systems/dash.system'
 import { LifeTimeSystem } from '@ecs/systems/lifetime.system'
@@ -29,18 +30,9 @@ export async function startLevel(world: World) {
   console.log(manifest)
   await assetsProcessor()
 
-  world.addSystem(new InputSystem())
-  world.addSystem(new PlayerLocomotionSystem())
-  world.addSystem(new DashSystem())
-  world.addSystem(new MovementSystem())
-  world.addSystem(new PlayerCombatSystem())
-  world.addSystem(new WeaponSystem())
-  // world.addSystem(new BoundsSystem())
-  world.addSystem(new LifeTimeSystem(world.destroyEntity.bind(world)))
-  // world.addSystem(new CollisionSystem(world)) // Проверяем столкновения
-  // world.addSystem(new LifespanSystem(world));     // Убиваем старые пули
-  world.addSystem(new RenderSystem())
-
+  for (const SystemClass of GamePipeline) {
+    world.addSystem(new SystemClass())
+  }
   world.services.get(ResizeService).requestResize()
 
   const factory = world.services.get(FactoryService)
