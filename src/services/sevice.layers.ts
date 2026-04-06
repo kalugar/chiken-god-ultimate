@@ -3,26 +3,23 @@ import type { LayersOptions, RectangleSize } from '@app-types'
 import { Container, Graphics } from 'pixi.js'
 
 export class BaseLayer extends Container {
-  resize(size: RectangleSize): void {
-    const { width, height, scale = 1 } = size
-
-    this.scale.set(scale)
-    const x = width / 2
-    const y = height / 2
-    this.position.set(x, y)
+  resize(_size: RectangleSize): void {
+    // const { width, height, scale = 1 } = size
+    // this.scale.set(scale)
+    // const x = width / 2
+    // const y = height / 2
+    // this.position.set(x, y)
   }
 }
 
 export class AbsoluteLayer extends BaseLayer {
-  resize(size: RectangleSize): void {
-    const { width, height, scale } = size
-
-    //ниже обработать слой как того требует необходимость
-    this.scale.set(scale)
-
-    const x = width / 2
-    const y = height / 2
-    this.position.set(x, y)
+  resize(_size: RectangleSize): void {
+    // const { width, height, scale } = size
+    // //ниже обработать слой как того требует необходимость
+    // this.scale.set(scale)
+    // const x = width / 2
+    // const y = height / 2
+    // this.position.set(x, y)
   }
 }
 
@@ -163,7 +160,7 @@ export default class LayersService {
   }
 
   resize(size: RectangleSize) {
-    console.log('layers resize')
+    // console.log('layers resize')
     for (const layer of this.#layers.values()) {
       layer.resize(size)
     }

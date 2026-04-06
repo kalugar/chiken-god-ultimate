@@ -19,6 +19,17 @@ export default class TimeService {
     return timer
   }
 
+  public wait(delay: number): Promise<void> {
+    return new Promise((resolve) => {
+      // Мы переиспользуем твой же delayedCall,
+      // но вместо обычного коллбека передаем функцию resolve,
+      // которая "разрешит" (завершит) Промис!
+      this.delayedCall(delay, () => {
+        resolve()
+      })
+    })
+  }
+
   public interval(delay: number, callback: () => void): TimeEvent {
     const timer: TimeEvent = {
       callback,
@@ -64,6 +75,8 @@ export default class TimeService {
         timer.callback()
         timersToClear.push(timer)
       }
+    }
+    if (timersToClear.length > 0) {
       this.clear(timersToClear)
     }
   }

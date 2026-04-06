@@ -17,7 +17,7 @@ export class PlayerLocomotionSystem extends System {
 
     if (dash && dash.dashTimer > 0) return
 
-    const sprintMultiplier = player.intentSprint ? 1.5 : 1
+    const sprintMultiplier = player.intentSprint ? player.sprintMultiplier : 1
     const finalSpeed = speed.current * sprintMultiplier
     const finalAcceleration = (speed.acceleration ?? 0) * sprintMultiplier
     const finalDeceleration = (speed.deceleration ?? 0) / sprintMultiplier

@@ -1,5 +1,7 @@
 import type { RectangleSize, ServiceToken } from '@app-types'
 
+import { isResizable } from '@utils/is.resizable'
+
 export class ServiceLocator {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private services: Map<ServiceToken, any> = new Map()
@@ -30,6 +32,10 @@ export class ServiceLocator {
     return service
   }
 
+  public getAll(): unknown[] {
+    return [...this.services.values()]
+  }
+
   public has<T>(token: ServiceToken<T>): boolean {
     return this.services.has(token)
   }
@@ -42,5 +48,11 @@ export class ServiceLocator {
     this.services.clear()
   }
 
-  public resize(_newSize: RectangleSize): void {}
+  public resize(newSize: RectangleSize): void {
+    for (const service of this.getAll()) {
+      if (service !== this && isResizable(service)) {
+        service.resize(newSize)
+      }
+    }
+  }
 }

@@ -6,9 +6,10 @@ import { LifeTimeSystem } from '@ecs/systems/lifetime.system'
 import { PlayerCombatSystem } from '@ecs/systems/player.combat.system'
 import { PlayerLocomotionSystem } from '@ecs/systems/player.locomotion.system'
 import { WeaponSystem } from '@ecs/systems/weapon.system'
+import CameraService from '@services/service.camera'
 import FactoryService from '@services/service.factory'
 import ResizeService from '@services/service.resize'
-import { Assets, Cache } from 'pixi.js'
+import { Assets } from 'pixi.js'
 
 import levelConfig from './level.config'
 import manifest from './manifest.json'
@@ -40,9 +41,16 @@ export async function startLevel(world: World) {
   // world.addSystem(new LifespanSystem(world));     // Убиваем старые пули
   world.addSystem(new RenderSystem())
 
-  world.services.get(ResizeService).resize()
+  world.services.get(ResizeService).requestResize()
 
   const factory = world.services.get(FactoryService)
 
   factory.loadScene(levelConfig)
+
+  const player = world.getEntityByTag('player')!
+  const playerTransform = player.get('Transform')!
+
+  const camera = world.services.get(CameraService)
+
+  camera.focus(playerTransform)
 }

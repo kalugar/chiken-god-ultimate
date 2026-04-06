@@ -18,17 +18,31 @@ export class WeaponSystem extends System {
 
     if (weapon.isFiring && weapon.cooldownTimer <= 0) {
       const transform = entity.get('Transform')!
+      const velocity = entity.get('Velocity')!
       const factory = this.services.get(FactoryService)
 
-      const vx = weapon.aimX * weapon.bulletSpeed
-      const vy = weapon.aimY * weapon.bulletSpeed
+      const rawVx = weapon.aimX * weapon.bulletSpeed + (velocity ? velocity.vx : 0)
+      const rawVy = weapon.aimY * weapon.bulletSpeed + (velocity ? velocity.vy : 0)
 
+      // 2. Высчитываем длину этого сырого вектора
+      const length = Math.hypot(rawVx, rawVy)
+
+      let finalVx = 0
+      let finalVy = 0
+
+      // 3. НОРМАЛИЗАЦИЯ (Магия здесь)
+      // Мы приводим длину вектора к 1, а затем жестко умножаем на bulletSpeed.
+      // Теперь траектория учитывает бег игрока, но скорость пули ВСЕГДА равна bulletSpeed!
+      if (length > 0) {
+        finalVx = (rawVx / length) * weapon.bulletSpeed
+        finalVy = (rawVy / length) * weapon.bulletSpeed
+      }
       factory.spawn('bullet', {
         x: transform.x,
         y: transform.y,
-        rotation: Math.atan2(weapon.aimY, weapon.aimX),
-        vx,
-        vy
+        rotation: Math.atan2(finalVy, finalVx),
+        vx: finalVx,
+        vy: finalVy
       })
       weapon.cooldownTimer = weapon.fireRate
     }

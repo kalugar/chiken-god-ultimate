@@ -5,3 +5,7 @@ export type RectangleSize = {
   logicalWidth?: number
   logicalHeight?: number
 }
+
+export interface IResizable {
+  resize(newSize: RectangleSize): void
+}

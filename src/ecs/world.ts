@@ -1,3 +1,4 @@
+import type { RectangleSize } from '@app-types'
 import type { ServiceLocator } from '@services/locator'
 
 import { ComponentMask } from '@ecs/components/component.mask'
@@ -149,6 +150,12 @@ export class World {
   public update(delta: number): void {
     for (let i = 0; i < this.systems.length; i++) {
       this.systems[i].execute(delta)
+    }
+  }
+
+  public resize(newSize: RectangleSize): void {
+    for (let i = 0; i < this.systems.length; i++) {
+      this.systems[i].resize?.(newSize)
     }
   }
 }

@@ -59,6 +59,7 @@ export interface PlayerData extends Component {
   score?: number
   moveX: number
   moveY: number
+  sprintMultiplier: number
   intentFire: boolean
   intentSprint: boolean
   intentDash: boolean
@@ -140,6 +141,7 @@ export const createDefaultPlayer = (): PlayerData => ({
   score: 0,
   moveX: 0,
   moveY: 0,
+  sprintMultiplier: 2,
   intentFire: false,
   intentSprint: false,
   intentDash: false,

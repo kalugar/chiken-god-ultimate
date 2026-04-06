@@ -1,8 +1,10 @@
-import type { EngineState } from '@app-types'
+import type { EngineState, GlobalEvents, TimeEvent } from '@app-types'
 import type { ApplicationOptions } from 'pixi.js'
 
 import { World } from '@ecs/world'
 import { ServiceLocator } from '@services/locator'
+import CameraService from '@services/service.camera'
+import EventService from '@services/service.events'
 import FactoryService from '@services/service.factory'
 import ResizeService from '@services/service.resize'
 import SystemTimeService from '@services/service.system.time'
@@ -11,7 +13,7 @@ import InputService from '@services/services.input'
 import LayersService from '@services/sevice.layers'
 import { Ticker, Application, Rectangle } from 'pixi.js'
 
-import { FIXED_TIME_STEP } from './constants'
+import { FIXED_TIME_STEP, RESIZE_DEBOUNCE } from './constants'
 import { EngineControl } from './engine.control'
 
 export class Engine {
@@ -19,6 +21,7 @@ export class Engine {
   public readonly world: World
   public readonly services: ServiceLocator
 
+  private resizeTimeout: TimeEvent | null = null
   private state: EngineState
   private timeStampAccumulator: number = 0
 
@@ -33,6 +36,13 @@ export class Engine {
 
     const gameTime = new TimeService()
     const systemTime = new SystemTimeService()
+
+    const events = new EventService<GlobalEvents>()
+    this.services.register(EventService, events)
+
+    events.on('engine:resize', this.resizeDebounced.bind(this))
+    events.on('engine:pause', this.pause.bind(this))
+    events.on('engine:resume', this.resume.bind(this))
 
     // eslint-disable-next-line unicorn/no-this-assignment, @typescript-eslint/no-this-alias
     const self = this
@@ -69,40 +79,45 @@ export class Engine {
   public async start(): Promise<void> {
     await this.app.init(this.state.settings)
     document.querySelector('#pixi-container')!.append(this.app.canvas)
-
-    const resize = new ResizeService(this.app, this.services, this.world.systems)
-    this.services.register(ResizeService, resize)
-
-    this.app.renderer.on('resize', resize.resizeDebounced.bind(resize))
+    this.app.canvas.addEventListener('contextmenu', (e: MouseEvent) => {
+      e.preventDefault()
+    })
 
     const layers = new LayersService(this.app.stage, { defaultList: true })
     this.services.register(LayersService, layers)
+
+    const worldLayer = layers.getLayerByLabel('world')
+
+    const camera = new CameraService(worldLayer)
+    this.services.register(CameraService, camera)
+
+    const resize = new ResizeService(this.app, this.services.get(EventService))
+    this.services.register(ResizeService, resize)
+
+    this.app.renderer.on('resize', this.resizeDebounced.bind(this))
 
     this.state.isRunning = true
 
     this.app.ticker.add(this.update.bind(this))
 
     this.app.stage.eventMode = 'static'
-    // Чтобы Pixi ловил мышь ВЕЗДЕ, даже если фон прозрачный:
     this.app.stage.hitArea = new Rectangle(-9999, -9999, 9999 * 2, 9999 * 2)
 
-    // Ловим глобальное движение мыши с идеальными логическими координатами
     this.app.stage.on('globalpointermove', (e) => {
       const input = this.services.get(InputService)
-      const layers = this.services.get(LayersService) // Достаем сервис слоев
-
-      // Получаем наш центрированный слой мира
+      const layers = this.services.get(LayersService)
       const worldLayer = layers.getLayerByLabel('world')
-
-      // === ПЕРЕВОД КООРДИНАТ ===
-      // Pixi сам вычтет смещение width/2 и height/2, а также учтет scale слоя!
       const localPos = worldLayer.toLocal(e.global)
       input.mouseX = localPos.x
       input.mouseY = localPos.y
     })
 
+    this.onFocusChanged()
+  }
+
+  private onFocusChanged(): void {
     window.addEventListener('blur', () => {
-      if (!this.state.isRunning) return // Если уже на паузе, ничего не делаем
+      if (!this.state.isRunning) return
 
       this.pause()
       console.log('Игра поставлена на паузу (потеря фокуса)')
@@ -122,10 +137,12 @@ export class Engine {
   }
 
   public pause(): void {
+    if (!this.state.isRunning) return
     this.state.isRunning = false
   }
 
   public resume(): void {
+    if (this.state.isRunning) return
     this.timeStampAccumulator = 0
     this.services.get(InputService).clearAll()
     this.state.isRunning = true
@@ -150,7 +167,39 @@ export class Engine {
       const deltaInSeconds = FIXED_TIME_STEP / 1000
       this.services.get(TimeService).update(FIXED_TIME_STEP)
       this.world.update(deltaInSeconds)
+
+      if (this.services.has(CameraService)) {
+        const camera = this.services.get(CameraService)
+        const input = this.services.get(InputService)
+
+        // Сначала передаем инпут камере (чтобы она поняла, тащат ли её)
+        camera.processInput(input)
+
+        // Затем заставляем камеру пересчитать свою математику
+        camera.update(deltaInSeconds)
+      }
+
       this.timeStampAccumulator -= FIXED_TIME_STEP
     }
+  }
+
+  private resizeDebounced(): void {
+    const systemTime = this.services.get(SystemTimeService)
+    if (this.resizeTimeout) {
+      systemTime.clear(this.resizeTimeout)
+    }
+    this.resizeTimeout = systemTime.delayedCall(RESIZE_DEBOUNCE, this.resizeHandler.bind(this))
+  }
+
+  private resizeHandler(): void {
+    const resizeService = this.services.get(ResizeService)
+
+    const newSize = resizeService.getSize()
+    this.app.canvas.style.width = newSize.width + 'px'
+    this.app.canvas.style.height = newSize.height + 'px'
+    this.world.resize(newSize)
+    this.services.resize(newSize)
+
+    this.resizeTimeout = null
   }
 }

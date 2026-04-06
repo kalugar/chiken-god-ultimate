@@ -39,4 +39,19 @@ export type TimeEvent = {
   elapsed: number
 }
 
-export type InputAction = 'up' | 'down' | 'left' | 'right' | 'fire' | 'dash' | 'sprint'
+export type InputAction = 'up' | 'down' | 'left' | 'right' | 'fire' | 'dash' | 'sprint' | 'pan'
+
+export type GlobalEvents = {
+  // События UI
+  'ui:score_changed': { newScore: number; delta: number }
+  'ui:show_pause_menu': void // payload не нужен
+
+  // Игровые события
+  'game:player_death': { killerId: number; weaponType: string }
+  'game:level_completed': { timeSeconds: number; stars: number }
+
+  // Команды движка
+  'engine:pause': void
+  'engine:resume': void
+  'engine:resize': void
+}

@@ -34,7 +34,7 @@ export default {
       Weapon: {
         ...createDefaultWeapon(),
         fireRate: 0.06,
-        bulletSpeed: 300
+        bulletSpeed: 600
       },
       Collider: { radius: 25 },
       View: {
@@ -73,6 +73,7 @@ export default {
     }
   },
   bulletPool: {
+    layer: 'world',
     components: {
       View: {
         type: 'container',
@@ -91,7 +92,7 @@ export default {
         parent: 'bulletPool',
         radius: 3,
         fill: {
-          color: 0xff_00_00
+          color: 0x00_00_ff
         }
       }
     }
