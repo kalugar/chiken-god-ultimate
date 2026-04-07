@@ -1,0 +1,30 @@
+import type { Entity } from '@ecs/entity'
+
+import { ComponentMask } from '@ecs/components/component.mask'
+import PoolService from '@services/service.object.pool'
+
+import { System } from './system'
+
+export class GarbageCollectorSystem extends System {
+  // Ищем ВСЕ убитые сущности, независимо от того, есть у них View или нет
+  public readonly includeMask = ComponentMask.Destroy
+
+  protected update(delta: number, entity: Entity): void {
+    // 1. Проверяем, есть ли графика (View), требующая очистки
+    const view = entity.get('View')
+
+    if (view && view.node) {
+      if (view.poolId) {
+        // Возвращаем на склад
+        this.services.get(PoolService).release(view.poolId, view.node)
+      } else {
+        // Сжигаем уникальную графику
+        view.node.removeFromParent()
+        view.node.destroy()
+      }
+    }
+
+    // 2. Окончательное удаление сущности из ECS (возврат ID в пул)
+    this.registry.destroyEntity(entity.id)
+  }
+}

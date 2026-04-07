@@ -1,14 +1,9 @@
-import type { World } from '@ecs/world'
+import type { SystemOrchestrator } from '@ecs/orchestrator'
 
-import { GamePipeline } from '@ecs/pipeline'
-import { MovementSystem, RenderSystem, InputSystem } from '@ecs/systems'
-import { DashSystem } from '@ecs/systems/dash.system'
-import { LifeTimeSystem } from '@ecs/systems/lifetime.system'
-import { PlayerCombatSystem } from '@ecs/systems/player.combat.system'
-import { PlayerLocomotionSystem } from '@ecs/systems/player.locomotion.system'
-import { WeaponSystem } from '@ecs/systems/weapon.system'
+import { SystemPipeline } from '@ecs/system.pipeline'
 import CameraService from '@services/service.camera'
 import FactoryService from '@services/service.factory'
+import RegistryService from '@services/service.registry'
 import ResizeService from '@services/service.resize'
 import { Assets } from 'pixi.js'
 
@@ -26,23 +21,26 @@ async function assetsProcessor() {
   await document.fonts.ready
 }
 
-export async function startLevel(world: World) {
+export async function startLevel(game: SystemOrchestrator) {
   console.log(manifest)
   await assetsProcessor()
 
-  for (const SystemClass of GamePipeline) {
-    world.addSystem(new SystemClass())
+  for (const SystemClass of SystemPipeline) {
+    game.addSystem(new SystemClass())
   }
-  world.services.get(ResizeService).requestResize()
+  game.services.get(ResizeService).requestResize()
 
-  const factory = world.services.get(FactoryService)
+  const factory = game.services.get(FactoryService)
 
   factory.loadScene(levelConfig)
 
-  const player = world.getEntityByTag('player')!
-  const playerTransform = player.get('Transform')!
+  const registry = game.services.get(RegistryService)
 
-  const camera = world.services.get(CameraService)
+  const player = registry.getEntityByTag('player')
+  const camera = game.services.get(CameraService)
 
-  camera.focus(playerTransform)
+  if (player && camera) {
+    const playerTransform = player.require('Transform')
+    camera.focus(playerTransform)
+  }
 }

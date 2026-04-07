@@ -1,3 +1,4 @@
+import { ComponentMask } from '@ecs/components/component.mask'
 import InputService from '@services/services.input'
 
 import type { Entity } from '../entity'
@@ -5,6 +6,7 @@ import type { Entity } from '../entity'
 import { System } from './system'
 
 export class InputSystem extends System {
+  public readonly includeMask = ComponentMask.Player | ComponentMask.Transform
   private dirX = 0
   private dirY = 0
   private isFiring = false
@@ -13,9 +15,6 @@ export class InputSystem extends System {
   private mouseX = 0
   private mouseY = 0
 
-  constructor() {
-    super(['Player', 'Transform'])
-  }
   public execute(delta: number): void {
     const input = this.services.get(InputService)
 
@@ -42,8 +41,8 @@ export class InputSystem extends System {
   }
 
   protected update(delta: number, entity: Entity): void {
-    const player = entity.get('Player')!
-    const transform = entity.get('Transform')!
+    const player = entity.require('Player')
+    const transform = entity.require('Transform')
 
     player.moveX = this.dirX
     player.moveY = this.dirY

@@ -49,7 +49,6 @@ export default class InputService {
     window.addEventListener('pointerout', this.onPointerUp)
 
     window.addEventListener('blur', this.handleClear)
-    window.addEventListener('contextmenu', this.handleClear)
     window.addEventListener('focus', () => this.events.emit('engine:resume'))
 
     window.addEventListener('wheel', this.onWheelScroll, { passive: true })

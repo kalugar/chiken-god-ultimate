@@ -82,7 +82,7 @@ export default {
     }
   },
   bullet: {
-    poolSize: 400,
+    poolSize: 800,
     components: {
       Transform: createDefaultTransform(),
       Velocity: createDefaultVelocity(),

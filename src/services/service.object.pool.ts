@@ -3,32 +3,31 @@ import type { Container } from 'pixi.js'
 import { ObjectPool } from '@utils/object.pool'
 
 export default class PoolService {
-  private static pools = new Map<string, ObjectPool<Container>>()
+  private pools = new Map<string, ObjectPool<Container>>()
 
-  public static register(poolLabel: string | Container, pool: ObjectPool<Container>) {
+  public register(poolLabel: string | Container, pool: ObjectPool<Container>): void {
     this.pools.set(typeof poolLabel === 'string' ? poolLabel : poolLabel.label, pool)
   }
 
-  public static has(poolLabel: string | Container): boolean {
+  public has(poolLabel: string | Container): boolean {
     return this.pools.has(typeof poolLabel === 'string' ? poolLabel : poolLabel.label)
   }
 
-  public static get(id: string): Container | null {
+  public get(id: string): Container | null {
     const pool = this.pools.get(id)
     return pool ? pool.get() : null
   }
 
-  public static release(id: string, node: Container) {
+  public release(id: string, node: Container): void {
     const pool = this.pools.get(id)
     if (pool) {
       pool.release(node)
     } else {
-      node.removeFromParent()
-      node.destroy()
+      console.warn(`[PoolService] Попытка вернуть ноду в несуществующий пул: ${id}`)
     }
   }
 
-  public static clearAll() {
+  public clearAll(): void {
     this.pools.clear()
   }
 }

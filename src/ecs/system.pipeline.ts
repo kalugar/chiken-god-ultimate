@@ -2,6 +2,7 @@ import type { System } from '@ecs/systems/system'
 
 import {
   DashSystem,
+  GarbageCollectorSystem,
   InputSystem,
   LifeTimeSystem,
   MovementSystem,
@@ -14,7 +15,7 @@ import {
 export type SystemConstructor = new () => System
 
 // Экспортируем наш пайплайн как массив конструкторов
-export const GamePipeline: SystemConstructor[] = [
+export const SystemPipeline: SystemConstructor[] = [
   // 1. Сбор данных
   InputSystem,
 
@@ -29,7 +30,7 @@ export const GamePipeline: SystemConstructor[] = [
 
   // 4. Очистка и утилиты
   LifeTimeSystem,
-
+  GarbageCollectorSystem,
   // 5. Отрисовка (ВСЕГДА в конце)
   RenderSystem
 ]

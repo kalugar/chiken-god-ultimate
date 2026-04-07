@@ -11,8 +11,6 @@ export class Entity {
 
   constructor(id: number) {
     this.id = id
-    this.mask = ComponentMask.None
-    this.isDestroyed = false
   }
 
   public get<K extends ComponentName>(
@@ -22,6 +20,19 @@ export class Entity {
       typeof identifier === 'string' ? identifier : (MaskToName[identifier] as K)
 
     return this.components.get(name) as ComponentRegistry[K]
+  }
+
+  public require<K extends ComponentName>(identifier: K | ComponentMask): ComponentRegistry[K] {
+    const component = this.get(identifier)
+
+    if (!component) {
+      const name = typeof identifier === 'string' ? identifier : MaskToName[identifier]
+      throw new Error(
+        `[ECS] Критическая ошибка: У сущности (ID: ${this.id}) отсутствует обязательный компонент "${name}"!`
+      )
+    }
+
+    return component
   }
 
   public has(identifier: ComponentName | ComponentMask): boolean {

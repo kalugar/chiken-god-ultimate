@@ -14,7 +14,9 @@ export const ComponentMask = {
   Mana: 1 << 10,
   Shield: 1 << 11,
   MovementSpeed: 1 << 12,
-  Stamina: 1 << 13
+  Stamina: 1 << 13,
+  Destroy: 1 << 14
+  // ... до 1 << 30
 } as const
 
 export type ComponentMask = (typeof ComponentMask)[keyof typeof ComponentMask]

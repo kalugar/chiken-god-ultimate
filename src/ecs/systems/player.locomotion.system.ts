@@ -1,19 +1,19 @@
 import type { Entity } from '@ecs/entity'
 
+import { ComponentMask } from '@ecs/components/component.mask'
 import { moveTowards } from '@utils/move.towards'
 
 import { System } from './system'
 
 export class PlayerLocomotionSystem extends System {
-  constructor() {
-    super(['Player', 'MovementSpeed', 'Velocity'])
-  }
+  public readonly includeMask =
+    ComponentMask.Player | ComponentMask.MovementSpeed | ComponentMask.Velocity
 
   protected update(delta: number, entity: Entity): void {
-    const player = entity.get('Player')!
-    const speed = entity.get('MovementSpeed')!
-    const velocity = entity.get('Velocity')!
-    const dash = entity.get('Dash')!
+    const player = entity.require('Player')
+    const speed = entity.require('MovementSpeed')
+    const velocity = entity.require('Velocity')
+    const dash = entity.require('Dash')
 
     if (dash && dash.dashTimer > 0) return
 

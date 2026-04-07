@@ -6,12 +6,13 @@ import {
   type ComponentRegistry
 } from '@ecs/components'
 import { Entity } from '@ecs/entity'
-import { World } from '@ecs/world'
 import LayersService from '@services/sevice.layers'
 import { ObjectPool } from '@utils/object.pool'
 import { resolveAnchor } from '@utils/resolve.anchor'
 import { createView, type ViewConfig } from '@utils/view.selector'
 import { Container } from 'pixi.js'
+
+import type RegistryService from './service.registry'
 
 import PoolService from './service.object.pool'
 
@@ -19,13 +20,17 @@ export default class FactoryService {
   private prefabs: Map<string, PrefabConfig> = new Map()
   public structuralViews: Map<string, Container> = new Map()
 
-  constructor(private world: World) {}
+  constructor(
+    private readonly registry: RegistryService,
+    private readonly layers: LayersService,
+    private readonly pools: PoolService
+  ) {}
 
   public loadScene(config: SceneConfig): void {
     this.prefabs.clear()
     this.structuralViews.clear()
 
-    PoolService.clearAll()
+    this.pools.clearAll()
 
     for (const [prefabId, prefabConfig] of Object.entries(config)) {
       this.prefabs.set(prefabId, prefabConfig)
@@ -53,7 +58,7 @@ export default class FactoryService {
       return null
     }
 
-    const entity = this.world.createEntity()
+    const entity = this.registry.createEntity()
     if (!entity) return null
 
     if (config.components) {
@@ -74,7 +79,7 @@ export default class FactoryService {
           ...typedPrefabData,
           ...overrideData
         }
-        this.world.addComponent(entity, compName, finalData)
+        this.registry.addComponent(entity, compName, finalData)
       }
     }
     this.applyTopLevelOverrides(entity, overrides)
@@ -97,11 +102,11 @@ export default class FactoryService {
     }
     const pool = new ObjectPool<Container>(
       () => this.createPoolItem(itemOptions),
-      (view) => (view.visible = false),
+      (view) => (view.renderable = false),
       config.poolSize
     )
 
-    PoolService.register(viewConfig.parent ?? prefabId, pool)
+    this.pools.register(viewConfig.parent ?? prefabId, pool)
   }
 
   private createPoolItem(viewConfig: ViewConfig): Container {
@@ -112,7 +117,7 @@ export default class FactoryService {
         `[initPool] Не удалось создать View для "${viewConfig.label}". Проверьте настройки.`
       )
     }
-    view.visible = false
+    view.renderable = false
     resolveAnchor(view, viewConfig)
     return view
   }
@@ -128,15 +133,8 @@ export default class FactoryService {
       return this.structuralViews.get(parentPrefab)!
     }
 
-    const layers = this.world.services.get(LayersService)
-
-    if (!layers) {
-      throw new Error('[FactoryService] resolveParent failed: LayersService is not registered.')
-    }
-
-    return layers.has(layerLabel)
-      ? layers.getLayerByLabel(layerLabel)
-      : layers.getLayerByLabel('world')
+    const targetParent = this.layers.has(layerLabel) ? layerLabel : 'world'
+    return this.layers.getLayerByLabel(targetParent)
   }
 
   private attachView(
@@ -146,29 +144,26 @@ export default class FactoryService {
     viewConfig: ViewConfig
   ): void {
     const poolId = config.components.View?.parent ?? prefabId
-    const hasPool = PoolService.has(poolId)
+    const hasPool = this.pools.has(poolId)
 
     let viewNode: Container | null
 
     if (hasPool) {
-      viewNode = PoolService.get(poolId)!
-      viewNode.visible = true
+      viewNode = this.pools.get(poolId)!
+      viewNode.renderable = true
     } else {
       const targetParent = this.resolveParent(config.layer, viewConfig.parent)
       viewNode = createView({ ...viewConfig, label: prefabId, parent: targetParent })
 
-      if (viewNode) {
-        resolveAnchor(viewNode, viewConfig)
-        this.structuralViews.set(prefabId, viewNode)
-        this.world.setTag(prefabId, entity)
-      }
+      resolveAnchor(viewNode, viewConfig)
+      this.structuralViews.set(prefabId, viewNode)
+      this.registry.setTag(prefabId, entity)
     }
-    if (viewNode) {
-      this.world.addComponent(entity, 'View', {
-        node: viewNode,
-        poolId: hasPool ? poolId : undefined
-      })
-    }
+
+    this.registry.addComponent(entity, 'View', {
+      node: viewNode,
+      poolId: hasPool ? poolId : undefined
+    })
   }
 
   private applyTopLevelOverrides(entity: Entity, overrides?: SpawnOverrides): void {

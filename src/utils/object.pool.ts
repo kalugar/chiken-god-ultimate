@@ -1,25 +1,26 @@
 export class ObjectPool<T> {
-  private pool: T[] = [];
-  private createFn: () => T;
-  private resetFn?: (obj: T) => void;
+  private pool: T[] = []
+  private createFn: () => T
+  private resetFn?: (obj: T) => void
 
   constructor(createFn: () => T, resetFn?: (obj: T) => void, initialSize: number = 0) {
-    this.createFn = createFn;
-    this.resetFn = resetFn;
+    this.createFn = createFn
+    this.resetFn = resetFn
 
     for (let i = 0; i < initialSize; i++) {
-      this.pool.push(this.createFn());
+      this.pool.push(this.createFn())
     }
   }
 
   public get(): T {
-    return this.pool.length > 0 ? this.pool.pop()! : this.createFn();
+    const sprite = this.pool.length > 0 ? this.pool.pop()! : this.createFn()
+    return sprite
   }
 
   public release(obj: T): void {
     if (this.resetFn) {
-      this.resetFn(obj);
+      this.resetFn(obj)
     }
-    this.pool.push(obj);
+    this.pool.push(obj)
   }
 }

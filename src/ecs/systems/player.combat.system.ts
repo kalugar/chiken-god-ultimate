@@ -1,3 +1,4 @@
+import { ComponentMask } from '@ecs/components/component.mask'
 // import { getNWayDirection } from '@utils/get.n.way.direction'
 import { snapToNWay } from '@utils/snap.to.8.way'
 
@@ -6,13 +7,11 @@ import type { Entity } from '../entity'
 import { System } from './system'
 
 export class PlayerCombatSystem extends System {
-  constructor() {
-    super(['Player', 'Weapon'])
-  }
+  public readonly includeMask = ComponentMask.Player | ComponentMask.Weapon
 
   protected update(delta: number, entity: Entity): void {
-    const player = entity.get('Player')!
-    const weapon = entity.get('Weapon')!
+    const player = entity.require('Player')
+    const weapon = entity.require('Weapon')
 
     // === ПРОВЕРКА СТАТУСОВ ===
     // Здесь в будущем добавить: if (entity.has('Stunned')) { weapon.isFiring = false; return; }

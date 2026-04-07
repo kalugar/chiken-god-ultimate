@@ -6,15 +6,16 @@ import { getNWayDirection } from '@utils/get.n.way.direction'
 import { Assets, Sprite } from 'pixi.js'
 
 export class RenderSystem extends System {
-  constructor() {
-    super(['Transform', 'View'])
-  }
+  public readonly includeMask = ComponentMask.Transform | ComponentMask.View
+
+  // private readonly FOV = 400
+  // private readonly CAMERA_HEIGHT = 150
+  // private readonly HORIZON_Y = window.innerHeight / 2
 
   protected update(delta: number, entity: Entity) {
-    const transform = entity.get('Transform')!
-    const view = entity.get('View')
+    const transform = entity.require('Transform')
+    const view = entity.require('View')
 
-    if (!view) return
     if (view.node) {
       view.node.x = transform.x
       view.node.y = transform.y
@@ -22,7 +23,7 @@ export class RenderSystem extends System {
     }
 
     if (entity.has(ComponentMask.Player) && view.node instanceof Sprite) {
-      const player = entity.get('Player')!
+      const player = entity.require('Player')
 
       // Считаем, куда смотрим сейчас
       const newDirection = getNWayDirection(8, player.aimX, player.aimY)

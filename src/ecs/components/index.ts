@@ -50,7 +50,7 @@ export interface MovementSpeedData {
 
 export interface ViewData {
   node: Container | null
-  poolId?: number | string
+  poolId?: string
   type?: string
   currentFrameIndex?: number
 }
@@ -123,6 +123,7 @@ export interface ComponentRegistry {
   LifeTime: LifeTimeData
   Collider: ColliderData
   Dash: DashData
+  Destroy: Component
 }
 
 export type ComponentName = keyof ComponentRegistry
@@ -204,5 +205,6 @@ export const defaultComponentRegistry = {
   Shield: createDefaultShield,
   MovementSpeed: createDefaultMovementSpeed,
   Stamina: createDefaultStamina,
-  Dash: createDefaultDash
+  Dash: createDefaultDash,
+  Destroy: () => ({})
 } satisfies ComponentFactoryRegistry

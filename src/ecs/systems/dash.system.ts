@@ -1,19 +1,19 @@
 import type { DashData, PlayerData, TransformData, VelocityData } from '@ecs/components'
 import type { Entity } from '@ecs/entity'
 
+import { ComponentMask } from '@ecs/components/component.mask'
+
 import { System } from './system'
 
 export class DashSystem extends System {
-  constructor() {
-    // Нам теперь нужен Transform, чтобы знать, откуда и куда лететь
-    super(['Player', 'Dash', 'Velocity', 'Transform'])
-  }
+  public readonly includeMask =
+    ComponentMask.Player | ComponentMask.Dash | ComponentMask.Velocity | ComponentMask.Transform
 
   protected update(delta: number, entity: Entity): void {
-    const player = entity.get('Player')!
+    const player = entity.require('Player')
     const dash = entity.get('Dash')!
-    const velocity = entity.get('Velocity')!
-    const transform = entity.get('Transform')!
+    const velocity = entity.require('Velocity')
+    const transform = entity.require('Transform')
 
     this.processCooldown(delta, dash)
     this.processTrigger(player, dash, transform)
