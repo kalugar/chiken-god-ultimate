@@ -1,19 +1,41 @@
 import type { Entity } from './entity'
 
+import { BitSet } from './components/bitset'
+
 export class Query {
   public entities: Entity[] = []
-
-  // Кэш индексов для удаления за O(1)
   private entityIndices = new Map<number, number>()
 
-  // Уникальный ключ корзины (например, "3_8" -> Требует 1 и 2, исключает 8)
+  public readonly includeMask = new BitSet()
+  public readonly excludeMask = new BitSet()
+
   public readonly key: string
 
-  constructor(
-    public readonly includeMask: number,
-    public readonly excludeMask: number = 0
-  ) {
-    this.key = `${includeMask}_${excludeMask}`
+  constructor(includeIds: number[], excludeIds: number[] = []) {
+    // 1. Заполняем BitSet'ы
+    for (const id of includeIds) {
+      this.includeMask.add(id)
+    }
+    for (const id of excludeIds) {
+      this.excludeMask.add(id)
+    }
+
+    // 2. Генерируем уникальный ключ на основе сырых слов BitSet.
+    // Пример ключа: "5,0,0,0_0,2,0,0" (гарантирует уникальность корзины)
+    this.key = `${this.includeMask.words.join(',')}_${this.excludeMask.words.join(',')}`
+  }
+
+  // === НОВЫЙ МЕТОД: Быстрая проверка сущности ===
+  public matches(entity: Entity): boolean {
+    if (entity.isDestroyed) return false
+
+    // Сущность должна иметь ВСЕ требуемые компоненты
+    if (!entity.mask.containsAll(this.includeMask)) return false
+
+    // Сущность НЕ должна иметь НИ ОДНОГО исключаемого компонента
+    if (this.excludeMask.intersects(entity.mask)) return false
+
+    return true
   }
 
   public has(entity: Entity): boolean {
@@ -35,14 +57,11 @@ export class Query {
     const lastIndex = this.entities.length - 1
     const lastEntity = this.entities[lastIndex]
 
-    // === ПАТТЕРН SWAP AND POP ===
-    // Ставим последний элемент на место удаляемого
     if (indexToRemove !== lastIndex) {
       this.entities[indexToRemove] = lastEntity
       this.entityIndices.set(lastEntity.id, indexToRemove)
     }
 
-    // Удаляем последний элемент (с конца массива удаление происходит мгновенно)
     this.entities.pop()
     this.entityIndices.delete(entity.id)
   }

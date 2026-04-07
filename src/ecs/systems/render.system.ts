@@ -1,12 +1,12 @@
 import type { Entity } from '@ecs/entity'
 
-import { ComponentMask } from '@ecs/components/component.mask'
+import { ComponentId } from '@ecs/components/component.id'
 import { System } from '@ecs/systems/system'
 import { getNWayDirection } from '@utils/get.n.way.direction'
 import { Assets, Sprite } from 'pixi.js'
 
 export class RenderSystem extends System {
-  public readonly includeMask = ComponentMask.Transform | ComponentMask.View
+  public readonly includeComponents = [ComponentId.Transform, ComponentId.View]
 
   // private readonly FOV = 400
   // private readonly CAMERA_HEIGHT = 150
@@ -22,7 +22,7 @@ export class RenderSystem extends System {
       view.node.rotation = transform.rotation
     }
 
-    if (entity.has(ComponentMask.Player) && view.node instanceof Sprite) {
+    if (entity.has(ComponentId.Player) && view.node instanceof Sprite) {
       const player = entity.require('Player')
 
       // Считаем, куда смотрим сейчас

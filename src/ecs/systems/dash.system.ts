@@ -1,13 +1,17 @@
 import type { DashData, PlayerData, TransformData, VelocityData } from '@ecs/components'
 import type { Entity } from '@ecs/entity'
 
-import { ComponentMask } from '@ecs/components/component.mask'
+import { ComponentId } from '@ecs/components/component.id'
 
 import { System } from './system'
 
 export class DashSystem extends System {
-  public readonly includeMask =
-    ComponentMask.Player | ComponentMask.Dash | ComponentMask.Velocity | ComponentMask.Transform
+  public readonly includeComponents = [
+    ComponentId.Player,
+    ComponentId.Dash,
+    ComponentId.Velocity,
+    ComponentId.Transform
+  ]
 
   protected update(delta: number, entity: Entity): void {
     const player = entity.require('Player')

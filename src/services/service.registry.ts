@@ -1,6 +1,9 @@
-import type { ComponentDataInput, ComponentName } from '@ecs/components'
-
-import { ComponentMask } from '@ecs/components/component.mask'
+import {
+  defaultComponentRegistry,
+  type ComponentDataInput,
+  type ComponentName
+} from '@ecs/components'
+import { ComponentId } from '@ecs/components/component.id'
 import { Entity } from '@ecs/entity' // Твой класс сущности
 // src/services/service.registry.ts
 import { Query } from '@ecs/query'
@@ -85,14 +88,18 @@ export default class RegistryService {
 
     // 1. Помечаем как убитую
     entity.isDestroyed = true
-    entity.components.clear()
-    entity.mask = ComponentMask.None
+    entity._clearComponents()
+
+    // Очищаем маску (метод fill(0) внутри BitSet)
+    entity.mask.clear()
+
     if (entity.tag) {
       this.taggedEntities.delete(entity.tag)
       entity.tag = undefined
     }
 
     // 2. Убираем её из всех систем (Корзин)
+    // Так как маска теперь пустая (clear), этот метод безошибочно выкинет сущность из всех Query
     this.updateEntityMask(entity)
 
     // 4. Отдаем ID обратно в пул!
@@ -136,20 +143,32 @@ export default class RegistryService {
   public addComponent<T extends ComponentName>(
     entity: Entity,
     name: T,
-    data: ComponentDataInput<T>
+    data?: ComponentDataInput<T>
   ): void {
-    if (entity.isDestroyed || entity.components.has(name)) return
+    const id = ComponentId[name] as number
 
-    entity.components.set(name, data)
-    entity.mask |= ComponentMask[name]
+    if (entity.isDestroyed || entity.mask.has(id)) return
+
+    // Распаковываем фабрику, если передали функцию, иначе берем сам объект
+    const fallbackData = data ?? defaultComponentRegistry[name]
+    const resolvedData = typeof fallbackData === 'function' ? fallbackData() : fallbackData
+
+    entity._setComponentData(id, resolvedData)
+    entity.mask.add(id)
+
     this.updateEntityMask(entity)
   }
 
   public removeComponent(entity: Entity, name: ComponentName): void {
-    if (entity.isDestroyed || !entity.components.has(name)) return
+    const id = ComponentId[name]
+    if (entity.isDestroyed || !entity.mask.has(id)) return
 
-    entity.components.delete(name)
-    entity.mask &= ~ComponentMask[name]
+    entity._removeComponentData(id)
+
+    // Убираем бит из BitSet
+    const componentId = ComponentId[name]
+    entity.mask.remove(componentId)
+
     this.updateEntityMask(entity)
   }
 
@@ -158,12 +177,8 @@ export default class RegistryService {
     for (let i = 0; i < this.activeQueries.length; i++) {
       const query = this.activeQueries[i]
 
-      const hasRequired = (entity.mask & query.includeMask) === query.includeMask
-      const hasExcluded = query.excludeMask !== 0 && (entity.mask & query.excludeMask) !== 0
-
-      const isMatch = !entity.isDestroyed && hasRequired && !hasExcluded
-
-      if (isMatch) {
+      // Вся магия битовых проверок теперь скрыта внутри query.matches!
+      if (query.matches(entity)) {
         query.add(entity)
       } else {
         query.remove(entity)
@@ -179,23 +194,19 @@ export default class RegistryService {
    * Система вызывает этот метод 1 раз за кадр.
    * Возвращает плоский массив сущностей за O(1).
    */
-  public getEntitiesByMask(includeMask: number, excludeMask: number = 0): Entity[] {
-    const key = `${includeMask}_${excludeMask}`
+  public getEntitiesByQuery(includeIds: number[], excludeIds: number[] = []): Entity[] {
+    // Временно создаем Query только чтобы сгенерировать правильный ключ кэша
+    const tempQuery = new Query(includeIds, excludeIds)
+    const key = tempQuery.key
+
     let query = this.queryCache.get(key)
 
     if (!query) {
-      // Кэш-промах. Инициализируем новую корзину (бывает только при старте системы)
-      query = new Query(includeMask, excludeMask)
+      query = tempQuery // Используем созданный
 
-      // Заполняем корзину уже существующими сущностями
       for (let i = 0; i < this.entities.length; i++) {
         const entity = this.entities[i]
-        if (!entity || entity.isDestroyed) continue
-
-        const hasRequired = (entity.mask & includeMask) === includeMask
-        const hasExcluded = excludeMask !== 0 && (entity.mask & excludeMask) !== 0
-
-        if (hasRequired && !hasExcluded) {
+        if (query.matches(entity)) {
           query.add(entity)
         }
       }

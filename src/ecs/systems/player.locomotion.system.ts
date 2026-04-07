@@ -1,13 +1,16 @@
 import type { Entity } from '@ecs/entity'
 
-import { ComponentMask } from '@ecs/components/component.mask'
+import { ComponentId } from '@ecs/components/component.id'
 import { moveTowards } from '@utils/move.towards'
 
 import { System } from './system'
 
 export class PlayerLocomotionSystem extends System {
-  public readonly includeMask =
-    ComponentMask.Player | ComponentMask.MovementSpeed | ComponentMask.Velocity
+  public readonly includeComponents = [
+    ComponentId.Player,
+    ComponentId.MovementSpeed,
+    ComponentId.Velocity
+  ]
 
   protected update(delta: number, entity: Entity): void {
     const player = entity.require('Player')

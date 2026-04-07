@@ -13,8 +13,7 @@ export class ObjectPool<T> {
   }
 
   public get(): T {
-    const sprite = this.pool.length > 0 ? this.pool.pop()! : this.createFn()
-    return sprite
+    return this.pool.length > 0 ? this.pool.pop()! : this.createFn()
   }
 
   public release(obj: T): void {

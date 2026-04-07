@@ -1,4 +1,4 @@
-import { ComponentMask } from '@ecs/components/component.mask'
+import { ComponentId } from '@ecs/components/component.id'
 import FactoryService from '@services/service.factory'
 
 import type { Entity } from '../entity'
@@ -6,7 +6,7 @@ import type { Entity } from '../entity'
 import { System } from './system'
 
 export class WeaponSystem extends System {
-  public readonly includeMask = ComponentMask.Transform | ComponentMask.Weapon
+  public readonly includeComponents = [ComponentId.Transform, ComponentId.Weapon]
 
   protected update(delta: number, entity: Entity): void {
     const weapon = entity.require('Weapon')

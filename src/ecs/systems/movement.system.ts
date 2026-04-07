@@ -1,9 +1,9 @@
-import { ComponentMask } from '@ecs/components/component.mask'
+import { ComponentId } from '@ecs/components/component.id'
 import { Entity } from '@ecs/entity'
 import { System } from '@ecs/systems/system'
 
 export class MovementSystem extends System {
-  public readonly includeMask = ComponentMask.Transform | ComponentMask.Velocity
+  public readonly includeComponents = [ComponentId.Transform, ComponentId.Velocity]
 
   protected update(delta: number, entity: Entity): void {
     const transform = entity.require('Transform')

@@ -1,13 +1,13 @@
 import type { Entity } from '@ecs/entity'
 
-import { ComponentMask } from '@ecs/components/component.mask'
+import { ComponentId } from '@ecs/components/component.id'
 import PoolService from '@services/service.object.pool'
 
 import { System } from './system'
 
 export class GarbageCollectorSystem extends System {
   // Ищем ВСЕ убитые сущности, независимо от того, есть у них View или нет
-  public readonly includeMask = ComponentMask.Destroy
+  public readonly includeComponents = [ComponentId.Destroy]
 
   protected update(delta: number, entity: Entity): void {
     // 1. Проверяем, есть ли графика (View), требующая очистки

@@ -1,4 +1,4 @@
-import { ComponentMask } from '@ecs/components/component.mask'
+import { ComponentId } from '@ecs/components/component.id'
 import InputService from '@services/services.input'
 
 import type { Entity } from '../entity'
@@ -6,7 +6,7 @@ import type { Entity } from '../entity'
 import { System } from './system'
 
 export class InputSystem extends System {
-  public readonly includeMask = ComponentMask.Player | ComponentMask.Transform
+  public readonly includeComponents = [ComponentId.Player, ComponentId.Transform]
   private dirX = 0
   private dirY = 0
   private isFiring = false
