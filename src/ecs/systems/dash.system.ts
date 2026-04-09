@@ -62,6 +62,7 @@ export class DashSystem extends System {
     }
 
     const length = Math.hypot(dx, dy)
+    const overDash = player.intentSprint ? player.sprintDashMultiplier : 1
     if (length > 0) {
       const dirX = dx / length
       const dirY = dy / length
@@ -69,8 +70,8 @@ export class DashSystem extends System {
       // === КЭШИРУЕМ ТОЧКИ ===
       dash.startX = transform.x
       dash.startY = transform.y
-      dash.targetX = transform.x + dirX * dash.distance
-      dash.targetY = transform.y + dirY * dash.distance
+      dash.targetX = transform.x + dirX * dash.distance * overDash
+      dash.targetY = transform.y + dirY * dash.distance * overDash
     }
   }
 

@@ -12,7 +12,7 @@ import {
   WeaponSystem
 } from '@ecs/systems'
 
-export type SystemConstructor = new () => System
+type SystemConstructor = new () => System
 
 // Экспортируем наш пайплайн как массив конструкторов
 export const SystemPipeline: SystemConstructor[] = [

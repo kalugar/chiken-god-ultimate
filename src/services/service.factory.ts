@@ -9,52 +9,41 @@ import type {
 
 import { defaultComponentRegistry, type ComponentName } from '@ecs/components'
 import { Entity } from '@ecs/entity'
-import LayersService from '@services/sevice.layers'
 import { ObjectPool } from '@utils/factory.object.pool'
 import { createView } from '@utils/factory.view.selector'
 import { resolveAnchor } from '@utils/resolver.anchor'
+import { resolveParent } from '@utils/resolver.parent'
 import { Container } from 'pixi.js'
 
-import type RegistryService from './service.registry'
-
-import PoolService from './service.object.pool'
+import type { BaseScene } from './service.scenes'
 
 export default class FactoryService {
-  private prefabs: Map<string, PrefabConfig> = new Map()
-  public structuralViews: Map<string, Container> = new Map()
+  public loadScene(context: BaseScene, config: SceneConfig): void {
+    // context.schemas.clear()
+    // context.pools.clearAll()
 
-  constructor(
-    private readonly registry: RegistryService,
-    private readonly layers: LayersService,
-    private readonly pools: PoolService
-  ) {}
+    // TODO: добавить scene reset код
 
-  public loadScene(config: SceneConfig): void {
-    this.prefabs.clear()
-    this.structuralViews.clear()
-
-    this.pools.clearAll()
-
-    for (const [prefabId, prefabConfig] of Object.entries(config)) {
-      this.prefabs.set(prefabId, prefabConfig)
+    for (const prefabId in config) {
+      context.schemas.set(prefabId, config[prefabId])
     }
 
-    for (const [prefabId, prefabConfig] of this.prefabs.entries()) {
+    for (const [prefabId, prefabConfig] of context.schemas.entries()) {
       if (prefabConfig.poolSize) {
-        this.initPool(prefabId, prefabConfig)
+        this.initPool(context, prefabId, prefabConfig)
       } else {
-        this.spawn(prefabId)
+        this.spawn(context, prefabId)
       }
     }
 
-    console.log(`[SceneFactory] Сцена загружена. Префабов: ${this.prefabs.size}`)
+    console.log(`[FactoryService] Сцена загружена. Префабов: ${context.schemas.size}`)
   }
 
-  public spawn(prefabId: string, overrides?: SpawnOverrides): Entity | null {
-    const config = this.getOrCreateConfig(prefabId, overrides)
+  public spawn(context: BaseScene, prefabId: string, overrides?: SpawnOverrides): Entity | null {
+    const config = this.getOrCreateConfig(context, prefabId, overrides)
     if (!config) return null
 
-    const entity = this.registry.createEntity()
+    const entity = context.registry.createEntity()
     if (!entity) return null
 
     if (config.components) {
@@ -63,7 +52,15 @@ export default class FactoryService {
 
       // Плоский цикл, никакой вложенной логики!
       for (const key in pComps) {
-        this.processComponent(entity, prefabId, config, key as ComponentName, pComps, oComps)
+        this.processComponent(
+          context,
+          entity,
+          prefabId,
+          config,
+          key as ComponentName,
+          pComps,
+          oComps
+        )
       }
     }
 
@@ -73,14 +70,15 @@ export default class FactoryService {
   }
 
   private getOrCreateConfig(
+    context: BaseScene,
     prefabId: string,
     overrides?: SpawnOverrides
   ): PrefabConfig | undefined {
-    if (!this.prefabs.has(prefabId) && overrides) {
-      this.prefabs.set(prefabId, overrides as PrefabConfig)
+    if (!context.schemas.has(prefabId) && overrides) {
+      context.schemas.set(prefabId, overrides as PrefabConfig)
     }
 
-    const config = this.prefabs.get(prefabId)
+    const config = context.schemas.get(prefabId)
     if (!config) {
       console.warn(`[SceneFactory] Префаб '${prefabId}' не найден!`)
     }
@@ -88,7 +86,16 @@ export default class FactoryService {
     return config
   }
 
+  private getParent(context: BaseScene, parent?: string | Container) {
+    return (
+      resolveParent(context, parent) ??
+      this.spawn(context, parent as string)?.get('View')?.node ??
+      new Container({ label: parent as string, parent: context.view })
+    )
+  }
+
   private processComponent(
+    context: BaseScene,
     entity: Entity,
     prefabId: string,
     config: PrefabConfig,
@@ -113,20 +120,23 @@ export default class FactoryService {
     }
 
     if (compName === 'View') {
-      this.attachView(entity, prefabId, config, finalData as ViewConfig)
+      this.attachView(context, entity, prefabId, config, finalData as ViewConfig)
     } else {
-      this.registry.addComponent(entity, compName, finalData as BaseComponents[typeof compName])
+      context.registry.addComponent(entity, compName, finalData as BaseComponents[typeof compName])
     }
   }
 
-  private initPool(prefabId: string, config: PrefabConfig): void {
+  private initPool(context: BaseScene, prefabId: string, config: PrefabConfig): void {
     const viewConfig = config?.components?.View
     if (!viewConfig) {
       console.warn(`[initPool] Пропуск пула для "${prefabId}": нет конфига или компонента View.`)
       return
     }
 
-    const targetParent = this.resolveParent(config.layer, viewConfig.parent)
+    //предохранитель на случай, если разработчик забыл указать в конфиге имя пула (parent)
+    const rawParent = viewConfig.parent ?? prefabId + 'Pool'
+    const targetParent = this.getParent(context, rawParent)
+
     const itemOptions = {
       label: prefabId,
       ...viewConfig,
@@ -138,7 +148,7 @@ export default class FactoryService {
       config.poolSize
     )
 
-    this.pools.register(viewConfig.parent ?? prefabId, pool)
+    context.pools.register(targetParent.label, pool)
   }
 
   private createPoolItem(viewConfig: ViewConfig): Container {
@@ -154,45 +164,31 @@ export default class FactoryService {
     return view
   }
 
-  private resolveParent(layerLabel?: string, parentPrefab?: string | Container): Container {
-    if (parentPrefab) {
-      if (typeof parentPrefab !== 'string') {
-        return parentPrefab
-      }
-      if (!this.structuralViews.has(parentPrefab)) {
-        this.spawn(parentPrefab)
-      }
-      return this.structuralViews.get(parentPrefab)!
-    }
-
-    const targetParent = this.layers.has(layerLabel) ? layerLabel : 'world'
-    return this.layers.getLayerByLabel(targetParent)
-  }
-
   private attachView(
+    context: BaseScene,
     entity: Entity,
     prefabId: string,
     config: PrefabConfig,
     viewConfig: ViewConfig
   ): void {
     const poolId = config.components.View?.parent ?? prefabId
-    const hasPool = this.pools.has(poolId)
+    const hasPool = context.pools.has(poolId)
 
     let viewNode: Container | null
 
     if (hasPool) {
-      viewNode = this.pools.get(poolId)!
+      viewNode = context.pools.get(poolId)!
       viewNode.renderable = true
     } else {
-      const targetParent = this.resolveParent(config.layer, viewConfig.parent)
+      const targetParent = this.getParent(context, viewConfig.parent)
       viewNode = createView({ ...viewConfig, label: prefabId, parent: targetParent })
 
       resolveAnchor(viewNode, viewConfig)
-      this.structuralViews.set(prefabId, viewNode)
-      this.registry.setTag(prefabId, entity)
+      context.refs.set(prefabId, viewNode)
+      context.registry.setTag(prefabId, entity)
     }
 
-    this.registry.addComponent(entity, 'View', {
+    context.registry.addComponent(entity, 'View', {
       node: viewNode,
       poolId: hasPool ? poolId : undefined
     })

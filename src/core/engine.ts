@@ -1,7 +1,7 @@
 import type { EngineState, GlobalEvents, TimeEvent } from '@app-types'
 import type { ApplicationOptions, Container } from 'pixi.js'
 
-import { SystemOrchestrator } from '@ecs/orchestrator'
+import { SystemDispatcher } from '@ecs/dispatcher'
 import { ServiceLocator } from '@services/locator'
 import CameraService from '@services/service.camera'
 import EventService from '@services/service.events'
@@ -9,6 +9,7 @@ import FactoryService from '@services/service.factory'
 import PoolService from '@services/service.object.pool'
 import RegistryService from '@services/service.registry'
 import ResizeService from '@services/service.resize'
+import { SceneService } from '@services/service.scenes'
 import SystemTimeService from '@services/service.system.time'
 import TimeService from '@services/service.time'
 import InputService from '@services/services.input'
@@ -19,7 +20,7 @@ import { FIXED_TIME_STEP, LOGICAL_SIZE, RESIZE_DEBOUNCE } from './constants'
 
 export class Engine {
   public readonly app: Application
-  public readonly orchestrator: SystemOrchestrator
+  public readonly dispatcher: SystemDispatcher
   public readonly services: ServiceLocator
 
   private resizeTimeout: TimeEvent | null = null
@@ -42,7 +43,7 @@ export class Engine {
 
     this.app = new Application()
     this.services = new ServiceLocator()
-    this.orchestrator = new SystemOrchestrator(this.services)
+    this.dispatcher = new SystemDispatcher(this.services)
   }
 
   public async start(): Promise<void> {
@@ -61,21 +62,16 @@ export class Engine {
     const events = new EventService<GlobalEvents>()
     this.services.register(EventService, events)
 
-    const systemTime = new SystemTimeService()
-    this.services.register(SystemTimeService, systemTime)
-
-    const gameTime = new TimeService()
-    this.services.register(TimeService, gameTime)
-
-    const registry = new RegistryService(this.state.maxEntities)
-    this.services.register(RegistryService, registry)
-
-    const pools = new PoolService()
-    this.services.register(PoolService, pools)
+    this.services.register(SystemTimeService, new SystemTimeService())
+    this.services.register(TimeService, new TimeService())
+    this.services.register(RegistryService, new RegistryService(this.state.maxEntities))
+    this.services.register(PoolService, new PoolService())
+    this.services.register(FactoryService, new FactoryService())
 
     // 2. Визуальные сервисы
     const layers = new LayersService(this.app.stage, { defaultList: true })
     this.services.register(LayersService, layers)
+    this.services.register(SceneService, new SceneService())
 
     const worldLayer = layers.getLayerByLabel('world')
     this.services.register(CameraService, new CameraService(worldLayer))
@@ -85,7 +81,6 @@ export class Engine {
     const height = this.state.settings.height ?? LOGICAL_SIZE.height
     this.services.register(InputService, new InputService(events))
     this.services.register(ResizeService, new ResizeService(this.app, events, { width, height }))
-    this.services.register(FactoryService, new FactoryService(registry, layers, pools))
   }
 
   private cacheHotServices(): void {
@@ -141,7 +136,7 @@ export class Engine {
     // Игровой цикл фиксированного шага
     while (this.timeStampAccumulator >= FIXED_TIME_STEP) {
       this.gameTime.update(FIXED_TIME_STEP)
-      this.orchestrator.update(deltaInSeconds)
+      this.dispatcher.update(deltaInSeconds)
 
       if (this.camera && this.input) {
         this.camera.processInput(this.input)
@@ -170,7 +165,7 @@ export class Engine {
     this.app.canvas.style.width = newSize.width + 'px'
     this.app.canvas.style.height = newSize.height + 'px'
 
-    this.orchestrator.resize(newSize)
+    this.dispatcher.resize(newSize)
     this.services.resize(newSize)
 
     this.resizeTimeout = null

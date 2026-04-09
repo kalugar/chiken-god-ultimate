@@ -24,8 +24,8 @@ export default class CameraService implements IResizable {
   // Зум
   private currentZoom: number = 1
   private targetZoom: number = 1
-  private minZoom: number = 0.5
-  private maxZoom: number = 3
+  private minZoom: number = 0.9
+  private maxZoom: number = 1.5
   private zoomSmoothness: number = 3
 
   // Тряска (Shake)

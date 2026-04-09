@@ -3,7 +3,7 @@ import type { ServiceLocator } from '@services/locator'
 
 import type { System } from './systems/system'
 
-export class SystemOrchestrator {
+export class SystemDispatcher {
   private systems: System[] = []
 
   constructor(public readonly services: ServiceLocator) {}

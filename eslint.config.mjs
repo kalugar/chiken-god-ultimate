@@ -69,6 +69,7 @@ export default defineConfig([
       'perfectionist/sort-imports': 'error',
 
       'sonarjs/pseudo-random': 'off',
+      'sonarjs/todo-tag': 'off',
 
       'unicorn/no-new-buffer': 'warn',
       'unicorn/no-process-exit': 'off',

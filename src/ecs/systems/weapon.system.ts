@@ -1,5 +1,8 @@
+import type { ServiceLocator } from '@services/locator'
+
 import { ComponentId } from '@ecs/components'
 import FactoryService from '@services/service.factory'
+import { BaseScene, SceneService } from '@services/service.scenes'
 
 import type { Entity } from '../entity'
 
@@ -7,6 +10,16 @@ import { System } from './system'
 
 export class WeaponSystem extends System {
   public readonly includeComponents = [ComponentId.Transform, ComponentId.Weapon]
+  private factory!: FactoryService
+  private sceneService!: SceneService
+  private activeScene!: BaseScene
+
+  public injectServices(services: ServiceLocator): void {
+    super.injectServices(services)
+    this.factory = this.services.get(FactoryService)
+    this.sceneService = this.services.get(SceneService)
+    this.activeScene = this.sceneService.getActiveScene()
+  }
 
   protected update(delta: number, entity: Entity): void {
     const weapon = entity.require('Weapon')
@@ -17,7 +30,6 @@ export class WeaponSystem extends System {
     if (weapon.isFiring && weapon.cooldownTimer <= 0) {
       const transform = entity.require('Transform')
       const velocity = entity.require('Velocity')
-      const factory = this.services.get(FactoryService)
 
       const rawVx = weapon.aimX * weapon.bulletSpeed + (velocity ? velocity.vx : 0)
       const rawVy = weapon.aimY * weapon.bulletSpeed + (velocity ? velocity.vy : 0)
@@ -35,7 +47,7 @@ export class WeaponSystem extends System {
         finalVx = (rawVx / length) * weapon.bulletSpeed
         finalVy = (rawVy / length) * weapon.bulletSpeed
       }
-      factory.spawn('bullet', {
+      this.factory.spawn(this.activeScene, 'bullet', {
         x: transform.x,
         y: transform.y,
         rotation: Math.atan2(finalVy, finalVx),

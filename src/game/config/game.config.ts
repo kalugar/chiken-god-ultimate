@@ -4,7 +4,6 @@ import { defaultComponentRegistry as components } from '@ecs/components'
 
 export default {
   player: {
-    layer: 'world',
     components: {
       Player: true,
       Transform: true,
@@ -33,7 +32,6 @@ export default {
     }
   },
   enemyPool: {
-    layer: 'world',
     components: {
       View: {
         type: 'container',
@@ -61,7 +59,6 @@ export default {
     }
   },
   bulletPool: {
-    layer: 'world',
     components: {
       View: {
         type: 'container',

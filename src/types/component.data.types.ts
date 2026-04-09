@@ -57,6 +57,7 @@ export interface PlayerData {
   moveX: number
   moveY: number
   sprintMultiplier: number
+  sprintDashMultiplier: number
   intentFire: boolean
   intentSprint: boolean
   intentDash: boolean

@@ -27,7 +27,8 @@ export const defaultComponentRegistry = {
     score: 0,
     moveX: 0,
     moveY: 0,
-    sprintMultiplier: 2,
+    sprintMultiplier: 2.5,
+    sprintDashMultiplier: 1.5,
     intentFire: false,
     intentSprint: false,
     intentDash: false,
@@ -60,7 +61,7 @@ export const defaultComponentRegistry = {
   Collider: (): ColliderData => ({ radius: 0 }),
   Dash: (): DashData => ({
     distance: 150,
-    duration: 0.12,
+    duration: 0.16,
     cooldown: 2,
     maxCharges: 2,
 

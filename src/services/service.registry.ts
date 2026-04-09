@@ -32,7 +32,7 @@ export default class RegistryService {
   // УПРАВЛЕНИЕ СУЩНОСТЯМИ
   // ==========================================
 
-  private expandPool(): void {
+  private expandRegistry(): void {
     // Увеличиваем размер на 50% (коэффициент 1.5 - стандарт индустрии)
     const deltaSize = Math.floor(this.maxEntities * 0.5)
     const oldSize = this.entities.length
@@ -67,7 +67,7 @@ export default class RegistryService {
           'Движок динамически выделил дополнительную память. Это может вызвать микрофриз.\n' +
           '💡 Совет: Увеличьте стартовый лимит при инициализации: new Engine(config, 50_000)'
       )
-      this.expandPool()
+      this.expandRegistry()
     }
 
     const id = this.availableIds.pop()!
