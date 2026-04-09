@@ -1,6 +1,6 @@
 import type { Entity } from './entity'
 
-import { BitSet } from '../utils/bitset'
+import { BitSet } from '../utils/ecs.bitset'
 
 export class Query {
   public entities: Entity[] = []

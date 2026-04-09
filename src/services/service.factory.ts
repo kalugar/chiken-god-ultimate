@@ -10,9 +10,9 @@ import type {
 import { defaultComponentRegistry, type ComponentName } from '@ecs/components'
 import { Entity } from '@ecs/entity'
 import LayersService from '@services/sevice.layers'
-import { ObjectPool } from '@utils/object.pool'
-import { resolveAnchor } from '@utils/resolve.anchor'
-import { createView } from '@utils/view.selector'
+import { ObjectPool } from '@utils/factory.object.pool'
+import { createView } from '@utils/factory.view.selector'
+import { resolveAnchor } from '@utils/resolver.anchor'
 import { Container } from 'pixi.js'
 
 import type RegistryService from './service.registry'

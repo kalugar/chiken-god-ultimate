@@ -1,4 +1,4 @@
-import { BitSet } from '../utils/bitset'
+import { BitSet } from '../utils/ecs.bitset'
 import { ComponentId, type ComponentName, type ComponentRegistry } from './components'
 export class Entity {
   private components: unknown[] = []

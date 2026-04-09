@@ -1,7 +1,7 @@
 import type { Entity } from '@ecs/entity'
 
 import { ComponentId } from '@ecs/components'
-import { moveTowards } from '@utils/move.towards'
+import { moveTowards } from '@utils/math.move.towards'
 
 import { System } from './system'
 

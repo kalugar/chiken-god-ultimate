@@ -1,6 +1,6 @@
 import type { Container } from 'pixi.js'
 
-import { ObjectPool } from '@utils/object.pool'
+import { ObjectPool } from '@utils/factory.object.pool'
 
 export default class PoolService {
   private pools = new Map<string, ObjectPool<Container>>()

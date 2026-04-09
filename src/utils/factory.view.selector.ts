@@ -1,7 +1,7 @@
 import { viewClasses, type ViewConfig, type ViewTypeKey } from '@app-types'
 import { Assets, Container, Graphics, Texture, type TextOptions } from 'pixi.js'
 
-import { bakeTTF, getFontFamily, stringifyFontFamily } from './font.processor'
+import { bakeTTF, getFontFamily, stringifyFontFamily } from './factory.font.processor'
 
 const inferViewType = (config: ViewConfig): ViewTypeKey => {
   if (config.text) return 'bitmapText'

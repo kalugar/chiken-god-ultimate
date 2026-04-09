@@ -2,7 +2,7 @@ import type { Entity } from '@ecs/entity'
 
 import { ComponentId } from '@ecs/components'
 import { System } from '@ecs/systems/system'
-import { getNWayDirection } from '@utils/get.n.way.direction'
+import { getNWayDirection } from '@utils/math.get.n.way.direction'
 import { Assets, Sprite } from 'pixi.js'
 
 export class RenderSystem extends System {
