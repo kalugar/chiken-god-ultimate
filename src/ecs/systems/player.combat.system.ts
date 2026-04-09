@@ -1,4 +1,4 @@
-import { ComponentId } from '@ecs/components/component.id'
+import { ComponentId } from '@ecs/components'
 // import { getNWayDirection } from '@utils/get.n.way.direction'
 import { snapToNWay } from '@utils/snap.to.8.way'
 

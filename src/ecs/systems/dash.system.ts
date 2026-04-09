@@ -1,7 +1,13 @@
-import type { DashData, PlayerData, TransformData, VelocityData } from '@ecs/components'
 import type { Entity } from '@ecs/entity'
 
-import { ComponentId } from '@ecs/components/component.id'
+import { ComponentId } from '@ecs/components'
+
+import type {
+  DashData,
+  PlayerData,
+  TransformData,
+  VelocityData
+} from '../../types/component.data.types'
 
 import { System } from './system'
 

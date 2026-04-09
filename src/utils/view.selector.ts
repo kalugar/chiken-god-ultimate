@@ -1,71 +1,7 @@
-import {
-  AnimatedSprite,
-  Assets,
-  BitmapText,
-  Container,
-  Graphics,
-  HTMLText,
-  MeshPlane,
-  MeshRope,
-  MeshSimple,
-  NineSliceSprite,
-  ParticleContainer,
-  PerspectiveMesh,
-  SplitBitmapText,
-  SplitText,
-  Sprite,
-  Text,
-  Texture,
-  TilingSprite,
-  type FillInput,
-  type TextOptions
-} from 'pixi.js'
+import { viewClasses, type ViewConfig, type ViewTypeKey } from '@app-types'
+import { Assets, Container, Graphics, Texture, type TextOptions } from 'pixi.js'
 
 import { bakeTTF, getFontFamily, stringifyFontFamily } from './font.processor'
-
-const viewClasses = {
-  animation: AnimatedSprite,
-  bitmapText: BitmapText,
-  container: Container,
-  graphics: Graphics,
-  htmlText: HTMLText,
-  mesh: MeshSimple,
-  nineSlice: NineSliceSprite,
-  particleContainer: ParticleContainer,
-  perspective: PerspectiveMesh,
-  plane: MeshPlane,
-  rope: MeshRope,
-  splitBitmapText: SplitBitmapText,
-  splitText: SplitText,
-  sprite: Sprite,
-  text: Text,
-  tile: TilingSprite
-} as const
-
-export type ViewTypeKey = keyof typeof viewClasses
-
-type ExtractOptions<T> = T extends abstract new (...args: infer Args) => unknown
-  ? NonNullable<Args[0]>
-  : never
-
-type CustomExtensions = {
-  type?: ViewTypeKey
-  label?: string
-  layer?: string
-  parent?: Container
-  texture?: string
-  width?: number
-  height?: number
-  radius?: number
-  fill?: FillInput
-  anchor?: number | { x: number; y: number }
-
-  [key: string]: unknown
-}
-export type ViewConfig = {
-  [K in ViewTypeKey]: Omit<ExtractOptions<(typeof viewClasses)[K]>, keyof CustomExtensions> &
-    CustomExtensions
-}[ViewTypeKey]
 
 const inferViewType = (config: ViewConfig): ViewTypeKey => {
   if (config.text) return 'bitmapText'

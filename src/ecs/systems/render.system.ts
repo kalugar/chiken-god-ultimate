@@ -1,6 +1,6 @@
 import type { Entity } from '@ecs/entity'
 
-import { ComponentId } from '@ecs/components/component.id'
+import { ComponentId } from '@ecs/components'
 import { System } from '@ecs/systems/system'
 import { getNWayDirection } from '@utils/get.n.way.direction'
 import { Assets, Sprite } from 'pixi.js'

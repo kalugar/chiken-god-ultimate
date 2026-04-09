@@ -1,38 +1,26 @@
 import type { SceneConfig } from '@app-types'
 
-import {
-  createDefaultDash,
-  createDefaultEnemy,
-  createDefaultHealth,
-  createDefaultMana,
-  createDefaultMovementSpeed,
-  createDefaultPlayer,
-  createDefaultShield,
-  createDefaultStamina,
-  createDefaultTransform,
-  createDefaultVelocity,
-  createDefaultWeapon
-} from '@ecs/components'
+import { defaultComponentRegistry as components } from '@ecs/components'
 
 export default {
   player: {
     layer: 'world',
     components: {
-      Player: createDefaultPlayer(),
-      Transform: createDefaultTransform(),
-      Velocity: createDefaultVelocity(),
-      Health: createDefaultHealth(),
+      Player: true,
+      Transform: true,
+      Velocity: true,
+      Health: true,
+      Mana: true,
+      Stamina: true,
+      Shield: true,
+      Dash: true,
       MovementSpeed: {
-        ...createDefaultMovementSpeed(),
+        ...components.MovementSpeed(),
         acceleration: 500,
         deceleration: 2000
       },
-      Mana: createDefaultMana(),
-      Stamina: createDefaultStamina(),
-      Shield: createDefaultShield(),
-      Dash: createDefaultDash(),
       Weapon: {
-        ...createDefaultWeapon(),
+        ...components.Weapon(),
         fireRate: 0.06,
         bulletSpeed: 600
       },
@@ -56,11 +44,11 @@ export default {
   enemy: {
     poolSize: 200,
     components: {
-      Enemy: createDefaultEnemy(),
-      Transform: createDefaultTransform(),
-      Velocity: createDefaultVelocity(),
-      Health: createDefaultHealth(),
-      MovementSpeed: createDefaultMovementSpeed(),
+      Enemy: true,
+      Transform: true,
+      Velocity: true,
+      Health: true,
+      MovementSpeed: true,
       View: {
         type: 'graphics',
         parent: 'enemyPool',
@@ -84,8 +72,8 @@ export default {
   bullet: {
     poolSize: 800,
     components: {
-      Transform: createDefaultTransform(),
-      Velocity: createDefaultVelocity(),
+      Transform: true,
+      Velocity: true,
       LifeTime: { value: 1.5 },
       View: {
         type: 'graphics',

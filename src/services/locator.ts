@@ -1,6 +1,9 @@
-import type { RectangleSize, ServiceToken } from '@app-types'
+import type { RectangleSize } from '@app-types'
 
 import { isResizable } from '@utils/is.resizable'
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ServiceToken<T = any> = abstract new (...args: any[]) => T
 
 export class ServiceLocator {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

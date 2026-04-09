@@ -1,5 +1,5 @@
 // src/services/service.camera.ts
-import type { IResizable, RectangleSize } from '@app-types'
+import type { CameraOptions, IResizable, RectangleSize } from '@app-types'
 
 import { Container } from 'pixi.js'
 
@@ -9,7 +9,7 @@ export default class CameraService implements IResizable {
   // private worldLayer: Container
 
   // --- Настройки ---
-  public smoothness: number = 10
+  public smoothness: number = 3
   private screenWidth: number = window.innerWidth
   private screenHeight: number = window.innerHeight
 
@@ -24,7 +24,9 @@ export default class CameraService implements IResizable {
   // Зум
   private currentZoom: number = 1
   private targetZoom: number = 1
-  private zoomSmoothness: number = 8
+  private minZoom: number = 0.5
+  private maxZoom: number = 3
+  private zoomSmoothness: number = 3
 
   // Тряска (Shake)
   private shakeIntensity: number = 0
@@ -37,7 +39,14 @@ export default class CameraService implements IResizable {
   private cameraStartX: number = 0
   private cameraStartY: number = 0
 
-  constructor(private worldLayer: Container) {}
+  constructor(
+    private worldLayer: Container,
+    options?: Partial<CameraOptions>
+  ) {
+    if (options) {
+      Object.assign(this, options)
+    }
+  }
 
   // === ПУБЛИЧНЫЙ API ===
 
@@ -47,7 +56,7 @@ export default class CameraService implements IResizable {
 
   public setZoom(zoom: number): void {
     // Ограничиваем зум, чтобы не уйти в минус или бесконечность
-    this.targetZoom = Math.max(0.2, Math.min(zoom, 5))
+    this.targetZoom = Math.max(this.minZoom, Math.min(zoom, this.maxZoom))
   }
 
   public zoomIn(amount: number = 0.2): void {

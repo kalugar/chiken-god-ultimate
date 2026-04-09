@@ -1,8 +1,5 @@
-import { ComponentId } from '@ecs/components/component.id'
-
-import type { ComponentName, ComponentRegistry } from './components'
-
-import { BitSet } from './components/bitset'
+import { BitSet } from '../utils/bitset'
+import { ComponentId, type ComponentName, type ComponentRegistry } from './components'
 export class Entity {
   private components: unknown[] = []
   public id: number

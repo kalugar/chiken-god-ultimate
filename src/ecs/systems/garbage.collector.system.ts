@@ -1,6 +1,6 @@
 import type { Entity } from '@ecs/entity'
 
-import { ComponentId } from '@ecs/components/component.id'
+import { ComponentId } from '@ecs/components'
 import PoolService from '@services/service.object.pool'
 
 import { System } from './system'

@@ -1,4 +1,4 @@
-import { ComponentId } from '@ecs/components/component.id'
+import { ComponentId } from '@ecs/components'
 import { Entity } from '@ecs/entity'
 import { System } from '@ecs/systems/system'
 

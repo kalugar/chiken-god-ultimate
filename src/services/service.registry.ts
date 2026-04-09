@@ -1,9 +1,4 @@
-import {
-  defaultComponentRegistry,
-  type ComponentDataInput,
-  type ComponentName
-} from '@ecs/components'
-import { ComponentId } from '@ecs/components/component.id'
+import { ComponentId, type ComponentName, type ComponentRegistry } from '@ecs/components'
 import { Entity } from '@ecs/entity' // Твой класс сущности
 // src/services/service.registry.ts
 import { Query } from '@ecs/query'
@@ -143,17 +138,17 @@ export default class RegistryService {
   public addComponent<T extends ComponentName>(
     entity: Entity,
     name: T,
-    data?: ComponentDataInput<T>
+    data?: ComponentRegistry[T]
   ): void {
     const id = ComponentId[name] as number
 
     if (entity.isDestroyed || entity.mask.has(id)) return
 
     // Распаковываем фабрику, если передали функцию, иначе берем сам объект
-    const fallbackData = data ?? defaultComponentRegistry[name]
-    const resolvedData = typeof fallbackData === 'function' ? fallbackData() : fallbackData
+    // const fallbackData = data ?? defaultComponentRegistry[name]
+    // const resolvedData = typeof fallbackData === 'function' ? fallbackData() : fallbackData
 
-    entity._setComponentData(id, resolvedData)
+    entity._setComponentData(id, data)
     entity.mask.add(id)
 
     this.updateEntityMask(entity)

@@ -1,4 +1,4 @@
-import { ComponentId } from '@ecs/components/component.id'
+import { ComponentId } from '@ecs/components'
 import FactoryService from '@services/service.factory'
 
 import type { Entity } from '../entity'

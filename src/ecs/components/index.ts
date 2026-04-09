@@ -1,207 +1,99 @@
-import { Container } from 'pixi.js'
+import type {
+  ColliderData,
+  DashData,
+  EnemyData,
+  HealthData,
+  LifeTimeData,
+  ManaData,
+  MovementSpeedData,
+  PlayerData,
+  ShieldData,
+  StaminaData,
+  TransformData,
+  VelocityData,
+  ViewData,
+  WeaponData
+} from '../../types/component.data.types'
 
-export interface TransformData {
-  x: number
-  y: number
-  rotation: number
-}
-export interface VelocityData {
-  vx: number
-  vy: number
-}
+export const defaultComponentRegistry = {
+  // Теги (void)
+  Destroy: (): void => {},
 
-export interface HealthData {
-  current: number
-  max: number
-  rechargeRate?: number
-  rechargeDelay?: number
-}
+  // Компоненты с данными
+  Transform: (): TransformData => ({ x: 0, y: 0, rotation: 0 }),
+  Velocity: (): VelocityData => ({ vx: 0, vy: 0 }),
+  View: (): ViewData => ({ node: null }),
+  Player: (): PlayerData => ({
+    score: 0,
+    moveX: 0,
+    moveY: 0,
+    sprintMultiplier: 2,
+    intentFire: false,
+    intentSprint: false,
+    intentDash: false,
+    aimX: 0,
+    aimY: -1
+  }),
+  Enemy: (): EnemyData => ({ state: 0 }),
+  Health: (): HealthData => ({ current: 100, max: 100 }),
+  Mana: (): ManaData => ({ current: 100, max: 100 }),
+  Shield: (): ShieldData => ({ current: 100, max: 100 }),
+  MovementSpeed: (): MovementSpeedData => ({
+    base: 250,
+    current: 250
+  }),
+  Stamina: (): StaminaData => ({
+    current: 100,
+    max: 100,
+    rechargeRate: 1,
+    rechargeDelay: 250
+  }),
+  Weapon: (): WeaponData => ({
+    isFiring: false,
+    fireRate: 0.12,
+    cooldownTimer: 0,
+    aimX: 0,
+    aimY: -1,
+    bulletSpeed: 800
+  }),
+  LifeTime: (): LifeTimeData => ({ value: 1 }),
+  Collider: (): ColliderData => ({ radius: 0 }),
+  Dash: (): DashData => ({
+    distance: 150,
+    duration: 0.12,
+    cooldown: 2,
+    maxCharges: 2,
 
-export interface ManaData {
-  current: number
-  max: number
-  rechargeRate?: number
-  rechargeDelay?: number
-}
-
-export interface StaminaData {
-  current: number
-  max: number
-  rechargeRate: number
-  rechargeDelay: number
-}
-
-export interface ShieldData {
-  current: number
-  max: number
-  rechargeRate?: number
-  rechargeDelay?: number
-}
-
-export interface MovementSpeedData {
-  base: number
-  current: number
-  acceleration?: number
-  deceleration?: number
-}
-
-export interface ViewData {
-  node: Container | null
-  poolId?: string
-  type?: string
-  currentFrameIndex?: number
-}
-
-export interface PlayerData {
-  score?: number
-  moveX: number
-  moveY: number
-  sprintMultiplier: number
-  intentFire: boolean
-  intentSprint: boolean
-  intentDash: boolean
-  aimX: number
-  aimY: number
-}
-export interface ColliderData {
-  radius: number
-}
-
-export interface EnemyData {
-  state?: number
-}
-export interface LifeTimeData {
-  value: number
-}
-
-export interface WeaponData {
-  isFiring: boolean
-  fireRate: number
-  cooldownTimer: number
-  bulletSpeed: number
-
-  aimX: number
-  aimY: number
+    currentCharges: 2,
+    cooldownTimer: 0,
+    dashTimer: 0,
+    directionX: 0,
+    directionY: 0,
+    startX: 0,
+    startY: 0,
+    targetX: 0,
+    targetY: 0
+  })
 }
 
-export interface DashData {
-  // --- Конфигурация (задается в префабе) ---
-  distance: number // Дальность рывка в пикселях
-  duration: number // Длительность самого перемещения (мс)
-  cooldown: number // Время восстановления одного заряда (мс)
-  maxCharges: number // Максимальное количество рывков
-
-  // --- Состояние (меняется в рантайме) ---
-  currentCharges: number // Доступно рывков сейчас
-  cooldownTimer: number // Таймер до восстановления следующего заряда
-  dashTimer: number // Таймер активного рывка (если > 0, сущность "летит")
-  directionX: number // Направление текущего рывка
-  directionY: number
-  isKeyLocked?: boolean
-
-  startX: number
-  startY: number
-  targetX: number
-  targetY: number
+export type ComponentName = keyof typeof defaultComponentRegistry
+// TypeScript автоматически берет ReturnType (то, что возвращает функция)
+// Если функция возвращает void, тип будет void. Если TransformData — будет TransformData.
+export type ComponentRegistry = {
+  [K in ComponentName]: ReturnType<(typeof defaultComponentRegistry)[K]>
 }
 
-export interface ComponentRegistry {
-  Transform: TransformData
-  Velocity: VelocityData
-  View: ViewData
-  Player: PlayerData
-  Enemy: EnemyData
-  Health: HealthData
-  Mana: ManaData
-  Shield: ShieldData
-  MovementSpeed: MovementSpeedData
-  Stamina: StaminaData
-  Weapon: WeaponData
-  LifeTime: LifeTimeData
-  Collider: ColliderData
-  Dash: DashData
-  Destroy: void
-}
-
-export type ComponentName = keyof ComponentRegistry
-export type ComponentFactoryRegistry = {
-  [T in ComponentName]: () => ComponentRegistry[T]
-}
-
+// Тип для аргументов в addComponent
 export type ComponentDataInput<T extends ComponentName> =
   | ComponentRegistry[T]
   | (() => ComponentRegistry[T])
 
-export const createDefaultTransform = (): TransformData => ({ x: 0, y: 0, rotation: 0 })
-export const createDefaultVelocity = (): VelocityData => ({ vx: 0, vy: 0 })
-export const createDefaultView = (): ViewData => ({ node: null })
-export const createDefaultPlayer = (): PlayerData => ({
-  score: 0,
-  moveX: 0,
-  moveY: 0,
-  sprintMultiplier: 2,
-  intentFire: false,
-  intentSprint: false,
-  intentDash: false,
-  aimX: 0,
-  aimY: -1
-})
-export const createDefaultCollider = (): ColliderData => ({ radius: 0 })
-export const createDefaultEnemy = (): EnemyData => ({ state: 0 })
-export const createDefaultLifeTime = (): LifeTimeData => ({ value: 1 })
-export const createDefaultHealth = (): HealthData => ({ current: 100, max: 100 })
-export const createDefaultMana = (): ManaData => ({ current: 100, max: 100 })
-export const createDefaultShield = (): ShieldData => ({ current: 100, max: 100 })
-export const createDefaultMovementSpeed = (): MovementSpeedData => ({
-  base: 250,
-  current: 250
-})
-export const createDefaultStamina = (): StaminaData => ({
-  current: 100,
-  max: 100,
-  rechargeRate: 1,
-  rechargeDelay: 250
-})
+// Идентефикаторы id компонентов [0, 127], т.к. для хранения масок компонетов
+// мы используем Uint32Array(4) 4*32 = 128 битов
+export const ComponentId = Object.fromEntries(
+  (Object.keys(defaultComponentRegistry) as ComponentName[]).map((key, index) => [key, index])
+) as Record<ComponentName, number>
 
-export const createDefaultWeapon = (): WeaponData => ({
-  isFiring: false,
-  fireRate: 0.12,
-  cooldownTimer: 0,
-  aimX: 0,
-  aimY: -1,
-  bulletSpeed: 800
-})
-export const createDefaultDash = (): DashData => ({
-  distance: 150,
-  duration: 0.12,
-  cooldown: 2,
-  maxCharges: 2,
-
-  currentCharges: 2,
-  cooldownTimer: 0,
-  dashTimer: 0,
-  directionX: 0,
-  directionY: 0,
-  startX: 0,
-  startY: 0,
-  targetX: 0,
-  targetY: 0
-})
-
-export const defaultComponentRegistry = {
-  Transform: createDefaultTransform,
-  Velocity: createDefaultVelocity,
-  View: createDefaultView,
-  Player: createDefaultPlayer,
-  Enemy: createDefaultEnemy,
-  LifeTime: createDefaultLifeTime,
-  Weapon: createDefaultWeapon,
-  Collider: createDefaultCollider,
-  Health: createDefaultHealth,
-  Mana: createDefaultMana,
-  Shield: createDefaultShield,
-  MovementSpeed: createDefaultMovementSpeed,
-  Stamina: createDefaultStamina,
-  Dash: createDefaultDash,
-  Destroy: (): void => {}
-} satisfies ComponentFactoryRegistry
+export const componentIdToName = Object.fromEntries(
+  Object.entries(ComponentId).map(([name, id]) => [id, name])
+) as Record<number, keyof typeof ComponentId>

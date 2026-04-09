@@ -1,6 +1,6 @@
 import type { Entity } from '@ecs/entity'
 
-import { ComponentId } from '@ecs/components/component.id'
+import { ComponentId } from '@ecs/components'
 import { moveTowards } from '@utils/move.towards'
 
 import { System } from './system'

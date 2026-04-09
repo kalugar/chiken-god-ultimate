@@ -1,4 +1,4 @@
-import { ComponentId } from '@ecs/components/component.id'
+import { ComponentId } from '@ecs/components'
 import InputService from '@services/services.input'
 
 import type { Entity } from '../entity'
