@@ -1,7 +1,9 @@
-import { ComponentId, type ComponentName, type ComponentRegistry } from '@ecs/components'
-import { Entity } from '@ecs/entity' // Твой класс сущности
+import type { ComponentController } from '@core/ecs/component/controller'
+import type { ComponentName, ComponentRegistry } from '@core/types/ecs.types'
+
+import { Entity } from '@core/ecs/entity' // Твой класс сущности
 // src/services/service.registry.ts
-import { Query } from '@ecs/query'
+import { Query } from '@core/ecs/entity/query'
 
 export default class RegistryService {
   // === ХРАНИЛИЩЕ СУЩНОСТЕЙ ===
@@ -16,14 +18,17 @@ export default class RegistryService {
   private activeQueries: Query[] = []
   private taggedEntities: Map<string, Entity> = new Map()
 
-  constructor(private readonly maxEntities: number = 10_000) {
+  constructor(
+    private readonly maxEntities: number = 10_000,
+    private compManager: ComponentController
+  ) {
     this.entities = Array.from({ length: maxEntities })
     this.availableIds = Array.from({ length: maxEntities })
     // this.events = new EventEmitter()
 
     // Предварительная аллокация памяти (Object Pool)
     for (let i = 0; i < maxEntities; i++) {
-      this.entities[i] = new Entity(i)
+      this.entities[i] = new Entity(i, compManager)
       this.availableIds[maxEntities - 1 - i] = i
     }
   }
@@ -45,7 +50,7 @@ export default class RegistryService {
 
     // 1. Создаем новые сущности
     for (let i = oldSize; i < newSize; i++) {
-      const entity = new Entity(i)
+      const entity = new Entity(i, this.compManager)
       entity.isDestroyed = true
       this.entities[i] = entity
     }
@@ -140,7 +145,7 @@ export default class RegistryService {
     name: T,
     data?: ComponentRegistry[T]
   ): void {
-    const id = ComponentId[name] as number
+    const id = this.compManager.getId(name)
 
     if (entity.isDestroyed || entity.mask.has(id)) return
 
@@ -155,24 +160,26 @@ export default class RegistryService {
   }
 
   public removeComponent(entity: Entity, name: ComponentName): void {
-    const id = ComponentId[name]
+    const id = this.compManager.getId(name)
     if (entity.isDestroyed || !entity.mask.has(id)) return
 
     entity._removeComponentData(id)
 
     // Убираем бит из BitSet
-    const componentId = ComponentId[name]
+    const componentId = this.compManager.getId(name)
     entity.mask.remove(componentId)
 
     this.updateEntityMask(entity)
   }
 
+  public getComponentId(name: ComponentName): number {
+    return this.compManager.getId(name)
+  }
   // Роутинг сущности по всем активным корзинам
   private updateEntityMask(entity: Entity): void {
     for (let i = 0; i < this.activeQueries.length; i++) {
       const query = this.activeQueries[i]
 
-      // Вся магия битовых проверок теперь скрыта внутри query.matches!
       if (query.matches(entity)) {
         query.add(entity)
       } else {

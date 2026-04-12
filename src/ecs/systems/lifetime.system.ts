@@ -1,7 +1,7 @@
-import type { Entity } from '@ecs/entity'
+import type { Entity } from '@core/ecs/entity'
 
+import { System } from '@core/ecs/system/system'
 import { ComponentId } from '@ecs/components'
-import { System } from '@ecs/systems/system'
 
 export class LifeTimeSystem extends System {
   public readonly includeComponents = [ComponentId.LifeTime]

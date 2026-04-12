@@ -1,4 +1,4 @@
-import { BaseScreen } from '@services/service.screens'
+import { BaseScreen } from '@core/services/service.screen.state'
 
 export default class TooltipsScreen extends BaseScreen {
   constructor(label: string) {

@@ -1,6 +1,6 @@
-import type { Entity } from './entity'
+import type { Entity } from '.'
 
-import { BitSet } from '../utils/ecs.bitset'
+import { BitSet } from '../utils/bitset'
 
 export class Query {
   public entities: Entity[] = []
@@ -12,7 +12,6 @@ export class Query {
   public readonly key: string
 
   constructor(includeIds: number[], excludeIds: number[] = []) {
-    // 1. Заполняем BitSet'ы
     for (const id of includeIds) {
       this.includeMask.add(id)
     }
@@ -21,11 +20,11 @@ export class Query {
     }
 
     // 2. Генерируем уникальный ключ на основе сырых слов BitSet.
-    // Пример ключа: "5,0,0,0_0,2,0,0" (гарантирует уникальность корзины)
+    // Пример ключа: "5,0,0,0_0,2,0,0" (гарантирует уникальность)
     this.key = `${this.includeMask.words.join(',')}_${this.excludeMask.words.join(',')}`
   }
 
-  // === НОВЫЙ МЕТОД: Быстрая проверка сущности ===
+  // === Быстрая проверка сущности ===
   public matches(entity: Entity): boolean {
     if (entity.isDestroyed) return false
 

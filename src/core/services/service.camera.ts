@@ -3,7 +3,7 @@ import type { CameraOptions, IResizable, RectangleSize } from '@app-types'
 
 import { Container } from 'pixi.js'
 
-import type InputService from './services.input'
+import type InputService from './service.input'
 
 export default class CameraService implements IResizable {
   // private worldLayer: Container

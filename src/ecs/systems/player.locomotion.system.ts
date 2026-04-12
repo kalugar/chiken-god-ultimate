@@ -1,9 +1,9 @@
-import type { Entity } from '@ecs/entity'
+import type { Entity } from '@core/ecs/entity'
 
 import { ComponentId } from '@ecs/components'
 import { moveTowards } from '@utils/math.move.towards'
 
-import { System } from './system'
+import { System } from '../../core/ecs/system/system'
 
 export class PlayerLocomotionSystem extends System {
   public readonly includeComponents = [

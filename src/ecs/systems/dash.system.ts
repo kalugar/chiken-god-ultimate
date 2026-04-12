@@ -1,4 +1,4 @@
-import type { Entity } from '@ecs/entity'
+import type { Entity } from '@core/ecs/entity'
 
 import { ComponentId } from '@ecs/components'
 
@@ -9,7 +9,7 @@ import type {
   VelocityData
 } from '../../types/component.data.types'
 
-import { System } from './system'
+import { System } from '../../core/ecs/system/system'
 
 export class DashSystem extends System {
   public readonly includeComponents = [

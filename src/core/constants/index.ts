@@ -1,4 +1,4 @@
-export const LOGICAL_SIZE = {
+export const DESIGN_SIZE = {
   width: 1280,
   height: 720
 }

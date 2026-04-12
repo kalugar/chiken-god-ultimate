@@ -1,4 +1,4 @@
-import type { PrefabConfig } from '@app-types'
+import type { PrefabConfig } from '@core/types/factory.types'
 import type LoadScreen from '@game/screens/load.screen'
 
 import {
@@ -9,7 +9,7 @@ import {
   Sprite
 } from 'pixi.js'
 
-import type { Screen, ScreenPipelineConfig } from '../types/screen.types'
+import type { Screen, ScreenPipelineConfig } from '../../types/screen.types'
 import type LayersService from './sevice.layers'
 
 export class BaseScreen implements Screen {
@@ -56,17 +56,17 @@ export class BaseScreen implements Screen {
   }
 }
 
-export default class ScreenService {
+export default class ScreenStateService {
   private activeScreen: Screen | null = null
   private cachedOverlays: Map<string, Screen> = new Map()
   private readonly screensConfig: Map<string, ScreenPipelineConfig> = new Map()
   private inTransitioning: boolean = false
-  private layers!: LayersService
+
   private loadingScreen!: LoadScreen
 
   // Допустим, у нас есть простенький сервис для экрана загрузки
   // (он живет всегда в самом верхнем слое и просто включается/выключается)
-  constructor() {
+  constructor(private layers: LayersService) {
     // Инициализируем мапу конфигов для быстрого поиска
   }
   public getActiveScreen(): Screen {
@@ -75,8 +75,7 @@ export default class ScreenService {
     }
     return this.activeScreen
   }
-  public inject(layers: LayersService, loadingScreen: LoadScreen) {
-    this.layers = layers
+  public inject(loadingScreen: LoadScreen) {
     this.loadingScreen = loadingScreen
   }
   /**

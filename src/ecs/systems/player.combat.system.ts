@@ -2,9 +2,9 @@ import { ComponentId } from '@ecs/components'
 // import { getNWayDirection } from '@utils/get.n.way.direction'
 import { snapToNWay } from '@utils/math.snap.to.n.way'
 
-import type { Entity } from '../entity'
+import type { Entity } from '../../core/ecs/entity'
 
-import { System } from './system'
+import { System } from '../../core/ecs/system/system'
 
 export class PlayerCombatSystem extends System {
   public readonly includeComponents = [ComponentId.Player, ComponentId.Weapon]

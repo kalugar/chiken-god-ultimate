@@ -1,6 +1,6 @@
+import { Entity } from '@core/ecs/entity'
+import { System } from '@core/ecs/system/system'
 import { ComponentId } from '@ecs/components'
-import { Entity } from '@ecs/entity'
-import { System } from '@ecs/systems/system'
 
 export class MovementSystem extends System {
   public readonly includeComponents = [ComponentId.Transform, ComponentId.Velocity]

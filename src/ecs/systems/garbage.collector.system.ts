@@ -1,9 +1,9 @@
-import type { Entity } from '@ecs/entity'
+import type { Entity } from '@core/ecs/entity'
 
+import PoolService from '@core/services/service.object.pool'
 import { ComponentId } from '@ecs/components'
-import PoolService from '@services/service.object.pool'
 
-import { System } from './system'
+import { System } from '../../core/ecs/system/system'
 
 export class GarbageCollectorSystem extends System {
   // Ищем ВСЕ убитые сущности, независимо от того, есть у них View или нет

@@ -1,18 +1,17 @@
 import type { RectangleSize } from '@app-types'
-import type { ServiceLocator } from '@services/locator'
+import type { ServiceLocator } from '@core/services/locator'
 
-import type { System } from './systems/system'
+import type { System } from './system/system'
 
 export class SystemDispatcher {
   private systems: System[] = []
 
-  constructor(public readonly services: ServiceLocator) {}
+  constructor(private readonly services: ServiceLocator) {}
 
   /**
    * Добавляет систему в пайплайн и внедряет в нее зависимости.
    */
   public addSystem(system: System): void {
-    system.injectServices(this.services)
     this.systems.push(system)
   }
 

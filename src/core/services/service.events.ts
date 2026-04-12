@@ -1,8 +1,6 @@
 // src/services/service.events.ts
 
-// Тип для функции-обработчика
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type EventHandler<T = any> = (payload: T) => void
+import type { EventHandler } from '@core/types/services.types'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default class EventService<Events extends Record<string, any>> {

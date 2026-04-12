@@ -1,9 +1,9 @@
+import InputService from '@core/services/service.input'
 import { ComponentId } from '@ecs/components'
-import InputService from '@services/services.input'
 
-import type { Entity } from '../entity'
+import type { Entity } from '../../core/ecs/entity'
 
-import { System } from './system'
+import { System } from '../../core/ecs/system/system'
 
 export class InputSystem extends System {
   public readonly includeComponents = [ComponentId.Player, ComponentId.Transform]

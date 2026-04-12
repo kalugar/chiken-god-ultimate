@@ -1,9 +1,9 @@
-import type { LayersOptions, RectangleSize } from '@app-types'
+import type { LayersOptions, ScreenSize } from '@core/types/services.types'
 
 import { Container, Graphics } from 'pixi.js'
 
 export class BaseLayer extends Container {
-  resize(_size: RectangleSize): void {
+  resize(_size: ScreenSize): void {
     // const { width, height, scale = 1 } = size
     // this.scale.set(scale)
     // const x = width / 2
@@ -13,7 +13,7 @@ export class BaseLayer extends Container {
 }
 
 export class AbsoluteLayer extends BaseLayer {
-  resize(_size: RectangleSize): void {
+  resize(_size: ScreenSize): void {
     const { width, height, scale } = _size
     //ниже обработать слой как того требует необходимость
     this.scale.set(scale)
@@ -32,11 +32,10 @@ export default class LayersService {
     const { defaultList } = options
     this.#layers = defaultList
       ? new Map([
-          ['background', new BaseLayer({ label: 'background' })],
           ['world', new BaseLayer({ label: 'world' })],
-          ['ui_low', new AbsoluteLayer({ label: 'ui_low' })],
-          ['fx', new AbsoluteLayer({ label: 'fx' })],
-          ['ui_top', new AbsoluteLayer({ label: 'ui_top' })]
+          ['ui', new BaseLayer({ label: 'ui' })],
+          ['modals', new AbsoluteLayer({ label: 'modals' })],
+          ['system', new AbsoluteLayer({ label: 'system' })]
         ])
       : new Map<string, BaseLayer>()
 
@@ -159,7 +158,7 @@ export default class LayersService {
     }
   }
 
-  resize(size: RectangleSize) {
+  resize(size: ScreenSize) {
     for (const layer of this.#layers.values()) {
       layer.resize(size)
     }

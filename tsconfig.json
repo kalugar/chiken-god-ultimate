@@ -28,7 +28,7 @@
       "@ecs/*": ["./src/ecs/*"],
       "@game/*": ["./src/game/*"],
       "@utils/*": ["./src/utils/*"],
-      "@services/*": ["./src/services/*"],
+      "@services/*": ["src/core/services/*"],
       "@rendering/*": ["./src/core/rendering/*"],
       "@app-types": ["./src/types/index.ts"]
     }

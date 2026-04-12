@@ -1,3 +1,16 @@
+export type ScreenSize = {
+  width: number
+  height: number
+  scale: number
+}
+
+export type TimeEvent = {
+  callback: () => void
+  delay: number
+  repeat: boolean
+  elapsed: number
+}
+
 export type GlobalEvents = {
   // События UI
   'ui:score_changed': { newScore: number; delta: number }
@@ -12,4 +25,11 @@ export type GlobalEvents = {
   'engine:resume': void
   'engine:resize': { width: number; height: number; scale: number }
   'engine:speed': number
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type EventHandler<T = any> = (payload: T) => void
+
+export type LayersOptions = {
+  defaultList?: boolean
 }

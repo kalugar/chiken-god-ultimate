@@ -1,5 +1,5 @@
 export * from './movement.system.ts'
-export * from './render.system.ts'
+export * from '../../core/ecs/system/render.system.ts'
 export * from './input.system.ts'
 export * from './dash.system.ts'
 export * from './lifetime.system.ts'

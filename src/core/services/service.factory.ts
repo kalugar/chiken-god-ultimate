@@ -8,8 +8,8 @@ import type {
   Screen
 } from '@app-types'
 
+import { Entity } from '@core/ecs/entity'
 import { defaultComponentRegistry, type ComponentName } from '@ecs/components'
-import { Entity } from '@ecs/entity'
 import { ObjectPool } from '@utils/factory.object.pool'
 import { createView } from '@utils/factory.view.selector'
 import { resolveAnchor } from '@utils/resolver.anchor'

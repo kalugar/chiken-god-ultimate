@@ -1,4 +1,5 @@
-import type { GlobalEvents, InputAction } from '@app-types'
+import type { InputAction } from '@core/types/input.types'
+import type { GlobalEvents } from '@core/types/services.types'
 import type { Container } from 'pixi.js'
 
 import type EventService from './service.events'
@@ -34,11 +35,15 @@ export default class InputService {
     MouseLeft: 'fire'
   }
 
-  constructor(private events: EventService<GlobalEvents>) {
+  constructor(
+    private canvas: HTMLCanvasElement,
+    private events: EventService<GlobalEvents>
+  ) {
     this.bindEvents()
   }
 
   private bindEvents(): void {
+    this.canvas.addEventListener('contextmenu', this.preventContextMenu)
     window.addEventListener('keydown', this.onKeyDown)
     window.addEventListener('keyup', this.onKeyUp)
 
@@ -71,6 +76,11 @@ export default class InputService {
 
     this.mouseX = localPos.x
     this.mouseY = localPos.y
+  }
+
+  // Главный метод для нашей ECS системы
+  public isActionActive(action: InputAction): boolean {
+    return this.activeActions.has(action)
   }
 
   private onWheelScroll = (e: WheelEvent): void => {
@@ -116,7 +126,7 @@ export default class InputService {
     }
   }
 
-  public onPointerMove = (e: PointerEvent): void => {
+  private onPointerMove = (e: PointerEvent): void => {
     this.activePointers.set(e.pointerId, e)
     this.updateScreenCoords(e)
 
@@ -142,9 +152,8 @@ export default class InputService {
     }
   }
 
-  // Главный метод для нашей ECS системы
-  public isActionActive(action: InputAction): boolean {
-    return this.activeActions.has(action)
+  private preventContextMenu = (e: MouseEvent): void => {
+    e.preventDefault()
   }
 
   private handleClear = (): void => {
@@ -179,5 +188,6 @@ export default class InputService {
     window.removeEventListener('blur', this.handleClear)
     window.removeEventListener('contextmenu', this.handleClear)
     window.removeEventListener('wheel', this.onWheelScroll)
+    this.canvas.removeEventListener('contextmenu', this.preventContextMenu)
   }
 }

@@ -1,4 +1,4 @@
-import type { RectangleSize } from '@app-types'
+import type { ScreenSize } from '@core/types/services.types'
 
 import { isResizable } from '@utils/is.resizable'
 
@@ -51,7 +51,7 @@ export class ServiceLocator {
     this.services.clear()
   }
 
-  public resize(newSize: RectangleSize): void {
+  public resize(newSize: ScreenSize): void {
     for (const service of this.getAll()) {
       if (service !== this && isResizable(service)) {
         service.resize(newSize)

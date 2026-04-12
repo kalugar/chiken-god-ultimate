@@ -1,4 +1,4 @@
-import type { TimeEvent } from '@app-types'
+import type { TimeEvent } from '@core/types/services.types'
 
 export default class TimeService {
   private timers: Set<TimeEvent> = new Set()

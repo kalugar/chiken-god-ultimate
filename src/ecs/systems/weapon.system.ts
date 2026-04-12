@@ -1,13 +1,13 @@
 import type { Screen } from '@app-types'
-import type { ServiceLocator } from '@services/locator'
+import type { ServiceLocator } from '@core/services/locator'
 
+import FactoryService from '@core/services/service.factory'
+import ScreenService from '@core/services/service.screen.state'
 import { ComponentId } from '@ecs/components'
-import FactoryService from '@services/service.factory'
-import ScreenService from '@services/service.screens'
 
-import type { Entity } from '../entity'
+import type { Entity } from '../../core/ecs/entity'
 
-import { System } from './system'
+import { System } from '../../core/ecs/system/system'
 
 export class WeaponSystem extends System {
   public readonly includeComponents = [ComponentId.Transform, ComponentId.Weapon]

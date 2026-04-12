@@ -1,4 +1,4 @@
-import type { System } from '@ecs/systems/system'
+import type { System } from '@core/ecs/system/system'
 
 import {
   DashSystem,
