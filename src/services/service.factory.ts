@@ -4,7 +4,8 @@ import type {
   SpawnOverrides,
   PrefabComponents,
   BaseComponents,
-  ViewConfig
+  ViewConfig,
+  Screen
 } from '@app-types'
 
 import { defaultComponentRegistry, type ComponentName } from '@ecs/components'
@@ -15,10 +16,8 @@ import { resolveAnchor } from '@utils/resolver.anchor'
 import { resolveParent } from '@utils/resolver.parent'
 import { Container } from 'pixi.js'
 
-import type { BaseScene } from './service.scenes'
-
 export default class FactoryService {
-  public loadScene(context: BaseScene, config: SceneConfig): void {
+  public loadScene(context: Screen, config: SceneConfig): void {
     // context.schemas.clear()
     // context.pools.clearAll()
 
@@ -39,7 +38,7 @@ export default class FactoryService {
     console.log(`[FactoryService] Сцена загружена. Префабов: ${context.schemas.size}`)
   }
 
-  public spawn(context: BaseScene, prefabId: string, overrides?: SpawnOverrides): Entity | null {
+  public spawn(context: Screen, prefabId: string, overrides?: SpawnOverrides): Entity | null {
     const config = this.getOrCreateConfig(context, prefabId, overrides)
     if (!config) return null
 
@@ -70,7 +69,7 @@ export default class FactoryService {
   }
 
   private getOrCreateConfig(
-    context: BaseScene,
+    context: Screen,
     prefabId: string,
     overrides?: SpawnOverrides
   ): PrefabConfig | undefined {
@@ -86,7 +85,7 @@ export default class FactoryService {
     return config
   }
 
-  private getParent(context: BaseScene, parent?: string | Container) {
+  private getParent(context: Screen, parent?: string | Container) {
     return (
       resolveParent(context, parent) ??
       this.spawn(context, parent as string)?.get('View')?.node ??
@@ -95,7 +94,7 @@ export default class FactoryService {
   }
 
   private processComponent(
-    context: BaseScene,
+    context: Screen,
     entity: Entity,
     prefabId: string,
     config: PrefabConfig,
@@ -126,7 +125,7 @@ export default class FactoryService {
     }
   }
 
-  private initPool(context: BaseScene, prefabId: string, config: PrefabConfig): void {
+  private initPool(context: Screen, prefabId: string, config: PrefabConfig): void {
     const viewConfig = config?.components?.View
     if (!viewConfig) {
       console.warn(`[initPool] Пропуск пула для "${prefabId}": нет конфига или компонента View.`)
@@ -165,7 +164,7 @@ export default class FactoryService {
   }
 
   private attachView(
-    context: BaseScene,
+    context: Screen,
     entity: Entity,
     prefabId: string,
     config: PrefabConfig,

@@ -1,0 +1,171 @@
+{
+  "bundles": [
+    {
+      "name": "default",
+      "assets": [
+        {
+          "alias": [
+            "fonts/AngelBanditDemoRegular.ttf",
+            "fonts/AngelBanditDemoRegular",
+            "AngelBanditDemoRegular.ttf",
+            "AngelBanditDemoRegular"
+          ],
+          "src": [
+            "fonts/AngelBanditDemoRegular.ttf"
+          ],
+          "data": {
+            "tags": {}
+          }
+        },
+        {
+          "alias": [
+            "fonts/MagicSchoolOne.ttf",
+            "fonts/MagicSchoolOne",
+            "MagicSchoolOne.ttf",
+            "MagicSchoolOne"
+          ],
+          "src": [
+            "fonts/MagicSchoolOne.ttf"
+          ],
+          "data": {
+            "tags": {}
+          }
+        },
+        {
+          "alias": [
+            "fonts/MagicSchoolTwo.ttf",
+            "fonts/MagicSchoolTwo",
+            "MagicSchoolTwo.ttf",
+            "MagicSchoolTwo"
+          ],
+          "src": [
+            "fonts/MagicSchoolTwo.ttf"
+          ],
+          "data": {
+            "tags": {}
+          }
+        },
+        {
+          "alias": [
+            "fonts/PowerofDragon-Regular.ttf",
+            "fonts/PowerofDragon-Regular",
+            "PowerofDragon-Regular.ttf",
+            "PowerofDragon-Regular"
+          ],
+          "src": [
+            "fonts/PowerofDragon-Regular.ttf"
+          ],
+          "data": {
+            "tags": {}
+          }
+        },
+        {
+          "alias": [
+            "fonts/RINGM.ttf",
+            "fonts/RINGM",
+            "RINGM.ttf",
+            "RINGM"
+          ],
+          "src": [
+            "fonts/RINGM.ttf"
+          ],
+          "data": {
+            "tags": {}
+          }
+        },
+        {
+          "alias": [
+            "images/favicon.png",
+            "images/favicon",
+            "favicon.png",
+            "favicon"
+          ],
+          "src": [
+            "images/favicon.webp",
+            "images/favicon.png"
+          ],
+          "data": {
+            "tags": {}
+          }
+        }
+      ]
+    },
+    {
+      "name": "loading",
+      "assets": [
+        {
+          "alias": [
+            "images/loading/logo_gold.png",
+            "images/loading/logo_gold",
+            "logo_gold.png",
+            "logo_gold"
+          ],
+          "src": [
+            "images/loading/logo_gold.webp",
+            "images/loading/logo_gold.png"
+          ],
+          "data": {
+            "tags": {
+              "m": true
+            }
+          }
+        },
+        {
+          "alias": [
+            "images/loading/logo_iron.png",
+            "images/loading/logo_iron",
+            "logo_iron.png",
+            "logo_iron"
+          ],
+          "src": [
+            "images/loading/logo_iron.webp",
+            "images/loading/logo_iron.png"
+          ],
+          "data": {
+            "tags": {
+              "m": true
+            }
+          }
+        },
+        {
+          "alias": [
+            "images/loading/logo_steel.png",
+            "images/loading/logo_steel",
+            "logo_steel.png",
+            "logo_steel"
+          ],
+          "src": [
+            "images/loading/logo_steel.webp",
+            "images/loading/logo_steel.png"
+          ],
+          "data": {
+            "tags": {
+              "m": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "shared",
+      "assets": [
+        {
+          "alias": [
+            "images/shared/player_idle",
+            "player_idle"
+          ],
+          "src": [
+            "images/shared/player_idle@0.5x.json",
+            "images/shared/player_idle.json"
+          ],
+          "data": {
+            "tags": {
+              "m": true,
+              "tps": true
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -14,12 +14,12 @@ export class BaseLayer extends Container {
 
 export class AbsoluteLayer extends BaseLayer {
   resize(_size: RectangleSize): void {
-    // const { width, height, scale } = size
-    // //ниже обработать слой как того требует необходимость
-    // this.scale.set(scale)
-    // const x = width / 2
-    // const y = height / 2
-    // this.position.set(x, y)
+    const { width, height, scale } = _size
+    //ниже обработать слой как того требует необходимость
+    this.scale.set(scale)
+    const x = width / 2
+    const y = height / 2
+    this.position.set(x, y)
   }
 }
 

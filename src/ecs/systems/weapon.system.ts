@@ -1,8 +1,9 @@
+import type { Screen } from '@app-types'
 import type { ServiceLocator } from '@services/locator'
 
 import { ComponentId } from '@ecs/components'
 import FactoryService from '@services/service.factory'
-import { BaseScene, SceneService } from '@services/service.scenes'
+import ScreenService from '@services/service.screens'
 
 import type { Entity } from '../entity'
 
@@ -11,14 +12,14 @@ import { System } from './system'
 export class WeaponSystem extends System {
   public readonly includeComponents = [ComponentId.Transform, ComponentId.Weapon]
   private factory!: FactoryService
-  private sceneService!: SceneService
-  private activeScene!: BaseScene
+  private sceneService!: ScreenService
+  private activeScreen!: Screen
 
   public injectServices(services: ServiceLocator): void {
     super.injectServices(services)
     this.factory = this.services.get(FactoryService)
-    this.sceneService = this.services.get(SceneService)
-    this.activeScene = this.sceneService.getActiveScene()
+    this.sceneService = this.services.get(ScreenService)
+    this.activeScreen = this.sceneService.getActiveScreen()
   }
 
   protected update(delta: number, entity: Entity): void {
@@ -47,7 +48,7 @@ export class WeaponSystem extends System {
         finalVx = (rawVx / length) * weapon.bulletSpeed
         finalVy = (rawVy / length) * weapon.bulletSpeed
       }
-      this.factory.spawn(this.activeScene, 'bullet', {
+      this.factory.spawn(this.activeScreen, 'bullet', {
         x: transform.x,
         y: transform.y,
         rotation: Math.atan2(finalVy, finalVx),

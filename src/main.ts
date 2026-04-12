@@ -13,3 +13,5 @@ try {
 }
 
 await startLevel(engine.dispatcher)
+
+console.log(engine.services)

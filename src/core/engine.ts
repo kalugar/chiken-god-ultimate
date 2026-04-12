@@ -9,7 +9,7 @@ import FactoryService from '@services/service.factory'
 import PoolService from '@services/service.object.pool'
 import RegistryService from '@services/service.registry'
 import ResizeService from '@services/service.resize'
-import { SceneService } from '@services/service.scenes'
+import ScreenService from '@services/service.screens'
 import SystemTimeService from '@services/service.system.time'
 import TimeService from '@services/service.time'
 import InputService from '@services/services.input'
@@ -55,6 +55,9 @@ export class Engine {
     this.bindEvents()
 
     this.state.isRunning = true
+
+    // const gameMachine = this.services.get(GameMachine)
+    // await gameMachine.bootGame()
   }
 
   private initServices(): void {
@@ -71,7 +74,7 @@ export class Engine {
     // 2. Визуальные сервисы
     const layers = new LayersService(this.app.stage, { defaultList: true })
     this.services.register(LayersService, layers)
-    this.services.register(SceneService, new SceneService())
+    this.services.register(ScreenService, new ScreenService())
 
     const worldLayer = layers.getLayerByLabel('world')
     this.services.register(CameraService, new CameraService(worldLayer))

@@ -1,0 +1,188 @@
+{
+  "frames": {
+    "08.png": {
+      "frame": {
+        "x": 2,
+        "y": 2,
+        "w": 51,
+        "h": 86
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 13,
+        "y": 0,
+        "w": 51,
+        "h": 86
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 86
+      }
+    },
+    "07.png": {
+      "frame": {
+        "x": 55,
+        "y": 2,
+        "w": 60,
+        "h": 84
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 3,
+        "y": 0,
+        "w": 60,
+        "h": 84
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 86
+      }
+    },
+    "06.png": {
+      "frame": {
+        "x": 2,
+        "y": 90,
+        "w": 56,
+        "h": 86
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 56,
+        "h": 86
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 86
+      }
+    },
+    "05.png": {
+      "frame": {
+        "x": 117,
+        "y": 2,
+        "w": 52,
+        "h": 86
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 11,
+        "y": 0,
+        "w": 52,
+        "h": 86
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 86
+      }
+    },
+    "04.png": {
+      "frame": {
+        "x": 2,
+        "y": 148,
+        "w": 53,
+        "h": 86
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 5,
+        "y": 0,
+        "w": 53,
+        "h": 86
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 86
+      }
+    },
+    "03.png": {
+      "frame": {
+        "x": 90,
+        "y": 90,
+        "w": 61,
+        "h": 86
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 3,
+        "y": 0,
+        "w": 61,
+        "h": 86
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 86
+      }
+    },
+    "02.png": {
+      "frame": {
+        "x": 171,
+        "y": 2,
+        "w": 60,
+        "h": 86
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 4,
+        "y": 0,
+        "w": 60,
+        "h": 86
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 86
+      }
+    },
+    "01.png": {
+      "frame": {
+        "x": 153,
+        "y": 90,
+        "w": 50,
+        "h": 86
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 5,
+        "y": 0,
+        "w": 50,
+        "h": 86
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 86
+      }
+    }
+  },
+  "animations": {
+    "": [
+      "01.png",
+      "02.png",
+      "03.png",
+      "04.png",
+      "05.png",
+      "06.png",
+      "07.png",
+      "08.png"
+    ]
+  },
+  "meta": {
+    "app": "http://github.com/pixijs/assetpack",
+    "version": "1.0",
+    "image": "player_idle@0.5x.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 233,
+      "h": 203
+    },
+    "scale": 0.5,
+    "related_multi_packs": []
+  }
+}
