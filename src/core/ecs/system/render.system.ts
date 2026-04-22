@@ -20,10 +20,8 @@ export class RenderSystem extends System {
     const transform = entity.require('Transform')
     const view = entity.require('View')
 
-    if (view.node) {
-      view.node.x = transform.x
-      view.node.y = transform.y
-      view.node.rotation = transform.rotation
-    }
+    view.node.x = transform.x
+    view.node.y = transform.y
+    view.node.rotation = transform.rotation
   }
 }

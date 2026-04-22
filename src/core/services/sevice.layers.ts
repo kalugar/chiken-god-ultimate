@@ -1,4 +1,4 @@
-import type { LayersOptions, ScreenSize } from '@core/types/services.types'
+import type { LayersOptions, ScreenSize } from '@core/types'
 
 import { Container, Graphics } from 'pixi.js'
 

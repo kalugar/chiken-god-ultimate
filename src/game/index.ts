@@ -1,7 +1,7 @@
 import type { SystemDispatcher } from '@core/ecs/dispatcher'
 
 import CameraService from '@core/services/service.camera'
-import FactoryService from '@core/services/service.factory'
+import FactoryService from '@core/services/service.factory.ecs'
 import PoolService from '@core/services/service.object.pool'
 import RegistryService from '@core/services/service.registry'
 import ResizeService from '@core/services/service.resize'

@@ -1,8 +1,8 @@
-import type { ComponentName, ComponentRegistry } from '@core/types/ecs.types'
+import type { ComponentName, ComponentRegistry } from '@core/types'
 
 import type { ComponentController } from '../component/controller'
 
-import { BitSet } from '../utils/bitset'
+import { BitSet } from '../../utils/bitset'
 export class Entity {
   private components: unknown[] = []
   public id: number

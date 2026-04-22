@@ -1,6 +1,6 @@
-import type { ComponentData, ComponentName } from '@core/types/ecs.types'
+import type { ComponentData, ComponentName } from '@core/types'
 
-import { BitSet } from '../utils/bitset'
+import { BitSet } from '../../utils/bitset'
 
 export class ComponentController {
   private idCounter = 0

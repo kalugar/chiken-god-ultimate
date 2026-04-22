@@ -1,4 +1,3 @@
-import type { RectangleSize } from '@app-types'
 import type { ServiceLocator } from '@core/services/locator'
 
 import type { System } from './system/system'
@@ -37,12 +36,6 @@ export class SystemDispatcher {
   public update(deltaInSeconds: number): void {
     for (let i = 0; i < this.systems.length; i++) {
       this.systems[i].execute(deltaInSeconds)
-    }
-  }
-
-  public resize(newSize: RectangleSize): void {
-    for (let i = 0; i < this.systems.length; i++) {
-      this.systems[i].resize?.(newSize)
     }
   }
 }

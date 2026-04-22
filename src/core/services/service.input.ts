@@ -1,5 +1,4 @@
-import type { InputAction } from '@core/types/input.types'
-import type { GlobalEvents } from '@core/types/services.types'
+import type { InputAction, GlobalEvents } from '@core/types'
 import type { Container } from 'pixi.js'
 
 import type EventService from './service.events'

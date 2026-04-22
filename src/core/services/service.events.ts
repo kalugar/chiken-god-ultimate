@@ -1,6 +1,4 @@
-// src/services/service.events.ts
-
-import type { EventHandler } from '@core/types/services.types'
+import type { EventHandler } from '@core/types'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default class EventService<Events extends Record<string, any>> {

@@ -15,6 +15,7 @@ export interface Screen {
 }
 
 export type ScreenPipelineConfig = {
+  type: ScreenType
   label: string
   layer: string
   Class: new (label: string) => Screen

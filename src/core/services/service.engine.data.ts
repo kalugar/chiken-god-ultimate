@@ -1,4 +1,4 @@
-import type { EngineConfig } from '@core/types/engine.types'
+import type { EngineConfig } from '@core/types'
 import type { Application } from 'pixi.js'
 
 export default class EngineDataService {

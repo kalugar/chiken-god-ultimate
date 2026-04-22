@@ -1,12 +1,12 @@
 import type { EngineState, GlobalEvents, TimeEvent } from '@app-types'
 import type { ApplicationOptions, Container } from 'pixi.js'
 
+import FactoryECSService from '@core/services/service.factory.ecs'
 import ScreenService from '@core/services/service.screen.state'
 import { SystemDispatcher } from '@ecs/dispatcher'
 import { ServiceLocator } from '@services/locator'
 import CameraService from '@services/service.camera'
 import EventService from '@services/service.events'
-import FactoryService from '@services/service.factory'
 import PoolService from '@services/service.object.pool'
 import RegistryService from '@services/service.registry'
 import ResizeService from '@services/service.resize'

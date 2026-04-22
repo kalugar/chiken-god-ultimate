@@ -1,5 +1,5 @@
 import type { ComponentController } from '@core/ecs/component/controller'
-import type { ComponentName, ComponentRegistry } from '@core/types/ecs.types'
+import type { ComponentName, ComponentRegistry } from '@core/types'
 
 import { Entity } from '@core/ecs/entity' // Твой класс сущности
 // src/services/service.registry.ts

@@ -17,7 +17,9 @@ import {
   Sprite,
   Text,
   TilingSprite,
-  type FillInput
+  ViewContainer,
+  type FillInput,
+  type ViewContainerOptions
 } from 'pixi.js'
 
 // import { bakeTTF, getFontFamily, stringifyFontFamily } from './font.processor'
@@ -87,6 +89,10 @@ export interface PrefabConfig {
   components: PrefabComponents
 }
 
+export interface WidgetConfig extends ViewContainerOptions {
+  layer?: string
+}
+
 export interface SpawnOverrides {
   x?: number
   y?: number
@@ -96,4 +102,41 @@ export interface SpawnOverrides {
   components?: PrefabComponents
 }
 
-export type SceneConfig = Record<string, PrefabConfig>
+// export type SceneConfig = Record<string, PrefabConfig>
+
+export interface ScreenConfig {
+  entities?: Record<string, PrefabConfig>
+  ui?: Record<string, WidgetConfig>
+}
+
+export type GameConfig = Record<string, ScreenConfig>
+
+export interface BaseScreen {
+  readonly label: string
+  refs: Map<string, ViewContainer>
+  schemas: Map<string, PrefabConfig>
+
+  init(): void
+  enter(): Promise<void>
+  exit(): Promise<void>
+  destroy(): void
+}
+
+export interface BaseWidget extends BaseScreen {
+  readonly view: Container
+}
+
+export interface LoadScreen extends BaseWidget {
+  show(): void
+  hide(): void
+  updateProgress(progress: number): void
+  awaitAnimation(): Promise<void>
+}
+
+export type ScreenPipelineConfig = {
+  label: string
+  layer: string
+  Class: new (label: string) => BaseScreen | BaseWidget
+  bundles?: string[]
+  keepBundlesOnExit?: boolean
+}

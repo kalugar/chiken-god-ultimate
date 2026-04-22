@@ -1,5 +1,4 @@
-// src/services/service.camera.ts
-import type { CameraOptions, IResizable, RectangleSize } from '@app-types'
+import type { CameraOptions, IResizable, ScreenSize } from '@core/types'
 
 import { Container } from 'pixi.js'
 
@@ -156,7 +155,7 @@ export default class CameraService implements IResizable {
     this.worldLayer.y = this.screenHeight / 2 - (this.y + offsetY) * this.currentZoom
   }
 
-  public resize(newSize: RectangleSize): void {
+  public resize(newSize: ScreenSize): void {
     const { width, height } = newSize
     this.screenWidth = width
     this.screenHeight = height

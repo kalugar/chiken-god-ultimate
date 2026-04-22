@@ -1,7 +1,7 @@
 import type { Screen } from '@app-types'
 import type { ServiceLocator } from '@core/services/locator'
 
-import FactoryService from '@core/services/service.factory'
+import FactoryService from '@core/services/service.factory.ecs'
 import ScreenService from '@core/services/service.screen.state'
 import { ComponentId } from '@ecs/components'
 

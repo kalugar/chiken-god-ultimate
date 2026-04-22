@@ -4,6 +4,10 @@ export type ScreenSize = {
   scale: number
 }
 
+export interface IResizable {
+  resize(newSize: ScreenSize): void
+}
+
 export type TimeEvent = {
   callback: () => void
   delay: number
@@ -32,4 +36,21 @@ export type EventHandler<T = any> = (payload: T) => void
 
 export type LayersOptions = {
   defaultList?: boolean
+}
+
+export type CameraOptions = {
+  smoothness: number
+
+  target: { x: number; y: number } | null
+
+  x: number
+  y: number
+
+  currentZoom: number
+  minZoom: number
+  maxZoom: number
+  zoomSmoothness: number
+
+  shakeIntensity: number
+  shakeDecay: number
 }

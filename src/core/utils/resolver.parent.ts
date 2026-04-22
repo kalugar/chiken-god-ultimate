@@ -1,8 +1,7 @@
+import type { Screen } from '@app-types'
 import type { Container } from 'pixi.js'
 
-import type { Scene } from '../types/screen.types'
-
-export function resolveParent(scene: Scene, parentPrefab?: string | Container): Container | null {
+export function resolveParent(scene: Screen, parentPrefab?: string | Container): Container | null {
   // 1. Если передали готовый инстанс Container — просто возвращаем его
   if (parentPrefab && typeof parentPrefab !== 'string') {
     return parentPrefab

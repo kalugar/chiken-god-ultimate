@@ -1,6 +1,6 @@
-import type { ScreenSize } from '@core/types/services.types'
+import type { ScreenSize } from '@core/types'
 
-import { isResizable } from '@utils/is.resizable'
+import { isResizable } from '@core/utils/is.resizable'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ServiceToken<T = any> = abstract new (...args: any[]) => T

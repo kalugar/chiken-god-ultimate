@@ -1,4 +1,3 @@
-import type { RectangleSize } from '@app-types'
 import type { ComponentName } from '@core/types/ecs.types'
 
 import RegistryService from '@core/services/service.registry'
@@ -48,6 +47,4 @@ export abstract class System {
 
   // Метод, который обязан реализовать разработчик игры
   protected abstract update(delta: number, entity: Entity): void
-
-  public resize(_newSize: RectangleSize): void {}
 }

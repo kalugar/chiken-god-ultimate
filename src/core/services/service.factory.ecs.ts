@@ -9,14 +9,23 @@ import type {
 } from '@app-types'
 
 import { Entity } from '@core/ecs/entity'
+import { ObjectPool } from '@core/utils/factory.object.pool'
+import { createView } from '@core/utils/factory.view.selector'
+import { resolveAnchor } from '@core/utils/resolver.anchor'
+import { resolveParent } from '@core/utils/resolver.parent'
 import { defaultComponentRegistry, type ComponentName } from '@ecs/components'
-import { ObjectPool } from '@utils/factory.object.pool'
-import { createView } from '@utils/factory.view.selector'
-import { resolveAnchor } from '@utils/resolver.anchor'
-import { resolveParent } from '@utils/resolver.parent'
 import { Container } from 'pixi.js'
 
-export default class FactoryService {
+import type PoolService from './service.object.pool'
+import type RegistryService from './service.registry'
+import type LayersService from './sevice.layers'
+
+export default class FactoryECSService {
+  constructor(
+    private readonly layers: LayersService,
+    private readonly registry: RegistryService,
+    private readonly pool: PoolService
+  ) {}
   public loadScene(context: Screen, config: SceneConfig): void {
     // context.schemas.clear()
     // context.pools.clearAll()
@@ -38,11 +47,11 @@ export default class FactoryService {
     console.log(`[FactoryService] Сцена загружена. Префабов: ${context.schemas.size}`)
   }
 
-  public spawn(context: Screen, prefabId: string, overrides?: SpawnOverrides): Entity | null {
+  public spawn( prefabId: string, overrides?: SpawnOverrides): Entity | null {
     const config = this.getOrCreateConfig(context, prefabId, overrides)
     if (!config) return null
 
-    const entity = context.registry.createEntity()
+    const entity = this.registry.createEntity()
     if (!entity) return null
 
     if (config.components) {
